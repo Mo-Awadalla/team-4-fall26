@@ -13,6 +13,7 @@ a curated campus list, which is most of them.
 from __future__ import annotations
 
 from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector, SearchVectorField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Upper
@@ -120,6 +121,27 @@ class StudySpot(models.Model):
         ),
     )
 
+    #: What free-text search matches against, maintained by Postgres rather
+    #: than by application code: a generated column cannot fall out of step with
+    #: the row the way a column the loader has to remember to update can.
+    #:
+    #: The weights are the ranking. A query word found in the name (A) counts for
+    #: more than the same word in the campus (B), the neighborhood (C) or the
+    #: address (D), so "Washington" ranks a library called Washington above one
+    #: on Washington Street. Campus is weighted second because it is the field
+    #: that makes a search for a university find its buildings: 14 spots relate
+    #: to NYU and only 3 say so in their name.
+    search_vector = models.GeneratedField(
+        expression=(
+            SearchVector("name", weight="A", config="english")
+            + SearchVector("university", weight="B", config="english")
+            + SearchVector("neighborhood", weight="C", config="english")
+            + SearchVector("address", weight="D", config="english")
+        ),
+        output_field=SearchVectorField(),
+        db_persist=True,
+    )
+
     class Meta:
         db_table = "spots"
         verbose_name = "study spot"
@@ -172,6 +194,12 @@ class StudySpot(models.Model):
                 opclasses=["gin_trgm_ops"],
                 name="spots_neighborhood_trgm_idx",
             ),
+            # Full-text search is the other half of spots/search.py, and the
+            # reason the column is persisted rather than computed per query:
+            # search now runs on a debounced keystroke, so recomputing four
+            # to_tsvector calls per row per request would be work repeated for
+            # every letter typed.
+            GinIndex(fields=["search_vector"], name="spots_search_idx"),
         ]
 
     def __str__(self) -> str:

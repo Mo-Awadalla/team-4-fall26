@@ -8,7 +8,7 @@ No route has a trailing slash, and the application does not redirect one onto th
 
 | Route | Purpose |
 |---|---|
-| `GET /health/live` | Reports whether the API process can serve requests. It intentionally does not contact Postgres or Meilisearch. |
+| `GET /health/live` | Reports whether the API process can serve requests. It intentionally does not contact Postgres. |
 | `GET /spots` | Returns a filtered, paginated page of study spots. |
 | `GET /spots/{id}` | Returns one study spot. |
 
@@ -188,27 +188,67 @@ The difference matters at the search box. `GET /spots` answers "does this
 match": `?name=libary` returns nothing, and so does `?name=NYPL`. `search`
 answers "which of these is closest", so both find what the person meant.
 
-Because a prefix scores highly, the endpoint also serves search-as-you-type:
-`bob` ranks *Elmer Holmes Bobst Library* without anything being submitted, so a
-client can call it on a debounced keystroke rather than only on a form submit.
+### Two passes
 
-Scoring is a few rules rather than one opaque number. An exact name scores
-highest, then a prefix, then a substring, then an exact neighborhood. Below
-those, Postgres trigram similarity compares the query against the best-matching
-run of words in the name, which is what tolerates a misspelling and what lets a
-fragment of a long title match -- `bobst` finds *Elmer Holmes Bobst Library*. A
-neighborhood match scores lower than a name match, so a place *called*
-Greenpoint outranks a place *in* Greenpoint.
+Finding every word someone typed and surviving a misspelling pull in opposite
+directions, so they are separate passes and the order is the design.
 
-Results below a relevance of 0.45 are dropped, so an unrelated query returns
-nothing rather than everything in an arbitrary order. That figure was measured
-rather than chosen: a one-character typo in a seven-letter word scores 0.5, and
-unrelated words sit near 0.33.
+**Full text runs first.** The query goes through `websearch_to_tsquery` and
+every word has to appear somewhere in the row, matched against four fields that
+count for different amounts:
+
+| Field | Weight | Why |
+|---|---|---|
+| `name` | highest | what the place is called is almost always what was meant |
+| `university` | second | the field that makes a campus find its buildings |
+| `neighborhood` | third | where it is, not what it is |
+| `address` | lowest | a place *called* Washington beats the places *on* Washington Street |
+
+Requiring every word is what keeps `library bobst` to the one library it
+describes. Scoring the query against the best-matching run of words instead --
+which is what the trigram pass does -- gave it 170 results, because "library"
+alone matches every library in the city.
+
+Weighting `university` is the other half. It is proximity rather than
+affiliation, but it is the only field that connects a campus to the buildings
+around it: in the current snapshot 14 spots relate to NYU and just 3 say so in
+their name, so searching names alone missed 11 of them.
+
+Because this pass is `websearch_to_tsquery`, it inherits that parser's syntax
+for free: `"washington square"` in quotes must match as a phrase, and a leading
+`-` excludes, so `library -bobst` is every library except that one. Neither can
+raise a syntax error on something typed into a box.
+
+**Trigrams run only if that found nothing.** A misspelling produces a word
+Postgres has never indexed, so full text cannot match `libary` at all. The
+fallback compares the query against the best-matching run of words in the name,
+and the same lower-weighted against the neighborhood, dropping anything below a
+relevance of 0.45.
+
+That figure was measured rather than chosen: a one-character typo in a
+seven-letter word scores 0.5, and unrelated words sit near 0.33. At 0.6
+`libary` matches nothing, which is the failure the pass exists to prevent.
+
+Running the passes the other way round would undo the first one -- a typo-
+tolerant match on "library" would bury the exact hit for `library bobst` -- so
+the fuzzy pass only ever runs when the precise one has already failed. Choosing
+between them costs one `EXISTS`; the alternative is blending a rank that
+measures *where* a word was found with a similarity that measures *how close*
+it was, into one number nobody could reason about.
+
+### Initialisms
 
 An initialism is expanded before the query reaches Postgres, because no fuzzy
 algorithm connects `NYPL` to `New York Public Library` -- they share almost no
-trigrams. The list is in `spots/search.py` and expands only when the whole query
-is an initialism.
+trigrams. Every word is expanded, so `nyu library` becomes `New York University
+library` and means it. The list is in `spots/search.py`.
+
+### As you type
+
+A prefix scores highly and the full-text pass is indexed, so this endpoint also
+serves search-as-you-type: `bob` ranks *Elmer Holmes Bobst Library* without
+anything being submitted. The browser calls it on a debounced keystroke rather
+than only on submit.
 
 The relevance score is not in the response. It exists to order results, and
 publishing it would be a number the contract has to keep stable for no one's

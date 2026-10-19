@@ -43,7 +43,7 @@ studyspot/
 │       ├── package.json
 │       └── bun.lock
 ├── tests/e2e/                   # Full browser-to-API tests
-├── compose.yaml                 # Local frontend, API, Postgres, and Meilisearch services
+├── compose.yaml                 # Local frontend, API, and Postgres services
 ├── flake.nix                    # Pinned Nix development environment
 └── justfile                     # Canonical development commands
 ```
@@ -82,8 +82,7 @@ and `refactor/`.
   state. Copy `.env.example` to `.env` only when local overrides are needed.
 - Changing a model means committing its migration. `just django-check` fails when the two
   disagree, and it runs as part of `just check`.
-- Use `just clean` carefully: it stops the Compose services and deletes their Postgres and
-  Meilisearch volumes.
+- Use `just clean` carefully: it stops the Compose services and deletes the Postgres volume.
 
 Write small commits in the imperative mood:
 

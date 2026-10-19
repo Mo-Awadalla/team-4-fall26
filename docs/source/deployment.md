@@ -72,7 +72,7 @@ Two things are worth repeating because they are easy to discover too late:
 
 Locally the same step is `just load-data`, after `just start-db` and `just migrate`. The Compose backend runs migrations itself on startup but does not load data, so a fresh volume serves an empty page until you load one.
 
-Search needs no separate deployed component. Ranking is Postgres trigram similarity through the `pg_trgm` extension, so the only deployment step it requires is the migration that creates the extension and its GIN indexes. Meilisearch remains in the local Compose topology as a starting point should the project outgrow that, and is not a deployed dependency.
+Search needs no separate deployed component. It is Postgres full text over a generated `tsvector` column, with `pg_trgm` similarity behind it for misspellings, so the only deployment step it requires is the migration that creates the column, the extension and their GIN indexes.
 
 While every record comes from the normalized public snapshot, any environment's database can be cleared and reloaded. Once StudySpot stores corrections, favorites, accounts, import cursors, or other non-reproducible state, backups and backward-compatible migrations become release requirements.
 

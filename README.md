@@ -5,7 +5,7 @@
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data.
 
 > [!IMPORTANT]
-> StudySpot is deployed and working. `data/spots.json` holds 390 real libraries, campuses, and campus buildings, 206 of them with a free public Wi-Fi hotspot nearby. Search ranks results with Postgres trigram similarity, so it tolerates misspellings and expands initialisms like `nypl`. Results filter by borough, type, campus, and Wi-Fi. The city's facilities database lists no cafés, so the published `cafe` category has no source yet; a spot detail page is the other notable gap.
+> StudySpot is deployed and working. `data/spots.json` holds 390 real libraries, campuses, and campus buildings, 206 of them with a free public Wi-Fi hotspot nearby. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. The city's facilities database lists no cafés, so the published `cafe` category has no source yet; a spot detail page is the other notable gap.
 
 ## How will it work?
 
@@ -17,7 +17,7 @@ Browser -> SvelteKit -> Django REST Framework -> Postgres
 NYC Open Data -> ingest.py -> spots.json -> Postgres
 ```
 
-The [Svelte 5](https://svelte.dev/) frontend owns the search experience. A [Django](https://www.djangoproject.com/) application with [Django REST Framework](https://www.django-rest-framework.org/) provides the HTTP boundary, and one model defines the study spot that the routes, the loader, and the search ranking all share. [Postgres](https://www.postgresql.org/) is both the serving database and the search engine: the `pg_trgm` extension scores candidates by trigram similarity behind a GIN index, which is ample for a few hundred records and removes a moving part from the deployment. The normalized NYC Open Data snapshot remains the reproducible source used to load it.
+The [Svelte 5](https://svelte.dev/) frontend owns the search experience. A [Django](https://www.djangoproject.com/) application with [Django REST Framework](https://www.django-rest-framework.org/) provides the HTTP boundary, and one model defines the study spot that the routes, the loader, and the search ranking all share. [Postgres](https://www.postgresql.org/) is both the serving database and the search engine, and deliberately the only one. Full-text search over a generated, weighted `tsvector` column finds every word someone typed across the name, campus, neighborhood and address; `pg_trgm` similarity sits behind it for the misspellings full text cannot match. Both are GIN-indexed, which is ample for a few hundred records and removes a moving part from the deployment. The normalized NYC Open Data snapshot remains the reproducible source used to load it.
 
 Local development uses Docker Compose for the browser app, the API, and Postgres. The same Postgres is published on `127.0.0.1:5432`, so a backend run outside Compose uses the same database as one run inside it. On [AWS](https://aws.amazon.com/) the same application runs against the same schema: the API is a Lambda function behind CloudFront, with an RDS Postgres instance in private subnets.
 
@@ -45,7 +45,7 @@ Four routes are available alongside `GET /health/live`, none of them with a trai
 | Route | Purpose |
 |---|---|
 | `GET /spots` | Pages with `limit` and `offset`; filters on `name`, `category`, `neighborhood`, `borough`, `university`, and `free_public_wifi` |
-| `GET /spots/search?q=` | Ranks instead of filtering, tolerating misspellings and expanding initialisms; accepts the same filters |
+| `GET /spots/search?q=` | Ranks instead of filtering, across name, campus, neighborhood and address; tolerates misspellings, expands initialisms, and accepts the same filters |
 | `GET /spots/facets` | The values the filter controls offer, with counts |
 | `GET /spots/{id}` | One spot |
 
@@ -95,8 +95,6 @@ Once healthy, the services are available at:
 | API liveness | <http://localhost:7501/health/live> |
 | Documentation (`just docs`) | <http://localhost:7503> |
 | Postgres | `127.0.0.1:5432` |
-
-Compose also starts Meilisearch on <http://localhost:7502>. Nothing talks to it: search runs in Postgres, and the service is held in Compose only as a starting point should the project outgrow trigram ranking.
 
 The backend applies its migrations before it starts serving, so a fresh checkout gets a working schema without a separate step. Follow logs with `just logs`, stop services while preserving local data with `just shutdown`, or remove the data volumes with `just clean`.
 
@@ -178,7 +176,7 @@ Useful starting points include the [architecture](docs/source/architecture.md), 
 - **Frontend:** Svelte 5, TypeScript, SvelteKit, Vite, Tailwind CSS, Bun
 - **Backend:** Python 3.12, Django 5.2, Django REST Framework, uv
 - **Data source:** NYC Open Data
-- **Database and search:** Postgres with `pg_trgm` — a container locally, Amazon RDS on AWS
+- **Database and search:** Postgres, with full-text search and `pg_trgm` — a container locally, Amazon RDS on AWS
 - **Deployment:** AWS (CloudFront, S3, API Gateway, Lambda, RDS) with Terraform
 - **Operations:** Nix, Docker Compose, just, pre-commit, GitHub Actions
 - **Checks:** Prettier, ESLint, svelte-check, Ruff, ty, pytest, Django system checks, `terraform validate`
