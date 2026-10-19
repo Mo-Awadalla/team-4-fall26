@@ -18,6 +18,7 @@ studyspot/
 │   └── branch-protection.json   # Required checks and protected-branch settings
 ├── contracts/                   # Shared schemas and representative API data
 ├── data/                        # NYC Open Data ingestion and normalized spots snapshot
+│   ├── fixtures/                # Trimmed upstream records, so the importer tests need no network
 │   ├── ingest.py
 │   ├── spots.json
 │   └── test_ingest.py
