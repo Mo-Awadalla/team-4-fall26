@@ -64,12 +64,30 @@ def hotspots() -> list[dict[str, Any]]:
 
 
 @pytest.fixture(scope="module")
+def cafes() -> list[dict[str, Any]]:
+    return ingest.fixture_rows(FIXTURES, "cafes")
+
+
+@pytest.fixture(scope="module")
 def spots(
     facilities: list[dict[str, Any]],
     names: dict[str, str],
     hotspots: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    return ingest.normalize(facilities, names, hotspots)
+    """The facility half of the snapshot. Cafes have their own fixture below."""
+    return ingest.normalize(facilities, [], names, hotspots)
+
+
+@pytest.fixture(scope="module")
+def cafe_spots(
+    cafes: list[dict[str, Any]],
+    names: dict[str, str],
+) -> list[dict[str, Any]]:
+    return [
+        spot
+        for spot in ingest.normalize([], cafes, names, [])
+        if spot["category"] == ingest.CAFE_CATEGORY
+    ]
 
 
 def upstream(facilities: list[dict[str, Any]], facname: str) -> dict[str, Any]:
@@ -109,14 +127,14 @@ class TestIdentifiers:
             "address": "224 E 125 STREET",
             "latitude": "40.8030269999",
         }
-        assert ingest.normalize([edited], names, [])[0]["id"] == PUBLISHED_EXAMPLE["id"]
+        assert ingest.normalize([edited], [], names, [])[0]["id"] == PUBLISHED_EXAMPLE["id"]
 
     def test_a_repeated_upstream_key_is_an_error(
         self, facilities: list[dict[str, Any]], names: dict[str, str]
     ) -> None:
         record = upstream(facilities, "125TH STREET LIBRARY")
         with pytest.raises(ingest.IngestError, match="Duplicate identifier"):
-            ingest.normalize([record, {**record, "facname": "SOMEWHERE ELSE"}], names, [])
+            ingest.normalize([record, {**record, "facname": "SOMEWHERE ELSE"}], [], names, [])
 
     def test_a_record_without_an_upstream_key_is_an_error(
         self, facilities: list[dict[str, Any]], names: dict[str, str]
@@ -124,7 +142,7 @@ class TestIdentifiers:
         record = upstream(facilities, "125TH STREET LIBRARY")
         del record["uid"]
         with pytest.raises(ingest.IngestError, match="no uid"):
-            ingest.normalize([record], names, [])
+            ingest.normalize([record], [], names, [])
 
 
 class TestCategories:
@@ -195,14 +213,14 @@ class TestAbsentValues:
         self, facilities: list[dict[str, Any]], names: dict[str, str]
     ) -> None:
         record = {**upstream(facilities, "125TH STREET LIBRARY"), "latitude": "", "longitude": ""}
-        assert ingest.normalize([record], names, []) == []
+        assert ingest.normalize([record], [], names, []) == []
 
     def test_a_non_numeric_coordinate_is_an_error(
         self, facilities: list[dict[str, Any]], names: dict[str, str]
     ) -> None:
         record = {**upstream(facilities, "125TH STREET LIBRARY"), "latitude": "uptown"}
         with pytest.raises(ingest.IngestError, match="non-numeric latitude"):
-            ingest.normalize([record], names, [])
+            ingest.normalize([record], [], names, [])
 
 
 class TestNeighborhoods:
@@ -216,7 +234,7 @@ class TestNeighborhoods:
         # The two datasets are revised separately. Publishing "MN9999" would put
         # a code where the contract promises a name.
         record = {**upstream(facilities, "125TH STREET LIBRARY"), "nta2020": "MN9999"}
-        assert ingest.normalize([record], names, [])[0]["neighborhood"] is None
+        assert ingest.normalize([record], [], names, [])[0]["neighborhood"] is None
 
 
 class TestUniversityIsProximity:
@@ -243,7 +261,7 @@ class TestUniversityIsProximity:
             "facname": "COLUMBIA UNIVERSITY READING ROOM",
         }
         campus = upstream(facilities, "COLUMBIA UNIVERSITY")
-        published_spots = ingest.normalize([far, campus], names, [])
+        published_spots = ingest.normalize([far, campus], [], names, [])
         assert published(published_spots, "Columbia University Reading Room")["university"] is None
 
     def test_the_radius_is_500_metres(self) -> None:
@@ -328,8 +346,8 @@ class TestSnapshot:
     ) -> None:
         # Socrata pages in whatever order it likes, and a reordered snapshot is
         # a diff of every line.
-        assert ingest.normalize(list(reversed(facilities)), names, hotspots) == (
-            ingest.normalize(facilities, names, hotspots)
+        assert ingest.normalize(list(reversed(facilities)), [], names, hotspots) == (
+            ingest.normalize(facilities, [], names, hotspots)
         )
 
     def test_rerunning_writes_the_same_bytes(
@@ -341,7 +359,7 @@ class TestSnapshot:
     ) -> None:
         first, second = tmp_path / "first.json", tmp_path / "second.json"
         for path in (first, second):
-            ingest.write_snapshot(path, ingest.normalize(facilities, names, hotspots))
+            ingest.write_snapshot(path, ingest.normalize(facilities, [], names, hotspots))
         assert first.read_bytes() == second.read_bytes()
 
     def test_a_record_outside_the_contract_is_an_error(self) -> None:
@@ -361,9 +379,11 @@ class TestCommandLine:
         assert ingest.main(["--fixtures", str(FIXTURES), "--output", str(output)]) == 0
 
         written = json.loads(output.read_text("utf-8"))
-        # Eleven fixture records plus the curated buildings, which are read
-        # from the repository rather than from the network either way.
-        assert len(written) == 11 + len(ingest.curated_spots())
+        # Eleven facility records and four cafes -- six licences, one without a
+        # borough and one a repeat of a storefront already seen -- plus the
+        # curated buildings, which are read from the repository rather than
+        # from the network either way.
+        assert len(written) == 11 + 4 + len(ingest.curated_spots())
 
     def test_a_missing_fixture_directory_is_reported_not_raised(self, tmp_path: Path) -> None:
         assert ingest.main(["--fixtures", str(tmp_path / "absent")]) == 1
@@ -550,7 +570,8 @@ class TestFreePublicWifi:
         # anything and must not crash the import.
         rows = [{"objectid": "x", "latitude": None, "longitude": None}]
         assert all(
-            spot["free_public_wifi"] is False for spot in ingest.normalize(facilities, names, rows)
+            spot["free_public_wifi"] is False
+            for spot in ingest.normalize(facilities, [], names, rows)
         )
 
     def test_the_value_is_always_a_boolean(self, spots: list[dict[str, Any]]) -> None:
@@ -564,3 +585,88 @@ class TestFreePublicWifi:
 
     def test_the_radius_is_tight_enough_to_mean_something(self) -> None:
         assert ingest.WIFI_RADIUS_METRES <= 50.0
+
+
+class TestCafes:
+    """Dining Out NYC, the source for the published ``cafe`` category.
+
+    FacDB is a register of city facilities, so it holds libraries and campuses
+    and not one cafe. Cafes are licensed rather than operated by the city, which
+    is why they are in a licence register instead and why the category had no
+    source until this one.
+    """
+
+    def by_name(self, spots: list[dict[str, Any]], name: str) -> dict[str, Any]:
+        return next(spot for spot in spots if spot["name"] == name)
+
+    def test_a_licence_becomes_a_cafe(self, cafe_spots: list[dict[str, Any]]) -> None:
+        spot = self.by_name(cafe_spots, "Jean's")
+
+        assert spot["category"] == "cafe"
+        assert spot["borough"] == "Manhattan"
+        assert spot["address"] == "415 Lafayette Street, New York, NY 10003"
+
+    def test_the_identifier_names_the_source(self, cafe_spots: list[dict[str, Any]]) -> None:
+        assert all(spot["id"].startswith("dining:") for spot in cafe_spots)
+
+    def test_the_identifier_is_stable_across_runs(
+        self, cafes: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        # Dining Out publishes no row identifier that survives a re-licensing,
+        # so it is derived from name and address. If it moved between runs the
+        # snapshot would churn and every spot's URL would change.
+        first = ingest.normalize([], cafes, names, [])
+        again = ingest.normalize([], cafes, names, [])
+        assert [spot["id"] for spot in first] == [spot["id"] for spot in again]
+
+    def test_the_trading_name_is_preferred(self, cafe_spots: list[dict[str, Any]]) -> None:
+        # "JEAN'S" is over the door; "CGM-LLNR LLC" holds the licence, and
+        # nobody searches for that.
+        assert self.by_name(cafe_spots, "Jean's")["name"] == "Jean's"
+
+    def test_the_legal_name_is_the_fallback(self, cafe_spots: list[dict[str, Any]]) -> None:
+        # One row in the fixture has no trading name at all.
+        assert self.by_name(cafe_spots, "No Trading Name Corp") is not None
+
+    def test_shouted_names_are_title_cased(self, cafe_spots: list[dict[str, Any]]) -> None:
+        # The register stores them upper case, as FacDB does.
+        assert self.by_name(cafe_spots, "The Butcher's Daughter")["name"] == (
+            "The Butcher's Daughter"
+        )
+
+    def test_one_storefront_with_two_licences_is_one_spot(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # The fixture holds the same address under two licence holders, which
+        # is what a re-licensing looks like upstream.
+        matching = [spot for spot in cafe_spots if spot["name"] == "The Butcher's Daughter"]
+        assert len(matching) == 1
+
+    def test_a_licence_with_no_borough_is_dropped(self, cafe_spots: list[dict[str, Any]]) -> None:
+        # Not an error: the register is maintained for licensing rather than
+        # for mapping, and a row that cannot be placed is simply not a spot.
+        assert not [spot for spot in cafe_spots if spot["name"] == "Nowhere In Particular"]
+
+    def test_a_cafe_gets_its_neighborhood_from_the_same_join(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # Dining Out carries nta2020 just as FacDB does, which is the whole
+        # reason cafes could join without a point-in-polygon test.
+        assert self.by_name(cafe_spots, "Jean's")["neighborhood"] is not None
+
+    def test_an_nta_code_with_no_name_leaves_the_neighborhood_null(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        spot = self.by_name(cafe_spots, "Code Ahead of the Boundary File")
+        assert spot["neighborhood"] is None
+
+    def test_every_cafe_matches_the_contract(self, cafe_spots: list[dict[str, Any]]) -> None:
+        for spot in cafe_spots:
+            assert tuple(spot) == ingest.CONTRACT_FIELDS
+
+    def test_only_issued_sidewalk_licences_are_requested(self) -> None:
+        # A licence that was applied for and never granted describes a cafe
+        # that does not exist; a roadway licence is a structure in a parking
+        # lane rather than somewhere to sit with a laptop.
+        assert "license_status = 'Issued'" in ingest.CAFES_WHERE
+        assert "license_type = 'Sidewalk'" in ingest.CAFES_WHERE

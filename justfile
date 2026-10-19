@@ -79,6 +79,12 @@ test:
     cd src/backend && uv run pytest
     cd data && uv run --project ../src/backend pytest .
 
+# End-to-end tests against a running deployment. Needs STUDYSPOT_E2E_URL; see
+# tests/e2e/README.md. Deliberately outside `just test`, which must pass with
+# nothing running.
+test-e2e:
+    cd tests/e2e && uv run --project ../../src/backend pytest .
+
 # Regenerate data/spots.json from NYC Open Data, then `just load-data` to serve
 # it. The snapshot stays in version control, so this is only needed when the
 # upstream data or the mapping changes. Set NYC_OPEN_DATA_APP_TOKEN in .env for
