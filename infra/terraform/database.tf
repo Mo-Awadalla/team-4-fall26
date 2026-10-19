@@ -32,9 +32,24 @@ resource "aws_db_parameter_group" "main" {
   # Reject any connection that is not TLS. This matters most when
   # database_publicly_accessible is true, but costs nothing when it is false, so
   # it is not conditional.
+  #
+  # Postgres 15 and later already default this to 1, so this entry restates the
+  # engine default rather than changing anything. RDS consequently reports the
+  # parameter with source "system" and apply_method "pending-reboot", and it
+  # does not appear under `describe-db-parameters --source user` at all --
+  # which looks exactly like the setting having been dropped, and is not.
+  #
+  # apply_method is declared because Terraform otherwise defaults to
+  # "immediate", disagrees with what RDS reports back, and proposes the same
+  # no-op change on every plan. A plan that is never clean is a plan nobody
+  # reads.
+  #
+  # It is kept rather than deleted so that the intent survives a future engine
+  # version whose default differs.
   parameter {
-    name  = "rds.force_ssl"
-    value = "1"
+    name         = "rds.force_ssl"
+    value        = "1"
+    apply_method = "pending-reboot"
   }
 
   # Log statements that take longer than a second. The study-spot queries are
