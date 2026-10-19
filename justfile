@@ -159,7 +159,7 @@ aws-load:
 
 # Build the static frontend, publish it, and invalidate the CloudFront cache.
 aws-frontend:
-    cd src/frontend && DEPLOY_TARGET=aws bun run build
+    cd src/frontend && bun run build
     aws s3 sync src/frontend/build/ "s3://$({{tf}} output -raw site_bucket)/" --delete
     aws cloudfront create-invalidation \
       --distribution-id "$({{tf}} output -raw cloudfront_distribution_id)" --paths '/*'
@@ -189,13 +189,3 @@ aws-db-start:
 # Tear the whole AWS stack down.
 aws-destroy:
     {{tf}} destroy
-
-# -- Vercel -------------------------------------------------------------------
-
-# Create a Vercel preview deployment.
-deploy-preview:
-    bunx vercel@59.16.0 deploy
-
-# Deploy the current revision to Vercel production.
-deploy-production:
-    bunx vercel@59.16.0 deploy --prod

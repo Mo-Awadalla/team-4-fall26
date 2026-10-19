@@ -1,9 +1,8 @@
 // Strips the public /api prefix before the request reaches Django.
 //
-// This is the CloudFront equivalent of the backend service rewrite in
-// vercel.json, and it has to agree with it: the API's routes are /health/live
-// and /spots, while the public paths are /api/health/live and /api/spots. Both
-// edges therefore remove exactly one leading /api segment.
+// The API's own routes are /health/live and /spots, while the public paths are
+// /api/health/live and /api/spots, so the edge removes exactly one leading
+// /api segment and Django never learns about the prefix.
 
 function handler(event) {
 	var request = event.request;

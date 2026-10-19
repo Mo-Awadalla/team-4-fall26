@@ -1,8 +1,8 @@
 # AWS infrastructure
 
-StudySpot's AWS deployment, defined in Terraform. The Vercel deployment is
-unchanged and still described in [`docs/source/deployment.md`](../docs/source/deployment.md);
-this is a second, independent target.
+StudySpot's deployment, defined in Terraform. It is the only deployment;
+[`docs/source/deployment.md`](../docs/source/deployment.md) covers the workflow
+around it.
 
 ```text
                         CloudFront
@@ -11,10 +11,9 @@ this is a second, independent target.
               /*  -->  S3                           (prerendered SvelteKit)
 ```
 
-One distribution owns the public hostname and splits on path, reproducing the
-same boundary `vercel.json` defines. `/api/*` is signed through to a Lambda
-function URL with the `/api` prefix stripped at the edge, so Django sees
-`/spots` exactly as it does locally.
+One distribution owns the public hostname and splits on path. `/api/*` goes to
+an API Gateway HTTP API in front of the Lambda function, with the `/api` prefix
+stripped at the edge, so Django sees `/spots` exactly as it does locally.
 
 ## What it costs
 
@@ -128,10 +127,11 @@ zone. The cost of that choice is real: the value is visible to anyone with
 before anyone shares this stack.
 
 **The database is private by default.** `database_publicly_accessible = false`
-means only this VPC can reach it, and the Vercel deployment therefore has no
-database. If you want Vercel serving `/spots` too, set that variable and
-`database_allowed_cidrs` — see the notes in `terraform.tfvars.example`, because
-a wide allowlist is a database exposed to the internet behind one password.
+means only this VPC can reach it, which is why migrations and data loads run
+as Lambda invocations rather than from a laptop. Reaching it from outside needs
+that variable and `database_allowed_cidrs` — see the notes in
+`terraform.tfvars.example`, because a wide allowlist is a database exposed to
+the internet behind one password.
 
 **Caching is off for `/api/*`.** Serving a stale page of spots from the edge
 would be a silent correctness problem. Turn it on when the API sends its own

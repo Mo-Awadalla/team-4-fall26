@@ -21,7 +21,7 @@ docker build --tag studyspot-frontend src/frontend
 docker build --tag studyspot-backend src/backend
 ```
 
-Postgres and Meilisearch use versioned upstream images from their registries. Compose builds the two application images and downloads the other two as needed.
+Postgres uses a versioned upstream image from its registry. Compose builds the two application images and downloads that one as needed.
 
 Dockerfile layers are ordered so dependency manifests are copied and installed before frequently changed source code. This lets Docker reuse the expensive dependency layer after ordinary code edits.
 
@@ -33,11 +33,10 @@ Browser
 frontend:5173
    |
 backend:8000
-   |-- postgres:5432
-   \-- meilisearch:7700
+   \-- postgres:5432
 ```
 
-Compose private DNS lets the backend reach `postgres:5432` and `meilisearch:7700`; `localhost` inside a container refers only to that container. Postgres is the one service also published on the host, at `127.0.0.1:5432`, so that a backend run outside Compose uses the same database as the one inside it.
+Compose private DNS lets the backend reach `postgres:5432`; `localhost` inside a container refers only to that container. Postgres is the one service also published on the host, at `127.0.0.1:5432`, so that a backend run outside Compose uses the same database as the one inside it.
 
 ## Port mappings
 
@@ -50,7 +49,7 @@ The first port belongs to the host; the second belongs to the container. StudySp
 
 ## Disposable containers and persistent data
 
-Application containers should be replaceable. The Postgres data directory and the Meilisearch index live on named volumes so a normal shutdown preserves them:
+Application containers should be replaceable. The Postgres data directory lives on a named volume so a normal shutdown preserves it:
 
 ```shell
 docker compose down
@@ -64,7 +63,7 @@ docker compose down --volumes
 
 ## Health and startup order
 
-Compose starts Postgres and Meilisearch first and verifies that both are accepting requests before the backend starts. `pg_isready` is given the database name explicitly, because without it the check passes against the user's default database while initialization is still running. The frontend waits for the backend health endpoint. A running process is not considered ready until its health check succeeds.
+Compose starts Postgres first and verifies that it is accepting requests before the backend starts. `pg_isready` is given the database name explicitly, because without it the check passes against the user's default database while initialization is still running. The frontend waits for the backend health endpoint. A running process is not considered ready until its health check succeeds.
 
 The backend then applies migrations before it starts serving, so a fresh volume gets a schema without anyone remembering to ask for one. It does not load data: an empty database is a valid state, and `GET /spots` answers with an empty page rather than an error. Fill it with:
 

@@ -2,16 +2,15 @@
 
 ## Docker and Compose model
 
-A Dockerfile builds one reusable image. A container is a running instance of that image. Docker Compose defines how the frontend, backend, database, and search containers start, communicate, persist local state, and report health.
+A Dockerfile builds one reusable image. A container is a running instance of that image. Docker Compose defines how the frontend, backend, and database containers start, communicate, persist local state, and report health.
 
 ```text
 Dockerfile -> image -> container
 
 Browser -> frontend:5173 -> backend:8000 -> postgres:5432
-                                      \----> meilisearch:7700
 ```
 
-Compose gives every service a private DNS name. The backend connects to `postgres:5432` and `meilisearch:7700`; `localhost` inside the backend container refers only to that backend container. On the host, Compose publishes frontend `7500`, backend `7501`, Meilisearch `7502`, and Postgres on `127.0.0.1:5432`.
+Compose gives every service a private DNS name. The backend connects to `postgres:5432`; `localhost` inside the backend container refers only to that backend container. On the host, Compose publishes frontend `7500`, backend `7501`, and Postgres on `127.0.0.1:5432`.
 
 Postgres is published because the backend is often run outside Compose. `just dev-backend`, `just migrate`, and `just test` all reach the same database the containers use, so there is one local database rather than one per way of starting the application.
 
@@ -48,7 +47,7 @@ just dev-backend
 
 ## Data lifecycle
 
-The Postgres data directory and the Meilisearch index use named volumes. Normal shutdown preserves them:
+The Postgres data directory uses a named volume. Normal shutdown preserves it:
 
 ```shell
 just shutdown
@@ -96,16 +95,15 @@ The goal is behavioral parity rather than identical infrastructure:
 - the same data mapping and search-ranking behavior
 - the same liveness and readiness semantics
 
-The database is the part that used to differ and no longer does: local development, CI, and the AWS deployment all run Postgres with one schema and one driver, so a query that works locally is not relying on behaviour the deployed database does not have. What still differs is how the application is served — a development server locally, a Lambda function on AWS, a Vercel function on Vercel — which is why the API holds no state between requests and opens a connection per request. See [Postgres database](database.md) for that reasoning and [Deployment](deployment.md) for the two targets.
+The database is the part that used to differ and no longer does: local development, CI, and the AWS deployment all run Postgres with one schema and one driver, so a query that works locally is not relying on behaviour the deployed database does not have. What still differs is how the application is served — a development server locally, a Lambda function on AWS — which is why the API holds no state between requests and opens a connection per request. See [Postgres database](database.md) for that reasoning and [Deployment](deployment.md) for the deployed stack.
 
-Meilisearch remains a local integration target; no deployed search service exists yet.
+Search runs inside Postgres -- full text for precision, `pg_trgm` for typos -- so there is no search service to run locally or deploy.
 
 The backend receives these Compose defaults:
 
 ```text
 DATABASE_URL=postgresql://studyspot:studyspot@postgres:5432/studyspot
 DJANGO_DEBUG=true
-MEILISEARCH_URL=http://meilisearch:7700
 ```
 
 Copy `.env.example` to `.env` to override them; `just` loads that file if it exists, so a copied `.env` takes effect without exporting anything, and its absence is not an error. The `just` targets also default `DJANGO_DEBUG` to `true`, because `settings.py` refuses to start without a `DJANGO_SECRET_KEY` when debug is off — right for a deployment, useless for `just test`. Nothing deploys through `just`.

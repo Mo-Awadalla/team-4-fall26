@@ -6,7 +6,6 @@ This uv project holds the Django application that serves the study-spot API.
 studyspot/     project configuration: settings, URLs, health, error envelope, middleware
 spots/         the shared study-spot model, routes, serializers, migrations, loader
 manage.py      Django's command-line entry point
-main.py        Vercel entry point
 handler.py     AWS Lambda entry points: the API, and a management-command runner
 ```
 

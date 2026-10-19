@@ -3,7 +3,7 @@ name: Repository checks
 on:
   pull_request:
   push:
-    branches: [main, staging]
+    branches: [main, develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

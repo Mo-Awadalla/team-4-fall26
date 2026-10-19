@@ -1,7 +1,6 @@
 # The CloudFront distribution: one public hostname in front of both services.
 #
-# This reproduces the path split vercel.json already defines, so the deployed
-# contract does not change between the two hosting providers:
+# One hostname, split on path:
 #
 #   /api/*  -> API Gateway, then the Django function, with /api stripped
 #   /*      -> the static SvelteKit build in S3

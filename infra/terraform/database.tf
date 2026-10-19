@@ -135,9 +135,9 @@ locals {
   ])
 }
 
-# Stored so that a human, or the Vercel deployment, can retrieve the connection
-# string without reading Terraform state. The functions themselves receive it as
-# an environment variable; see the note in network.tf.
+# Stored so that a human can retrieve the connection string without reading
+# Terraform state. The functions themselves receive it as an environment
+# variable; see the note in network.tf.
 resource "aws_secretsmanager_secret" "database" {
   name        = "${local.name_prefix}/database"
   description = "StudySpot Postgres connection details"

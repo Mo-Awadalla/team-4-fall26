@@ -75,10 +75,10 @@ cp "${BACKEND_DIR}/handler.py" "${STAGE_DIR}/"
 # function behaves the same as it does locally.
 cp "${BACKEND_DIR}/manage.py" "${STAGE_DIR}/"
 
-# The management function reads the snapshot from inside the package. The Vercel
-# build could never see data/spots.json because its service root is
-# src/backend/, which is the gap docs/source/deployment.md warns about; bundling
-# it here is what lets the AWS deployment actually populate its database.
+# The management function reads the snapshot from inside the package: the
+# database is private, so the only thing that can load it is a function running
+# inside the VPC, and bundling the snapshot here is what lets that function
+# populate the database at all.
 echo "==> Adding the normalized dataset"
 mkdir -p "${STAGE_DIR}/data"
 cp "${REPO_ROOT}/data/spots.json" "${STAGE_DIR}/data/spots.json"

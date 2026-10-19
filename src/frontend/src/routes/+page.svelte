@@ -19,16 +19,52 @@
 	let facets = $state<Facets | null>(null);
 	let filters = $state<SpotFilters>({});
 
+	/**
+	 * The query and filters the shown results came from.
+	 *
+	 * `query` is what the search box shows, which is not the same thing: the box
+	 * can be typed in, or emptied, without being submitted. Paging has to repeat
+	 * the request that produced the visible page, and the empty-state message has
+	 * to name the query that actually found nothing, so both read this instead.
+	 *
+	 * `run()` records it when it issues a request rather than when one returns,
+	 * which is sound because of the `latestSearch` guard below: only the most
+	 * recently issued request is allowed to write results, so it is also the one
+	 * that wrote this.
+	 */
+	let applied = $state<{ query: string; filters: SpotFilters }>({ query: '', filters: {} });
+
 	// The hero fills the viewport until there is something below it to see.
 	let searched = $derived(status !== 'idle');
 
-	// The filter values come from the data rather than from a hard-coded list,
-	// so they are fetched once. A failure leaves the controls empty rather than
-	// breaking the page: search still works without them.
+	/**
+	 * Keep the filter controls describing the results on screen.
+	 *
+	 * The counts are promises about what picking a value returns, so they follow
+	 * `applied` rather than being fetched once: counted over the whole snapshot
+	 * they stop being true the moment anything is narrowing the results, and the
+	 * controls go on offering values that now match nothing. The endpoint leaves
+	 * each facet's own filter out, so a chosen borough still lists the other
+	 * four.
+	 *
+	 * The cost is one extra request per interaction. Returning results and facets
+	 * together would avoid it, which is what a dedicated search engine does in a
+	 * single response; two requests is the price of keeping this in Postgres.
+	 */
+	let latestFacets = 0;
+
 	$effect(() => {
-		fetchFacets()
-			.then((loaded) => (facets = loaded))
-			.catch(() => (facets = null));
+		const snapshot = applied;
+		const request = ++latestFacets;
+
+		fetchFacets({ query: snapshot.query || undefined, filters: snapshot.filters })
+			.then((loaded) => {
+				if (request === latestFacets) facets = loaded;
+			})
+			// Deliberately keeps whatever is already there. Blanking the controls
+			// because one refresh failed would take away the filters mid-use; stale
+			// counts beside working controls are the better failure.
+			.catch(() => {});
 	});
 
 	/**
@@ -37,6 +73,33 @@
 	 * behaviour, and without this the results could end up showing the wrong one.
 	 */
 	let latestSearch = 0;
+
+	/**
+	 * How long to wait after a keystroke before searching.
+	 *
+	 * Long enough that an ordinary word is one request rather than five, short
+	 * enough to feel like the results are following the typing. The ranking
+	 * itself needs no help: `search.py` already scores a prefix at 0.95, so
+	 * `bob` finds Bobst Library without anything being submitted.
+	 */
+	const TYPING_DELAY_MS = 250;
+
+	let typingTimer: ReturnType<typeof setTimeout> | undefined;
+
+	/** Search once the typing stops. */
+	function runSoon(): void {
+		clearTimeout(typingTimer);
+		typingTimer = setTimeout(() => void run(), TYPING_DELAY_MS);
+	}
+
+	/** Search now, dropping a keystroke's pending search so it cannot land after. */
+	function runNow(): void {
+		clearTimeout(typingTimer);
+		void run();
+	}
+
+	// Nothing should fire after the page is gone.
+	$effect(() => () => clearTimeout(typingTimer));
 
 	function describe(error: unknown): string {
 		if (error instanceof ApiError) {
@@ -64,6 +127,8 @@
 		const search = ++latestSearch;
 		const trimmed = query.trim();
 		const filtering = Object.keys(filters).length > 0;
+
+		applied = { query: trimmed, filters: { ...filters } };
 
 		if (!trimmed && !filtering) {
 			status = 'idle';
@@ -97,14 +162,25 @@
 		}
 	}
 
+	/**
+	 * Typing searches, once it pauses.
+	 *
+	 * Submitting is still meaningful: it searches immediately rather than waiting
+	 * out the delay, and it is how someone who has cleared the box says so.
+	 */
+	function handleQueryInput(next: string): void {
+		query = next;
+		runSoon();
+	}
+
 	function handleSearch(submitted: string): void {
 		query = submitted;
-		void run();
+		runNow();
 	}
 
 	function handleFilters(next: SpotFilters): void {
 		filters = next;
-		void run();
+		runNow();
 	}
 
 	async function handleShowMore(): Promise<void> {
@@ -113,10 +189,19 @@
 		loadingMore = true;
 
 		try {
-			const trimmed = query.trim();
-			const page = trimmed
-				? await searchSpots(trimmed, { limit: DEFAULT_LIMIT, offset: spots.length, filters })
-				: await listSpots({ limit: DEFAULT_LIMIT, offset: spots.length, filters });
+			// Deliberately `applied` and not the live controls: this continues the
+			// page already on screen, which the box may since have been typed in.
+			const page = applied.query
+				? await searchSpots(applied.query, {
+						limit: DEFAULT_LIMIT,
+						offset: spots.length,
+						filters: applied.filters
+					})
+				: await listSpots({
+						limit: DEFAULT_LIMIT,
+						offset: spots.length,
+						filters: applied.filters
+					});
 			if (search !== latestSearch) return;
 
 			spots = [...spots, ...page.items];
@@ -157,7 +242,7 @@
 				<p class="description">Explore cafés and public gathering places from NYC Open Data.</p>
 			</div>
 
-			<SearchBar onSearch={handleSearch} />
+			<SearchBar value={query} onInput={handleQueryInput} onSearch={handleSearch} />
 		</section>
 
 		<SpotFiltersBar {facets} {filters} onChange={handleFilters} />
@@ -170,9 +255,9 @@
 				<p class="status error" role="alert">{errorMessage}</p>
 			{:else if status === 'loaded' && spots.length === 0}
 				<p class="status">
-					{#if query.trim()}
-						No places match <strong>{query}</strong>. Try a library, a campus, or a neighborhood, or
-						clear a filter.
+					{#if applied.query}
+						No places match <strong>{applied.query}</strong>. Try a library, a campus, or a
+						neighborhood, or clear a filter.
 					{:else}
 						No places match these filters.
 					{/if}
