@@ -41,6 +41,17 @@ export type StudySpot = {
 	 * reason to know about it.
 	 */
 	free_public_wifi: boolean;
+	/**
+	 * Whether sitting down here costs nothing.
+	 *
+	 * True of every library and of the campus buildings, false only of cafés,
+	 * so it is not any one category. Derived by the API from `category` rather
+	 * than computed here, so the rule has one definition rather than two.
+	 *
+	 * About money and not entry: a campus building is free and still wants the
+	 * university's credentials.
+	 */
+	no_purchase_needed: boolean;
 };
 
 /** One value a filter can take, with how many spots carry it. */
@@ -64,6 +75,7 @@ export type Facets = {
 	categories: Facet[];
 	universities: Facet[];
 	free_public_wifi: number;
+	no_purchase_needed: number;
 };
 
 /**
@@ -75,6 +87,7 @@ export type SpotFilters = {
 	category?: string;
 	university?: string;
 	free_public_wifi?: boolean;
+	no_purchase_needed?: boolean;
 };
 
 /** Where a page sits in the full result set. */

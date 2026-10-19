@@ -22,7 +22,8 @@ const FACETS: Facets = {
 	],
 	categories: [{ value: 'academic_library', count: 8 }],
 	universities: [{ value: 'New York University', count: 10 }],
-	free_public_wifi: 34
+	free_public_wifi: 34,
+	no_purchase_needed: 56
 };
 
 function spot(id: string, name: string): StudySpot {
@@ -36,7 +37,8 @@ function spot(id: string, name: string): StudySpot {
 		latitude: 40.86,
 		longitude: -73.86,
 		university: null,
-		free_public_wifi: false
+		free_public_wifi: false,
+		no_purchase_needed: true
 	};
 }
 
@@ -202,6 +204,15 @@ describe('the filter counts', () => {
 
 		const latest = facetRequests()[facetRequests().length - 1];
 		expect(latest.parameters.get('q')).toBe('library');
+	});
+
+	it('put the no-purchase count on its checkbox', async () => {
+		// Not any one category: true of every library and of the campus
+		// buildings, false only of cafes, so it cannot be read off the Type
+		// control.
+		render(Home);
+
+		await expect.element(page.getByText('(56)')).toBeInTheDocument();
 	});
 
 	it('put the Wi-Fi count on its checkbox', async () => {
