@@ -5,22 +5,21 @@
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data.
 
 > [!IMPORTANT]
-> StudySpot is early but no longer empty. The frontend, the Django API, the shared study-spot model and its migrations, the NYC Open Data importer and its snapshot, the dataset loader, the listing and detail routes, the Meilisearch service, CI, and both deployment targets are in place. `data/spots.json` holds 380 real libraries and campuses; the city's facilities database lists no cafés, so the published `cafe` category has no source yet. The browser search is wired to the listing filters and returns real results; a dedicated search endpoint and a Meilisearch index are not implemented, so a query is matched against a spot's name and then its neighborhood rather than ranked.
+> StudySpot is deployed and working. `data/spots.json` holds 390 real libraries, campuses, and campus buildings, 206 of them with a free public Wi-Fi hotspot nearby. Search ranks results with Postgres trigram similarity, so it tolerates misspellings and expands initialisms like `nypl`. Results filter by borough, type, campus, and Wi-Fi. The city's facilities database lists no cafés, so the published `cafe` category has no source yet; a spot detail page is the other notable gap.
 
 ## How will it work?
 
-StudySpot is designed as a small modular monolith with two deployed applications and a versioned public-data snapshot:
+StudySpot is a small modular monolith: one application, one versioned public-data snapshot.
 
 ```text
 Browser -> SvelteKit -> Django REST Framework -> Postgres
 
 NYC Open Data -> ingest.py -> spots.json -> Postgres
-                                      \-> search index
 ```
 
-The [Svelte 5](https://svelte.dev/) frontend owns the search experience. A [Django](https://www.djangoproject.com/) application with [Django REST Framework](https://www.django-rest-framework.org/) provides the HTTP boundary, and one model defines the study spot that the routes, the loader, and any future search projection all share. [Postgres](https://www.postgresql.org/) is the serving database. The normalized NYC Open Data snapshot remains the reproducible source used to load it and to rebuild any search index.
+The [Svelte 5](https://svelte.dev/) frontend owns the search experience. A [Django](https://www.djangoproject.com/) application with [Django REST Framework](https://www.django-rest-framework.org/) provides the HTTP boundary, and one model defines the study spot that the routes, the loader, and the search ranking all share. [Postgres](https://www.postgresql.org/) is both the serving database and the search engine: the `pg_trgm` extension scores candidates by trigram similarity behind a GIN index, which is ample for a few hundred records and removes a moving part from the deployment. The normalized NYC Open Data snapshot remains the reproducible source used to load it.
 
-Local development uses Docker Compose for the browser app, API, Postgres, and Meilisearch. The same Postgres is published on `127.0.0.1:5432`, so a backend run outside Compose uses the same database as one run inside it. Deployments run the same application against the same schema: on [AWS](https://aws.amazon.com/) the API is a Lambda function behind CloudFront with an RDS Postgres instance in private subnets, and on [Vercel](https://vercel.com/) it is a Python service — which has no database until the RDS instance is made publicly reachable.
+Local development uses Docker Compose for the browser app, the API, and Postgres. The same Postgres is published on `127.0.0.1:5432`, so a backend run outside Compose uses the same database as one run inside it. On [AWS](https://aws.amazon.com/) the same application runs against the same schema: the API is a Lambda function behind CloudFront, with an RDS Postgres instance in private subnets.
 
 The shared study-spot summary contract is intentionally small:
 
@@ -34,11 +33,23 @@ The shared study-spot summary contract is intentionally small:
   "borough": "Manhattan",
   "latitude": 40.803027,
   "longitude": -73.934853,
-  "university": "Touro University - Harlem"
+  "university": "Touro University - Harlem",
+  "free_public_wifi": true
 }
 ```
 
-`GET /spots` and `GET /spots/{id}` are available alongside `GET /health/live`, none of them with a trailing slash. `GET /spots` pages with `limit` and `offset` and filters on `name`, `neighborhood`, `borough`, and `university`. `GET /spots/search?q=` ranks results instead of filtering, tolerating misspellings and expanding initialisms. See the [HTTP API guide](docs/source/api.md).
+`university` is proximity and never affiliation or a claim of access. `free_public_wifi` means the city publishes a free hotspot within 25 m; `false` means none is recorded rather than that there is no Wi-Fi, which is why a campus building with credentialled Wi-Fi reads as `false`.
+
+Four routes are available alongside `GET /health/live`, none of them with a trailing slash:
+
+| Route | Purpose |
+|---|---|
+| `GET /spots` | Pages with `limit` and `offset`; filters on `name`, `category`, `neighborhood`, `borough`, `university`, and `free_public_wifi` |
+| `GET /spots/search?q=` | Ranks instead of filtering, tolerating misspellings and expanding initialisms; accepts the same filters |
+| `GET /spots/facets` | The values the filter controls offer, with counts |
+| `GET /spots/{id}` | One spot |
+
+See the [HTTP API guide](docs/source/api.md).
 
 ## Development
 
@@ -64,7 +75,7 @@ Without Nix, install Bun, Python 3.12, uv, just, pre-commit, Git, and Docker, th
 
 ### Running the complete system
 
-Build and start all four container services with live source updates:
+Build and start every container service with live source updates:
 
 ```shell
 just dev
@@ -82,11 +93,12 @@ Once healthy, the services are available at:
 |---|---|
 | Frontend | <http://localhost:7500> |
 | API liveness | <http://localhost:7501/health/live> |
-| Meilisearch | <http://localhost:7502> |
 | Documentation (`just docs`) | <http://localhost:7503> |
 | Postgres | `127.0.0.1:5432` |
 
-The backend applies its migrations before it starts serving, so a fresh checkout gets a working schema without a separate step. Follow logs with `just logs`, stop services while preserving local data with `just shutdown`, or remove the Postgres and Meilisearch volumes with `just clean`.
+Compose also starts Meilisearch on <http://localhost:7502>. Nothing talks to it: search runs in Postgres, and the service is held in Compose only as a starting point should the project outgrow trigram ranking.
+
+The backend applies its migrations before it starts serving, so a fresh checkout gets a working schema without a separate step. Follow logs with `just logs`, stop services while preserving local data with `just shutdown`, or remove the data volumes with `just clean`.
 
 ### Running one application
 
@@ -108,7 +120,7 @@ just dev-backend
 
 ### Loading data
 
-The data boundary lives in [`data/`](data/): `ingest.py` normalizes NYC Open Data into `spots.json`, and `test_ingest.py` verifies the mapping against a committed sample of upstream records. Copy the snapshot into the local database before using the study-spot routes:
+The data boundary lives in [`data/`](data/): `ingest.py` normalizes three NYC Open Data datasets and a curated list of NYU buildings into `spots.json`, and `test_ingest.py` verifies the mapping against a committed sample of upstream records. Copy the snapshot into the local database before using the study-spot routes:
 
 ```shell
 just load-data
@@ -120,7 +132,7 @@ The snapshot is in version control, so this needs no network. Regenerate it from
 just ingest
 ```
 
-The loader validates every record against the shared model and replaces the table's contents in one transaction, so it is safe to re-run and the table can only ever hold records the API can serve. Deriving a search index remains a separate backend concern.
+The loader validates every record against the shared model and replaces the table's contents in one transaction, so it is safe to re-run and the table can only ever hold records the API can serve.
 
 ### Checks
 
@@ -137,39 +149,27 @@ just start-db
 just test
 ```
 
-The suites run against a real Postgres because the schema depends on Postgres behaviour; pytest-django creates and drops its own test database, so loaded data is left alone.
+The suites run against a real Postgres because the schema depends on Postgres behaviour — trigram ranking most of all — so pytest-django creates and drops its own test database and loaded data is left alone.
 
 Run `just nix-check` to validate the pinned development environment. Tests live beside the behavior they verify.
 
 ## Deployment
 
-There are two targets, and one revision deploys to both.
-
-**Vercel** owns the automatic path through its Git integration:
-
-- feature pull requests receive isolated Preview deployments;
-- pushes to `staging` update the shared staging deployment; and
-- pushes to `main` update production.
-
-Vercel Services deploy the SvelteKit frontend and the Django application together, splitting on the same `/api/*` boundary the frontend proxy uses locally. The Vercel deployment status is a required pull-request check. Create an out-of-band preview with `just deploy-preview`, or release manually with `just deploy-production`.
-
-**AWS** is the deployment that has a database: CloudFront in front of S3 for the prerendered frontend and a Lambda function for the API, with RDS Postgres in private subnets. It is Terraform in [`infra/`](infra/), applied deliberately from a checkout rather than from CI, which would need long-lived AWS credentials in the repository:
+AWS is the deployment: CloudFront in front of S3 for the prerendered frontend and a Lambda function for the API, with RDS Postgres in private subnets. It is Terraform in [`infra/`](infra/), applied deliberately from a checkout rather than from CI, which would need long-lived AWS credentials in the repository:
 
 ```shell
 just aws-init aws-build aws-apply aws-migrate aws-load aws-frontend aws-verify
 ```
 
-Because the RDS instance has no public endpoint, migrations and data loads run as Lambda invocations, and the Vercel deployment has no database: it serves the frontend and `/api/health/live`, while `/api/spots` answers `503`. [`infra/README.md`](infra/README.md) covers the stack, what it costs, and how to stop the database when it is not in use.
+Because the RDS instance has no public endpoint, migrations and data loads run as Lambda invocations rather than from a laptop. `just aws-plan` previews a change, `just aws-db-stop` and `just aws-db-start` pause the database between work sessions, and `just aws-destroy` removes the stack. [`infra/README.md`](infra/README.md) covers the stack, what it costs, and the three account constraints the configuration works around.
 
-GitHub Actions runs repository, container, documentation, Nix, and Terraform checks, and performs no deployment of its own. Feature pull requests target `staging`; release pull requests merge `staging` into `main`. See the [deployment guide](docs/source/deployment.md) for the environment model and rollback behavior.
+GitHub Actions runs repository, container, documentation, Nix, and Terraform checks, and performs no deployment of its own. Feature pull requests target `develop`; release pull requests merge `develop` into `main`. See the [deployment guide](docs/source/deployment.md) for the environment model and rollback behavior.
 
 ## Documentation
 
 The documentation is written in MyST Markdown, built with Sphinx, and rendered with the Furo theme. Sources live in [`docs/source/`](docs/source/).
 
-Run `just docs`, then open <http://localhost:7503>. The command builds the documentation before starting the local server.
-
-Documentation is published alongside the staging app at <https://dev-studyspot-nyu.vercel.app/docs/>.
+Run `just docs`, then open <http://localhost:7503>. The command builds the documentation before starting the local server. The build is warning-strict and runs as part of `just check`; it is not published anywhere yet.
 
 Useful starting points include the [architecture](docs/source/architecture.md), [local development](docs/source/local-development.md), [deployment](docs/source/deployment.md), [testing](docs/source/testing.md), and [contribution guide](CONTRIBUTING.md).
 
@@ -178,9 +178,8 @@ Useful starting points include the [architecture](docs/source/architecture.md), 
 - **Frontend:** Svelte 5, TypeScript, SvelteKit, Vite, Tailwind CSS, Bun
 - **Backend:** Python 3.12, Django 5.2, Django REST Framework, uv
 - **Data source:** NYC Open Data
-- **Database:** Postgres — a container locally, Amazon RDS on AWS
-- **Search integration:** Meilisearch
-- **Deployment:** Vercel, and AWS (CloudFront, S3, Lambda, RDS) with Terraform
+- **Database and search:** Postgres with `pg_trgm` — a container locally, Amazon RDS on AWS
+- **Deployment:** AWS (CloudFront, S3, API Gateway, Lambda, RDS) with Terraform
 - **Operations:** Nix, Docker Compose, just, pre-commit, GitHub Actions
 - **Checks:** Prettier, ESLint, svelte-check, Ruff, ty, pytest, Django system checks, `terraform validate`
 
