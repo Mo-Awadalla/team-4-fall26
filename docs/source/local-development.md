@@ -96,9 +96,9 @@ The goal is behavioral parity rather than identical infrastructure:
 - the same data mapping and search-ranking behavior
 - the same liveness and readiness semantics
 
-The database is the part that used to differ and no longer does: local development, CI, and the AWS deployment all run Postgres with one schema and one driver, so a query that works locally is not relying on behaviour the deployed database does not have. What still differs is how the application is served — a development server locally, a Lambda function on AWS, a Vercel function on Vercel — which is why the API holds no state between requests and opens a connection per request. See [Postgres database](database.md) for that reasoning and [Deployment](deployment.md) for the two targets.
+The database is the part that used to differ and no longer does: local development, CI, and the AWS deployment all run Postgres with one schema and one driver, so a query that works locally is not relying on behaviour the deployed database does not have. What still differs is how the application is served — a development server locally, a Lambda function on AWS — which is why the API holds no state between requests and opens a connection per request. See [Postgres database](database.md) for that reasoning and [Deployment](deployment.md) for the deployed stack.
 
-Meilisearch remains a local integration target; no deployed search service exists yet.
+Search runs in Postgres through the `pg_trgm` extension, so there is no search service to run locally or deploy. Meilisearch remains in the Compose topology as a starting point should the project outgrow trigram ranking.
 
 The backend receives these Compose defaults:
 

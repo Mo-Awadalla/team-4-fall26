@@ -3,7 +3,7 @@ name: Nix development shell
 on:
   pull_request:
   push:
-    branches: [main, staging]
+    branches: [main, develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

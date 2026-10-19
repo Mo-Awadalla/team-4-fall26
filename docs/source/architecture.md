@@ -35,14 +35,13 @@ Postgres being a local container is itself a decision. The previous implementati
 
 ## Two deployment targets
 
-| Target | Frontend | API | Database |
-|---|---|---|---|
-| Vercel | Vercel service | Vercel Python service | None by default |
-| AWS | S3 behind CloudFront | Lambda behind CloudFront | RDS Postgres, private |
+| Part | How it is served | Database |
+|---|---|---|
+| AWS | S3 behind CloudFront, Lambda behind CloudFront `/api/*` | RDS Postgres, private subnets |
 
-One revision, two deployments, no shared state. The application is the same either way: it holds nothing between requests and opens a database connection per request, which is what a serverless function needs and what a development server does not mind. The frontend picks its SvelteKit adapter from `DEPLOY_TARGET`, producing a Vercel build or a set of prerendered files for S3.
+One revision, one deployment, no shared state. The application holds nothing between requests and opens a database connection per request, which is what a serverless function needs and what a development server does not mind. The frontend is prerendered to a set of files for S3, so the deployed site needs no server of its own.
 
-See [Deployment](deployment.md) for both, including why the Vercel deployment has no database.
+See [Deployment](deployment.md) for the stack and how it is applied.
 
 ## Current capability
 

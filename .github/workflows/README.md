@@ -1,23 +1,22 @@
 # Workflows
 
-- `ci.yml` installs locked dependencies and runs `just check` on every pull request and push to `staging` or `main`.
+- `ci.yml` installs locked dependencies and runs `just check` on every pull request and push to `develop` or `main`.
 - `compose.yml` builds the four-service local topology, waits for healthy containers, and checks the frontend and API liveness endpoint.
-- `ci.yml` builds the warning-free Sphinx documentation as part of `just check`; Vercel publishes it with the staging app at `/docs/`.
+- `ci.yml` builds the warning-free Sphinx documentation as part of `just check`. The documentation is not published anywhere.
 - `nix.yml` evaluates the pinned Nix development shell.
 
-Vercel's Git integration is the only automatic deployment path. It creates a Preview deployment for every pull request and branch push, and deploys `main` to production. GitHub Actions does not need a Vercel token, project ID, or team ID.
+There is no automatic deployment. AWS is applied by hand with `just aws-*` from a checkout with credentials, so GitHub Actions needs no deployment secrets of any kind.
 
-Configure the `staging` and `main` branches to require these checks before merging:
+Configure the `develop` and `main` branches to require these checks before merging:
 
 - `Repository checks`
 - `Container smoke test`
 - `Nix flake`
-- `Vercel`
 
 Require resolved conversations and disable force pushes and branch deletion. GitHub does not permit pull-request authors to approve their own work, so a solo maintainer must use zero required approvals. Teams with an independent reviewer can require one or more approvals.
 
 The canonical settings are stored in `.github/branch-protection.json` and can be reapplied through the GitHub branch-protection API.
 
-Feature pull requests target `staging`. Release pull requests merge `staging` into `main`. In Vercel, set `main` as the Production Branch, assign the desired staging domain to `staging`, and choose a Deployment Protection setting that matches the intended audience.
+Feature pull requests target `develop`. Release pull requests merge `develop` into `main`.
 
 This repository's GitHub Pages site uses **GitHub Actions** as its source. Forks must enable that setting before their first documentation deployment.

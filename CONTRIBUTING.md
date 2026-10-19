@@ -45,8 +45,7 @@ studyspot/
 ├── tests/e2e/                   # Full browser-to-API tests
 ├── compose.yaml                 # Local frontend, API, Postgres, and Meilisearch services
 ├── flake.nix                    # Pinned Nix development environment
-├── justfile                     # Canonical development commands
-└── vercel.json                  # Vercel frontend and backend deployment configuration
+└── justfile                     # Canonical development commands
 ```
 
 Tests live with the behavior they verify: frontend tests belong beside frontend components,
@@ -61,12 +60,12 @@ configuration stays with its relevant package; repository-wide commands belong i
 
 ### Create a branch
 
-Feature work starts from `staging`, not `main`. Update `staging`, then create a short-lived branch
+Feature work starts from `develop`, not `main`. Update `develop`, then create a short-lived branch
 for one issue:
 
 ```shell
-git switch staging
-git pull origin staging
+git switch develop
+git pull origin develop
 git switch -c feat/short-description
 ```
 
@@ -136,14 +135,14 @@ Use `just start` for a local container smoke test, `just dev` for live source up
 
 ## Opening a pull request
 
-1. Push the feature branch and open a pull request into `staging`.
+1. Push the feature branch and open a pull request into `develop`.
 2. Link the issue with a closing keyword such as `Closes #123`.
 3. Complete `.github/PULL_REQUEST_TEMPLATE.md`: explain the rationale, summarize the changes,
    describe the tests run, and identify user-facing or breaking API changes.
-4. Review the Vercel Preview deployment for user-facing changes. Include screenshots when they
-   help reviewers evaluate the result.
+4. Run the change locally for user-facing work. There are no preview deployments, so include
+   screenshots when they help reviewers evaluate the result.
 5. Wait for all required checks to pass and resolve every review conversation before merging.
-6. Do not push feature work directly to `staging` or `main`.
+6. Do not push feature work directly to `develop` or `main`.
 
 Keep pull requests small and focused. If a change is too large to review comfortably, divide it
 into independently useful pull requests. Respond to every review comment; if you disagree with a
@@ -151,18 +150,17 @@ suggestion, explain the tradeoff instead of silently ignoring it.
 
 Use this checklist before requesting review:
 
-- [ ] The branch started from and is up to date with `staging`.
+- [ ] The branch started from and is up to date with `develop`.
 - [ ] The pull request closes or links the relevant issue.
 - [ ] `just check` passes locally.
 - [ ] Relevant behavioral tests pass, and new behavior has appropriate coverage.
 - [ ] User-facing or contract changes are documented.
 - [ ] No credentials, `.env` files, local databases, or generated search indexes are committed.
-- [ ] The Vercel Preview has been checked when the change affects deployed behavior.
+- [ ] User-facing changes have been run locally, with screenshots where they help.
 - [ ] All review conversations are resolved.
 
-Release pull requests merge `staging` into `main` after the shared staging deployment has been
-verified. If an emergency fix lands on `main`, merge it back into `staging` immediately so the
-branches do not diverge.
+Release pull requests merge `develop` into `main`. If an emergency fix lands on `main`, merge it
+back into `develop` immediately so the branches do not diverge.
 
 ## Reporting issues
 
@@ -189,33 +187,25 @@ privately through the repository owner's security-reporting channel instead.
 
 ## CI/CD
 
-StudySpot uses GitHub Actions for validation and documentation publishing. Vercel's Git
-integration is the only automatic application deployment path; CI does not store a Vercel token
-or perform a duplicate deployment.
+StudySpot uses GitHub Actions for validation only. Nothing deploys automatically, so CI stores
+no deployment credentials of any kind.
 
 | Check or workflow | What it does | When it runs |
 |---|---|---|
-| `Repository checks` | Installs locked dependencies and runs `just check` and `just test` against a Postgres service container, including a warning-strict Sphinx build | Every pull request and pushes to `staging` or `main` |
-| `Terraform` | Formats and validates `infra/terraform/` with no AWS credentials | Every pull request and pushes to `staging` or `main` |
-| `Container smoke test` | Builds the Compose services, waits for health checks, and probes the frontend and API | Every pull request and pushes to `staging` or `main` |
-| `Nix flake` | Evaluates the pinned Nix development environment | Every pull request and pushes to `staging` or `main` |
-| `Vercel` | Creates application deployments through the repository's Git integration | Pull requests and configured branch deployments |
+| `Repository checks` | Installs locked dependencies and runs `just check` and `just test` against a Postgres service container, including a warning-strict Sphinx build | Every pull request and pushes to `develop` or `main` |
+| `Terraform` | Formats and validates `infra/terraform/` with no AWS credentials | Every pull request and pushes to `develop` or `main` |
+| `Container smoke test` | Builds the Compose services, waits for health checks, and probes the frontend and API | Every pull request and pushes to `develop` or `main` |
+| `Nix flake` | Evaluates the pinned Nix development environment | Every pull request and pushes to `develop` or `main` |
 
-`Repository checks`, `Terraform`, `Container smoke test`, `Nix flake`, and `Vercel` are
+`Repository checks`, `Terraform`, `Container smoke test`, and `Nix flake` are
 protected-branch requirements. Branches must also be current, review conversations must be resolved, and force
 pushes and branch deletion are disabled.
 
 The deployment flow is:
 
-- feature pull requests receive isolated Vercel Preview deployments;
-- pushes to `staging` update the shared staging deployment;
-- release pull requests merge `staging` into `main`; and
-- pushes to `staging` update the developer app and its documentation at `/docs/`.
-
-Preview and staging deployments use staging services and credentials; production uses its own.
-Never copy production secrets into a feature environment. For an explicit manual preview or
-recovery deployment, maintainers can use `just deploy-preview` or `just deploy-production`;
-normal contributions should rely on the Git integration.
+- feature pull requests are reviewed from the diff and a local run;
+- release pull requests merge `develop` into `main`; and
+- a maintainer deploys to AWS by hand when the team wants a change live.
 
 The AWS deployment is deliberately outside CI: applying it needs long-lived AWS credentials,
 which do not belong in this repository. Maintainers apply it from a checkout with the `just
