@@ -37,6 +37,7 @@ function spot(id: string, name: string): StudySpot {
 		latitude: 40.86,
 		longitude: -73.86,
 		university: null,
+		operator: 'New York Public Library',
 		free_public_wifi: false,
 		no_purchase_needed: true
 	};
@@ -166,6 +167,20 @@ describe('paging', () => {
 		await expect.element(page.getByText('Butler Library')).toBeInTheDocument();
 		expect(lastRequest().parameters.get('q')).toBe('library');
 		expect(lastRequest().parameters.get('offset')).toBe('1');
+	});
+});
+
+describe('the place card', () => {
+	it('names who runs the place', async () => {
+		// A branch is named after its neighbourhood, so its own name never says
+		// which library system it belongs to -- and the three have separate
+		// membership.
+		render(Home);
+
+		await box().fill('library');
+		await searchButton().click();
+
+		await expect.element(page.getByText('New York Public Library')).toBeInTheDocument();
 	});
 });
 

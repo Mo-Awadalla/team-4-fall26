@@ -34,6 +34,17 @@ export type StudySpot = {
 	 */
 	university: string | null;
 	/**
+	 * Who runs the place, where the city records it.
+	 *
+	 * For a public library branch this is its system — New York, Brooklyn or
+	 * Queens Public Library — which nothing else in the record says, because
+	 * branches are named after their neighbourhood. The three systems have
+	 * separate membership, so it is worth showing.
+	 *
+	 * Null for cafés, whose licence names only the company holding it.
+	 */
+	operator: string | null;
+	/**
 	 * Whether a free public Wi-Fi hotspot the city publishes sits within 25 m.
 	 *
 	 * False means none is recorded, not that there is no Wi-Fi: a campus

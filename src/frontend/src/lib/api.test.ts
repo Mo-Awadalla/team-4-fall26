@@ -15,6 +15,7 @@ function page(total: number, count = total, offset = 0): SpotPage {
 			latitude: 40.73,
 			longitude: -73.95,
 			university: null,
+			operator: 'Brooklyn Public Library',
 			free_public_wifi: false,
 			no_purchase_needed: true
 		})),

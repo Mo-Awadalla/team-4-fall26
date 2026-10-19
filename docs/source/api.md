@@ -33,6 +33,7 @@ No route has a trailing slash, and the application does not redirect one onto th
   "latitude": 40.803027,
   "longitude": -73.934853,
   "university": "Touro University - Harlem",
+  "operator": "New York Public Library",
   "free_public_wifi": true,
   "no_purchase_needed": true
 }
@@ -217,9 +218,16 @@ count for different amounts:
 | Field | Weight | Why |
 |---|---|---|
 | `name` | highest | what the place is called is almost always what was meant |
-| `university` | second | the field that makes a campus find its buildings |
+| `university`, `operator` | second | which institution this is — the campus it sits by, and who runs it |
 | `neighborhood` | third | where it is, not what it is |
 | `address`, `borough`, `category` | lowest | a place *called* Washington beats the places *on* Washington Street |
+
+`operator` is who runs the place, and it is the only field that connects a
+branch to its library system: a branch is named after its neighbourhood —
+*Howard Beach*, *Fresh Meadows*, *Glendale* — so nothing else in the record says
+whether it is NYPL, BPL or QPL. Without it `qpl` found two spots; with it, 68.
+It is null for cafés, whose licence names only the company holding it, and for
+academic and special libraries it simply repeats the facility's own name.
 
 `borough` and `category` are matched despite each having a filter of its own,
 because a search box is where people type them first. Without them

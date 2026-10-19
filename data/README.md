@@ -65,6 +65,20 @@ to put tables on the sidewalk, which is good evidence the place exists and has s
 nothing about hours, Wi-Fi, power, noise, or whether anyone may sit with a laptop and one coffee
 for three hours. The contract has no field for any of that and the application promises none.
 
+## `operator` is who runs it
+
+FacDB's `opname`. For the 226 public branches it is the system — 91 New York Public Library, 68
+Brooklyn, 67 Queens — and it is the only field that says so: a branch is named after its
+neighbourhood, so *Howard Beach* and *Fresh Meadows* carry nothing else to connect them to Queens
+Public Library. The three systems have separate membership, which makes it worth publishing and
+not only searching.
+
+It is not title-cased. Upstream already capitalises this field, unlike `facname`, so passing it
+through the title-caser would leave *Nyu Tamiment Library* exactly as wrong as it arrives. For
+academic and special libraries it repeats the facility's own name, where it adds nothing and does
+no harm. Cafés have none: Dining Out records the company holding the licence, which is
+*CGM-LLNR LLC* where the trading name is *JEAN'S*.
+
 ## Identifiers
 
 A café identifier is `dining:` and a digest of the name and address, as in

@@ -34,12 +34,13 @@ The shared study-spot summary contract is intentionally small:
   "latitude": 40.803027,
   "longitude": -73.934853,
   "university": "Touro University - Harlem",
+  "operator": "New York Public Library",
   "free_public_wifi": true,
   "no_purchase_needed": true
 }
 ```
 
-`university` is proximity and never affiliation or a claim of access. `free_public_wifi` means the city publishes a free hotspot within 25 m; `false` means none is recorded rather than that there is no Wi-Fi, which is why a campus building with credentialled Wi-Fi reads as `false`. `no_purchase_needed` is true where sitting down costs nothing — every library and campus building, no café — and is about money rather than entry.
+`university` is proximity and never affiliation or a claim of access. `free_public_wifi` means the city publishes a free hotspot within 25 m; `false` means none is recorded rather than that there is no Wi-Fi, which is why a campus building with credentialled Wi-Fi reads as `false`. `operator` is who runs the place — for a branch, its library system, which nothing else in the record says. `no_purchase_needed` is true where sitting down costs nothing — every library and campus building, no café — and is about money rather than entry.
 
 Four routes are available alongside `GET /health/live`, none of them with a trailing slash:
 

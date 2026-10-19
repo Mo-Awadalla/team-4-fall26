@@ -90,6 +90,7 @@ CONTRACT_FIELDS = {
     "latitude",
     "longitude",
     "university",
+    "operator",
     "free_public_wifi",
     "no_purchase_needed",
 }

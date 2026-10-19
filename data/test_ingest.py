@@ -37,6 +37,9 @@ PUBLISHED_EXAMPLE = {
     "latitude": 40.803027,
     "longitude": -73.934853,
     "university": "Touro University - Harlem",
+    # FacDB's opname. The branch is named after its neighborhood and nothing
+    # else in the record says which system runs it.
+    "operator": "New York Public Library",
     # The fixture puts a free hotspot on this branch; see fixtures/wifi.json.
     "free_public_wifi": True,
 }
@@ -512,6 +515,7 @@ class TestCuratedBuildings:
                         "latitude": 40.73,
                         "longitude": -73.99,
                         "university": "New York University",
+                        "operator": "New York University",
                         "free_public_wifi": False,
                     }.items()
                 )
@@ -731,3 +735,39 @@ class TestCafesAreNotAttachedToCampuses:
         # The rule is about cafes, not about switching the derivation off.
         spots = ingest.normalize(facilities, [], names, [])
         assert any(spot["university"] for spot in spots if spot["category"] != "university")
+
+
+class TestOperator:
+    """The one field that connects a branch to its library system.
+
+    A branch is named after its neighborhood -- "Howard Beach", "Fresh
+    Meadows" -- so without this nothing in the record says who runs it, and
+    asking for the Queens Public Library branches could not find them.
+    """
+
+    def test_a_branch_names_its_system(self, spots: list[dict[str, Any]]) -> None:
+        assert published(spots, "125th Street Library")["operator"] == "New York Public Library"
+
+    def test_it_is_not_title_cased(self, facilities: list[dict[str, Any]]) -> None:
+        # Upstream already capitalises this field, unlike facname, so running
+        # it through title_case() would only make it worse.
+        record = {**upstream(facilities, "125TH STREET LIBRARY"), "opname": "NYU Tamiment Library"}
+        assert ingest.operator(record) == "NYU Tamiment Library"
+
+    def test_a_record_without_one_publishes_null(
+        self, facilities: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        record = {**upstream(facilities, "125TH STREET LIBRARY")}
+        record.pop("opname", None)
+        assert ingest.normalize([record], [], names, [])[0]["operator"] is None
+
+    def test_a_cafe_has_none(self, cafe_spots: list[dict[str, Any]]) -> None:
+        # Dining Out carries the licence holder -- "CGM-LLNR LLC" where the
+        # trading name is "JEAN'S" -- which is a registration rather than an
+        # operator anyone would search for.
+        assert all(spot["operator"] is None for spot in cafe_spots)
+
+    def test_it_is_part_of_the_contract(self, spots: list[dict[str, Any]]) -> None:
+        assert "operator" in ingest.CONTRACT_FIELDS
+        for spot in spots:
+            assert tuple(spot) == ingest.CONTRACT_FIELDS
