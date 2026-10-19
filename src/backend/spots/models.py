@@ -152,18 +152,32 @@ class StudySpot(models.Model):
     #: than by application code: a generated column cannot fall out of step with
     #: the row the way a column the loader has to remember to update can.
     #:
-    #: The weights are the ranking. A query word found in the name (A) counts for
-    #: more than the same word in the campus (B), the neighborhood (C) or the
-    #: address (D), so "Washington" ranks a library called Washington above one
-    #: on Washington Street. Campus is weighted second because it is the field
-    #: that makes a search for a university find its buildings: 14 spots relate
-    #: to NYU and only 3 say so in their name.
+    #: The weights are the ranking. A query word found in the name (A) counts
+    #: for more than the same word in the campus (B), the neighborhood (C), or
+    #: the address, borough and category (D), so "Washington" ranks a library
+    #: called Washington above one on Washington Street. Campus is weighted
+    #: second because it is the field that makes a search for a university find
+    #: its buildings: 14 spots relate to NYU and only 3 say so in their name.
+    #:
+    #: Borough and category are in here despite each having a filter of its
+    #: own, because without them the phrases people actually type did not work.
+    #: "bronx public library" found three spots and put a Manhattan one first;
+    #: "manhattan library" found five of the sixty-eight. They cannot flood a
+    #: result set either, because the full-text pass requires every word to
+    #: match: "bobst library" still returns the one library named Bobst, since
+    #: only one row matches both words. A bare "cafe" does grow to every cafe,
+    #: which is what the word means.
+    #:
+    #: The category needs no transformation. Postgres splits on the underscore,
+    #: so "public_library" indexes exactly as "public library" does.
     search_vector = models.GeneratedField(
         expression=(
             SearchVector("name", weight="A", config="english")
             + SearchVector("university", weight="B", config="english")
             + SearchVector("neighborhood", weight="C", config="english")
             + SearchVector("address", weight="D", config="english")
+            + SearchVector("borough", weight="D", config="english")
+            + SearchVector("category", weight="D", config="english")
         ),
         output_field=SearchVectorField(),
         db_persist=True,

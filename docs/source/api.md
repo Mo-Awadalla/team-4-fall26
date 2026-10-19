@@ -219,7 +219,18 @@ count for different amounts:
 | `name` | highest | what the place is called is almost always what was meant |
 | `university` | second | the field that makes a campus find its buildings |
 | `neighborhood` | third | where it is, not what it is |
-| `address` | lowest | a place *called* Washington beats the places *on* Washington Street |
+| `address`, `borough`, `category` | lowest | a place *called* Washington beats the places *on* Washington Street |
+
+`borough` and `category` are matched despite each having a filter of its own,
+because a search box is where people type them first. Without them
+`bronx public library` found three spots and put a Manhattan one first, and
+`manhattan library` found five of the sixty-eight.
+
+They cannot flood a result set, because every word still has to match:
+`bobst library` returns the one library named Bobst, since only one row matches
+both words. A bare `cafe` does grow to every café, which is what the word means.
+The category needs no transformation either -- Postgres splits on the
+underscore, so `public_library` indexes exactly as `public library` does.
 
 Requiring every word is what keeps `library bobst` to the one library it
 describes. Scoring the query against the best-matching run of words instead --
@@ -259,6 +270,15 @@ An initialism is expanded before the query reaches Postgres, because no fuzzy
 algorithm connects `NYPL` to `New York Public Library` -- they share almost no
 trigrams. Every word is expanded, so `nyu library` becomes `New York University
 library` and means it. The list is in `spots/search.py`.
+
+**The expansion is a hint, not a replacement.** If it matches nothing, the
+literal term gets a turn before the fuzzy pass does. `CUNY` is the case that
+proved it necessary: it expands to `City University of New York`, which no
+record contains -- the campuses are named `CUNY Hunter College` -- so the single
+attempt failed and the query fell through to trigrams, where `New York Cit...`
+is a close match for *New York City Bagel & Coffee House*. Typing CUNY returned
+bagel shops. The fuzzy pass now also runs on what was typed rather than on the
+expansion, so nothing is ever matched against words the search box substituted.
 
 ### As you type
 
