@@ -74,7 +74,7 @@ NYC Open Data -> data/ingest.py -> data/spots.json -> load_spots -> spots table
                                                                  \-> search projection
 ```
 
-`data/spots.json` is the reproducible normalized snapshot and the source of truth. The `spots` table is a rebuildable projection of it, and any Meilisearch index is another projection, not an independent source of truth.
+`data/spots.json` is the reproducible normalized snapshot and the source of truth. The `spots` table is a rebuildable projection of it, and the `search_vector` column is a projection of that in turn -- Postgres generates it from the row, so it cannot drift from what it describes.
 
 Load or reload the local database with:
 
