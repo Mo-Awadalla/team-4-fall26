@@ -27,9 +27,23 @@ variable "environment" {
 }
 
 variable "region" {
-  description = "AWS region for everything except the CloudFront certificate."
+  description = <<-EOT
+    AWS region for everything except the CloudFront certificate.
+
+    us-east-2 rather than the more usual us-east-1 because the organization this
+    account belongs to applies a region-scoped service control policy: EC2, RDS,
+    Lambda and Secrets Manager are permitted in us-east-2 and explicitly denied
+    elsewhere. An apply against another region fails at the first call with an
+    UnauthorizedOperation naming the policy, not with anything that looks like a
+    configuration error.
+
+    One consequence worth knowing: CloudFront requires ACM certificates in
+    us-east-1, which that policy denies. A custom domain is therefore blocked
+    until the policy changes. The default CloudFront certificate needs no ACM,
+    so nothing here is affected today.
+  EOT
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 # -- Network -------------------------------------------------------------------
@@ -97,9 +111,18 @@ variable "db_multi_az" {
 }
 
 variable "db_backup_retention_days" {
-  description = "Automated backup retention. Zero disables backups entirely."
+  description = <<-EOT
+    Automated backup retention. Zero disables backups entirely.
+
+    One day, not the seven a production database would want, because an account
+    on the AWS Free Plan is capped: CreateDBInstance fails outright with
+    FreeTierRestrictionError rather than silently clamping the value. Raise it
+    after the account moves to a paid plan, and raise it before this database
+    holds anything that cannot be rebuilt from data/spots.json -- favourites and
+    reviews, when the backlog reaches them, are exactly that.
+  EOT
   type        = number
-  default     = 7
+  default     = 1
 }
 
 variable "database_publicly_accessible" {

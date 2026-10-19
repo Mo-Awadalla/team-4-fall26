@@ -3,7 +3,7 @@
 # This reproduces the path split vercel.json already defines, so the deployed
 # contract does not change between the two hosting providers:
 #
-#   /api/*  -> the FastAPI function, with the /api prefix stripped
+#   /api/*  -> API Gateway, then the Django function, with /api stripped
 #   /*      -> the static SvelteKit build in S3
 
 data "aws_cloudfront_cache_policy" "caching_optimized" {
@@ -33,20 +33,12 @@ resource "aws_cloudfront_origin_access_control" "site" {
   signing_protocol                  = "sigv4"
 }
 
-resource "aws_cloudfront_origin_access_control" "api" {
-  name                              = "${local.name_prefix}-api"
-  description                       = "StudySpot API function URL"
-  origin_access_control_origin_type = "lambda"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
-}
-
 # -- Edge rewrites -------------------------------------------------------------
 
 resource "aws_cloudfront_function" "api_rewrite" {
   name    = "${local.name_prefix}-api-rewrite"
   runtime = "cloudfront-js-2.0"
-  comment = "Strips the public /api prefix before the request reaches FastAPI"
+  comment = "Strips the public /api prefix before the request reaches Django"
   code    = file("${path.module}/functions/api-rewrite.js")
   publish = true
 }
@@ -54,7 +46,7 @@ resource "aws_cloudfront_function" "api_rewrite" {
 resource "aws_cloudfront_function" "site_rewrite" {
   name    = "${local.name_prefix}-site-rewrite"
   runtime = "cloudfront-js-2.0"
-  comment = "Serves the SvelteKit shell for routes that are not files in S3"
+  comment = "Maps clean URLs onto the prerendered HTML files in S3"
   code    = file("${path.module}/functions/site-rewrite.js")
   publish = true
 }
@@ -74,10 +66,15 @@ resource "aws_cloudfront_distribution" "main" {
     origin_access_control_id = aws_cloudfront_origin_access_control.site.id
   }
 
+  # No origin access control on this one. OAC can sign to an S3 bucket or a
+  # Lambda function URL, not to API Gateway, so the gateway's endpoint is
+  # publicly reachable and CloudFront is a convenience rather than a gate. For a
+  # read-only public API that is acceptable; the way to close it would be a REST
+  # API with a resource policy restricting the caller to this distribution, or a
+  # shared secret header CloudFront adds and Django checks.
   origin {
-    origin_id                = "api"
-    domain_name              = trimsuffix(trimprefix(aws_lambda_function_url.api.function_url, "https://"), "/")
-    origin_access_control_id = aws_cloudfront_origin_access_control.api.id
+    origin_id   = "api"
+    domain_name = trimsuffix(trimprefix(aws_apigatewayv2_api.api.api_endpoint, "https://"), "/")
 
     custom_origin_config {
       origin_protocol_policy = "https-only"

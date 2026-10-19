@@ -56,11 +56,15 @@ resource "aws_db_instance" "main" {
   engine_version = var.db_engine_version
   instance_class = var.db_instance_class
 
-  # gp3 at the 20 GB floor. Storage autoscaling is capped so that a runaway write
-  # cannot quietly grow the bill; the dataset is a few megabytes.
+  # gp3 at the 20 GB floor, which is also the Free Plan's ceiling.
+  #
+  # Storage autoscaling is off: setting max_allocated_storage equal to
+  # allocated_storage disables it. Allowing growth past 20 GB would both exceed
+  # what the Free Plan permits and let a runaway write quietly grow the bill,
+  # and the dataset is a few megabytes against a 20 GB floor.
   storage_type          = "gp3"
   allocated_storage     = var.db_allocated_storage
-  max_allocated_storage = var.db_allocated_storage * 2
+  max_allocated_storage = var.db_allocated_storage
   storage_encrypted     = true
 
   db_name  = var.db_name
