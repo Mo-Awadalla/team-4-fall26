@@ -169,7 +169,7 @@ HTTP_TIMEOUT_SECONDS = 60
 #: NYC Open Data asks for identifiable traffic and sheds load under pressure.
 #: Two requests do not need a budget, but paging politely costs nothing.
 PAGE_DELAY_SECONDS = 0.25
-USER_AGENT = "StudySpot-ingest/1.0 (+https://github.com/2SpaceMasterRace/studyspot)"
+USER_AGENT = "StudySpot-ingest/1.0 (+https://github.com/gcivil-nyu-org/team-4-fall26)"
 
 #: The fields ``load_spots`` accepts. A tenth field fails the load rather than
 #: being dropped, so the importer checks its own output against this.

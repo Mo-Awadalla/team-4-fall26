@@ -13,8 +13,8 @@ html_title = "StudySpot documentation"
 html_static_path = ["_static"]
 html_theme_options = {
     "navigation_with_keys": True,
-    "source_repository": "https://github.com/2SpaceMasterRace/studyspot/",
-    "source_branch": "main",
+    "source_repository": "https://github.com/gcivil-nyu-org/team-4-fall26/",
+    "source_branch": "develop",
     "source_directory": "docs/source/",
     "light_css_variables": {
         "color-brand-primary": "#6f3f2c",

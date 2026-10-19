@@ -7,8 +7,8 @@ Docker Compose is the default path because it requires the fewest host tools. Ni
 Install Git and a recent Docker distribution with Docker Compose 2.23 or newer, then run:
 
 ```shell
-git clone git@github.com:2SpaceMasterRace/studyspot.git
-cd studyspot
+git clone git@github.com:gcivil-nyu-org/team-4-fall26.git
+cd team-4-fall26
 docker compose up --build --watch
 ```
 

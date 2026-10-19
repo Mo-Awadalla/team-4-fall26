@@ -164,7 +164,7 @@ back into `develop` immediately so the branches do not diverge.
 
 ## Reporting issues
 
-Search [existing issues](https://github.com/2SpaceMasterRace/studyspot/issues) before opening a
+Search [existing issues](https://github.com/gcivil-nyu-org/team-4-fall26/issues) before opening a
 new one. Use the repository's bug report or feature request template.
 
 A useful bug report includes:
