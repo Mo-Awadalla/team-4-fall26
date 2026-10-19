@@ -5,7 +5,7 @@
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data.
 
 > [!IMPORTANT]
-> StudySpot is early but no longer empty. The frontend, the Django API, the shared study-spot model and its migrations, the NYC Open Data importer and its snapshot, the dataset loader, the listing and detail routes, the Meilisearch service, CI, and both deployment targets are in place. `data/spots.json` holds 380 real libraries and campuses; the city's facilities database lists no cafés, so the published `cafe` category has no source yet, and indexing and search behavior are not implemented.
+> StudySpot is early but no longer empty. The frontend, the Django API, the shared study-spot model and its migrations, the NYC Open Data importer and its snapshot, the dataset loader, the listing and detail routes, the Meilisearch service, CI, and both deployment targets are in place. `data/spots.json` holds 380 real libraries and campuses; the city's facilities database lists no cafés, so the published `cafe` category has no source yet. The browser search is wired to the listing filters and returns real results; a dedicated search endpoint and a Meilisearch index are not implemented, so a query is matched against a spot's name and then its neighborhood rather than ranked.
 
 ## How will it work?
 
