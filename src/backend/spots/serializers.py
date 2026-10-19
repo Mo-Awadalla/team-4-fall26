@@ -34,6 +34,7 @@ class StudySpotSerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
             "university",
+            "free_public_wifi",
         ]
 
 
@@ -71,6 +72,17 @@ class SpotQuerySerializer(serializers.Serializer):
 
     name = filter_field("Case-insensitive substring match on the spot name.")
     neighborhood = filter_field("Case-insensitive exact match on the neighborhood name.")
+    category = filter_field(
+        "Case-insensitive exact match on the category. The vocabulary belongs to the "
+        "importer rather than to this endpoint, so the values a snapshot actually "
+        "contains are what GET /spots/facets reports."
+    )
+    free_public_wifi = serializers.BooleanField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text="Restrict to spots with, or without, free public Wi-Fi nearby.",
+    )
     borough = BoroughField(
         required=False,
         trim_whitespace=True,
@@ -138,6 +150,26 @@ class SpotSearchQuerySerializer(serializers.Serializer):
         min_length=1,
         max_length=MAX_FILTER_LENGTH,
         help_text="Free text matched against the spot name and neighborhood.",
+    )
+
+    # The same filters the listing endpoint takes. They narrow the candidates
+    # before ranking, so "library" restricted to the Bronx ranks the Bronx
+    # libraries rather than ranking everything and hiding most of it.
+    neighborhood = filter_field("Case-insensitive exact match on the neighborhood name.")
+    borough = BoroughField(
+        required=False,
+        trim_whitespace=True,
+        min_length=1,
+        max_length=MAX_FILTER_LENGTH,
+        help_text="Case-insensitive exact match on one of the five boroughs.",
+    )
+    category = filter_field("Case-insensitive exact match on the category.")
+    university = filter_field("Case-insensitive exact match on the campus.")
+    free_public_wifi = serializers.BooleanField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text="Restrict to spots with, or without, free public Wi-Fi nearby.",
     )
 
     limit = serializers.IntegerField(

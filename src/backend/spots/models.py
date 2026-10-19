@@ -110,6 +110,16 @@ class StudySpot(models.Model):
         ),
     )
 
+    free_public_wifi = models.BooleanField(
+        default=False,
+        help_text=(
+            "Whether a free public Wi-Fi hotspot the city publishes sits within 25 m. "
+            "False means none is recorded, not that there is no Wi-Fi: a campus "
+            "building's Wi-Fi needs the university's credentials and the city has no "
+            "reason to know about it."
+        ),
+    )
+
     class Meta:
         db_table = "spots"
         verbose_name = "study spot"
@@ -146,6 +156,7 @@ class StudySpot(models.Model):
             models.Index(Upper("neighborhood"), name="spots_neighborhood_idx"),
             models.Index(Upper("borough"), name="spots_borough_idx"),
             models.Index(Upper("university"), name="spots_university_idx"),
+            models.Index(fields=["free_public_wifi"], name="spots_wifi_idx"),
             # Trigram indexes for the ranked search in spots/search.py. A GIN
             # index with gin_trgm_ops is what turns a similarity comparison
             # from a scan of every row into an index lookup, and it serves the

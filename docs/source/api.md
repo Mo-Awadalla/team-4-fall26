@@ -38,7 +38,12 @@ No route has a trailing slash, and the application does not redirect one onto th
 
 The records represent public third places from NYC Open Data — today the libraries and campuses of the city's facilities database. They are candidate gathering and study locations; the API must not imply that unverified amenities are available. This response shape belongs to the shared contract. Changes require review from frontend, API, data, and search owners.
 
-`category` currently takes one of `library`, `academic_library`, `university`, or `university_building`. `university_building` is a campus building a student can work in; the city's facilities database registers institutions and administrative points rather than buildings, so these come from the curated list in `data/nyu_buildings.json` and all carry the `nyu:` identifier prefix. `cafe` is part of the published vocabulary and has no source yet: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration. `borough` is one of the five borough names and the database refuses any other. `neighborhood` is the 2020 Neighborhood Tabulation Area name and is `null` when NYC Open Data does not place the record in one.
+`category` currently takes one of `library`, `academic_library`, `university`, or `university_building`. `university_building` is a campus building a student can work in; the city's facilities database registers institutions and administrative points rather than buildings, so these come from the curated list in `data/nyu_buildings.json` and all carry the `nyu:` identifier prefix. `cafe` is part of the published vocabulary and has no source yet: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
+sits within 25 m, derived from `yjub-udmw`. False means none is recorded, which
+is not the same as there being no Wi-Fi: a campus building's network needs the
+university's credentials, and the city has no reason to know about it. The field
+answers whether *anyone* can use Wi-Fi there. `borough` is one of the five
+borough names and the database refuses any other. `neighborhood` is the 2020 Neighborhood Tabulation Area name and is `null` when NYC Open Data does not place the record in one.
 
 ```{important}
 `university` is an addition to the previously agreed contract and still needs owner sign-off. It is proximity and nothing else: it names the closest campus within 500 metres, or the campus itself for a campus record, and is `null` when no campus is that close. The campus list is curated — the college and university records of the city's facilities database — and the field is never guessed from a spot's name, its operator, or anything else. It is not an affiliation, an endorsement, or an access claim: a named campus does not mean the institution is connected to the spot or that the public may use the room. In the example above, 169 metres separate a public library branch from a campus with no relationship to it.
@@ -115,6 +120,38 @@ Every non-2xx response uses one envelope:
 | 422 | `validation_error` | A parameter is missing, malformed, out of range, or unrecognized. |
 | 500 | `internal_error` | An unhandled failure. The cause is logged, never returned. |
 | 503 | `database_unavailable` | Postgres could not answer the query, or has never been migrated. |
+
+## Filtering
+
+Both `GET /spots` and `GET /spots/search` take the same filters: `neighborhood`,
+`borough`, `category`, `university`, and `free_public_wifi`. They combine with
+AND, so supplying two narrows rather than widens, and on the search endpoint
+they narrow the candidates *before* ranking. Filtering after ranking would drop
+the best matches out of a page rather than out of the result set, and the
+reported total would describe something the caller never sees.
+
+`free_public_wifi` takes `true` or `false`. False is a filter in its own right,
+not the absence of one.
+
+A present but empty parameter is a `422`, the same as an unrecognized one: a
+filter whose value was lost should fail rather than quietly widen the search.
+
+### `GET /spots/facets`
+
+```json
+{
+  "boroughs": [{ "value": "Manhattan", "count": 151 }],
+  "categories": [{ "value": "library", "count": 248 }],
+  "universities": [{ "value": "New York University", "count": 12 }]
+}
+```
+
+What the filters can be set to, with how many spots carry each value. A client
+cannot derive this from the contract: `borough` is five fixed names, but the
+category vocabulary belongs to the importer and the campuses are whatever the
+snapshot contains, so a hard-coded list would silently stop matching when the
+data changes. Counts are included because offering a value that matches nothing
+is worse than not offering it.
 
 ## Searching
 

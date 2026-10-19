@@ -8,7 +8,8 @@
     "borough": "Manhattan",
     "latitude": 40.764003,
     "longitude": -73.969857,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:00a024c4889cd4120d01cb85f8398e07",
@@ -19,7 +20,8 @@
     "borough": "Manhattan",
     "latitude": 40.770217,
     "longitude": -73.982697,
-    "university": "NY Inst Tech-Manhattan Campus"
+    "university": "NY Inst Tech-Manhattan Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0272db2a815f38d52de5a70bb9181fca",
@@ -30,7 +32,8 @@
     "borough": "Queens",
     "latitude": 40.663813,
     "longitude": -73.841801,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:02923b42067a8b3790486a4763d785f5",
@@ -41,7 +44,8 @@
     "borough": "Queens",
     "latitude": 40.741559,
     "longitude": -73.782268,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:02cb698f33a96d5ab6deb0cb9df019c1",
@@ -52,7 +56,8 @@
     "borough": "Queens",
     "latitude": 40.702581,
     "longitude": -73.875799,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:0312ff0b7fe412109cda32662d5dfad8",
@@ -63,7 +68,8 @@
     "borough": "Bronx",
     "latitude": 40.861265,
     "longitude": -73.887395,
-    "university": "Fordham Univ (Rose Hill-Lincoln Ctr)"
+    "university": "Fordham Univ (Rose Hill-Lincoln Ctr)",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0316d8b022043f0b657b19ab0aa20eaf",
@@ -74,7 +80,8 @@
     "borough": "Manhattan",
     "latitude": 40.74583,
     "longitude": -74.004178,
-    "university": "Gen Theo Sem-Protestant Epis Ch U S"
+    "university": "Gen Theo Sem-Protestant Epis Ch U S",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:032108b6f64e3f45f9046c37e20db0a2",
@@ -85,7 +92,8 @@
     "borough": "Manhattan",
     "latitude": 40.73795,
     "longitude": -73.998944,
-    "university": "Pratt Institute Manhattan Cntr"
+    "university": "Pratt Institute Manhattan Cntr",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:03c6d733eefe179d405351b9ccc899ca",
@@ -96,7 +104,8 @@
     "borough": "Bronx",
     "latitude": 40.831272,
     "longitude": -73.90179,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:043a663af03b0d70d0a3f7831ef1aefd",
@@ -107,7 +116,8 @@
     "borough": "Manhattan",
     "latitude": 40.72731,
     "longitude": -73.980411,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:04936216558ef20601879ec29d89afda",
@@ -118,7 +128,8 @@
     "borough": "Manhattan",
     "latitude": 40.708623,
     "longitude": -74.014678,
-    "university": "Metropolitan College of NY (MCNY)"
+    "university": "Metropolitan College of NY (MCNY)",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:05601de94006cc0b5ec99e025c6bfe0b",
@@ -129,7 +140,8 @@
     "borough": "Bronx",
     "latitude": 40.84401,
     "longitude": -73.910092,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:057d26a803e341d91bdb735afd961e30",
@@ -140,7 +152,8 @@
     "borough": "Queens",
     "latitude": 40.725941,
     "longitude": -73.820748,
-    "university": "Touro University - Kew Gardens"
+    "university": "Touro University - Kew Gardens",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:05aa37b0e376beb93718d719151d119e",
@@ -151,7 +164,8 @@
     "borough": "Brooklyn",
     "latitude": 40.640726,
     "longitude": -73.985826,
-    "university": "Daemen University-Brooklyn Branch"
+    "university": "Daemen University-Brooklyn Branch",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:06994ae1765308adf812985cb2204b7d",
@@ -162,7 +176,8 @@
     "borough": "Brooklyn",
     "latitude": 40.623071,
     "longitude": -73.989444,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:072c748a2f8a2563ee7b7b4299bd9999",
@@ -173,7 +188,8 @@
     "borough": "Manhattan",
     "latitude": 40.72813,
     "longitude": -73.991613,
-    "university": "Cooper Union"
+    "university": "Cooper Union",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0809656e340a82528569fc986db14658",
@@ -184,7 +200,8 @@
     "borough": "Brooklyn",
     "latitude": 40.587009,
     "longitude": -73.955429,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:08172fb3a315dd5fa26a6cc37b0a6743",
@@ -195,7 +212,8 @@
     "borough": "Queens",
     "latitude": 40.680322,
     "longitude": -73.791681,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:08709d41fe31d25e513310a33f90bfe8",
@@ -206,7 +224,8 @@
     "borough": "Brooklyn",
     "latitude": 40.655086,
     "longitude": -73.944912,
-    "university": "SUNY Downstate Health Sciences Univ."
+    "university": "SUNY Downstate Health Sciences Univ.",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:08a69fdfc1cfff9336889ff678362ddd",
@@ -217,7 +236,8 @@
     "borough": "Manhattan",
     "latitude": 40.74558,
     "longitude": -73.984903,
-    "university": "Amer Academy of Dramatic Arts"
+    "university": "Amer Academy of Dramatic Arts",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:09a564c8e4f30ff80cc382200d8e775d",
@@ -228,7 +248,8 @@
     "borough": "Manhattan",
     "latitude": 40.808231,
     "longitude": -73.961837,
-    "university": "Columbia University"
+    "university": "Columbia University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0a1b6e5a0b3f8fa0c38c6a910916b2f3",
@@ -239,7 +260,8 @@
     "borough": "Brooklyn",
     "latitude": 40.672646,
     "longitude": -73.874089,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:0ad7841a37579731c647d893439e431e",
@@ -250,7 +272,8 @@
     "borough": "Queens",
     "latitude": 40.604334,
     "longitude": -73.752466,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0c7334464469f72625f91403211ad338",
@@ -261,7 +284,8 @@
     "borough": "Manhattan",
     "latitude": 40.805578,
     "longitude": -73.966663,
-    "university": "Bank Street Col of Educ"
+    "university": "Bank Street Col of Educ",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0d05a6859eadd3cb40d336e844cb319d",
@@ -272,7 +296,8 @@
     "borough": "Manhattan",
     "latitude": 40.745807,
     "longitude": -73.987455,
-    "university": "Coll of New Rochelle at NY Theo Semi"
+    "university": "Coll of New Rochelle at NY Theo Semi",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0dd13768bcd79d58d88cd5d7235c974e",
@@ -283,7 +308,8 @@
     "borough": "Brooklyn",
     "latitude": 40.625163,
     "longitude": -73.959966,
-    "university": "Touro University - Flatbush"
+    "university": "Touro University - Flatbush",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:0ddf3f7fd6063f6f89642e76e3c68f56",
@@ -294,7 +320,8 @@
     "borough": "Bronx",
     "latitude": 40.837967,
     "longitude": -73.923545,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:0e18d5f24d7aada30769753cf69849c8",
@@ -305,7 +332,8 @@
     "borough": "Queens",
     "latitude": 40.782536,
     "longitude": -73.777015,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:0f70705af2d8110f7757f193ee996491",
@@ -316,7 +344,8 @@
     "borough": "Staten Island",
     "latitude": 40.566544,
     "longitude": -74.13855,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:10c0c3484af97dbdbd519ac043dd6448",
@@ -327,7 +356,8 @@
     "borough": "Bronx",
     "latitude": 40.888901,
     "longitude": -73.840834,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:10c585f927aec1bde8b7173d69df8d61",
@@ -338,7 +368,8 @@
     "borough": "Brooklyn",
     "latitude": 40.695417,
     "longitude": -73.987689,
-    "university": "CUNY NYC College of Technology"
+    "university": "CUNY NYC College of Technology",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:11227fa7d859b1c64029c0a3c92b4911",
@@ -349,7 +380,8 @@
     "borough": "Bronx",
     "latitude": 40.870146,
     "longitude": -73.845066,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1272cb890cb09e441317c0ee2fbea430",
@@ -360,7 +392,8 @@
     "borough": "Manhattan",
     "latitude": 40.764349,
     "longitude": -73.983784,
-    "university": "Mandl School Inc"
+    "university": "Mandl School Inc",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:12f9ad95f1a7100bbe3ae67f2da79089",
@@ -371,7 +404,8 @@
     "borough": "Queens",
     "latitude": 40.773759,
     "longitude": -73.79635,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:13087f1014cb4ae22b84af82d279a681",
@@ -382,7 +416,8 @@
     "borough": "Brooklyn",
     "latitude": 40.713637,
     "longitude": -73.947968,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:13522ee484728cf90b296e5706502f14",
@@ -393,7 +428,8 @@
     "borough": "Brooklyn",
     "latitude": 40.616315,
     "longitude": -74.01199,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:13a45234dc98200df9154e26fab699c6",
@@ -404,7 +440,8 @@
     "borough": "Brooklyn",
     "latitude": 40.691801,
     "longitude": -73.964196,
-    "university": "Pratt Institute"
+    "university": "Pratt Institute",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:144c91d88e55a62205c5cc9d22c95752",
@@ -415,7 +452,8 @@
     "borough": "Manhattan",
     "latitude": 40.724074,
     "longitude": -73.995724,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:146745b995f7db41ff9738ef021e27a3",
@@ -426,7 +464,8 @@
     "borough": "Queens",
     "latitude": 40.60074,
     "longitude": -73.820053,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:146a0eccf131ea7b836b5cdecf44682c",
@@ -437,7 +476,8 @@
     "borough": "Manhattan",
     "latitude": 40.850546,
     "longitude": -73.92981,
-    "university": "Yeshiva University"
+    "university": "Yeshiva University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:14a0a05fcb5e1354be00d97b9bdf112e",
@@ -448,7 +488,8 @@
     "borough": "Queens",
     "latitude": 40.788538,
     "longitude": -73.810719,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:152b4ea25001f26454e5f99aa07f8d64",
@@ -459,7 +500,8 @@
     "borough": "Brooklyn",
     "latitude": 40.664473,
     "longitude": -73.905219,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1674f5b16b2f82759d039b8b8309d388",
@@ -470,7 +512,8 @@
     "borough": "Manhattan",
     "latitude": 40.833477,
     "longitude": -73.945882,
-    "university": "Boricua College"
+    "university": "Boricua College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:16c43157ad1d08974acb24533d982f8d",
@@ -481,7 +524,8 @@
     "borough": "Brooklyn",
     "latitude": 40.683037,
     "longitude": -73.934838,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:16f77463d54e81fc6320bcc00cfc239c",
@@ -492,7 +536,8 @@
     "borough": "Manhattan",
     "latitude": 40.865725,
     "longitude": -73.92572,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:17422b7fccdbd202e287b5edd43b3238",
@@ -503,7 +548,8 @@
     "borough": "Manhattan",
     "latitude": 40.790412,
     "longitude": -73.952859,
-    "university": "Mt Sinai School of Medicine"
+    "university": "Mt Sinai School of Medicine",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:1796ef48f88daa663ce954b67b58aa47",
@@ -514,7 +560,8 @@
     "borough": "Brooklyn",
     "latitude": 40.684789,
     "longitude": -73.915177,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:190c1da8dc160502e5ed0f93514025c2",
@@ -525,7 +572,8 @@
     "borough": "Manhattan",
     "latitude": 40.740157,
     "longitude": -73.993377,
-    "university": "New York Conservatory for Dramatic A"
+    "university": "New York Conservatory for Dramatic A",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:1948ba31c21bacc79ecc2578210bfeb2",
@@ -536,7 +584,8 @@
     "borough": "Queens",
     "latitude": 40.763755,
     "longitude": -73.809835,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1a8ec7ee1d74ff7f47ebeb7b0c6cdf3b",
@@ -547,7 +596,8 @@
     "borough": "Manhattan",
     "latitude": 40.749995,
     "longitude": -73.987127,
-    "university": "Mercy Univ.-Manhattan Campus"
+    "university": "Mercy Univ.-Manhattan Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:1b2d01dbabaa19954081aa7950433960",
@@ -558,7 +608,8 @@
     "borough": "Manhattan",
     "latitude": 40.713607,
     "longitude": -74.007866,
-    "university": "Pace University - NYC Campus"
+    "university": "Pace University - NYC Campus",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1b5f19ba9293b1171b520d2ce197f0fb",
@@ -569,7 +620,8 @@
     "borough": "Brooklyn",
     "latitude": 40.651921,
     "longitude": -73.958256,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1b93bf18b98a19a8f00758b5528a2e78",
@@ -580,7 +632,8 @@
     "borough": "Brooklyn",
     "latitude": 40.638856,
     "longitude": -73.989018,
-    "university": "Daemen University-Brooklyn Branch"
+    "university": "Daemen University-Brooklyn Branch",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1c251538ea7f4571d32788a8cc08a01e",
@@ -591,7 +644,8 @@
     "borough": "Manhattan",
     "latitude": 40.706489,
     "longitude": -74.012272,
-    "university": "The King's College"
+    "university": "The King's College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:1e61ab24f52d4baa3dbda1d3e19426a2",
@@ -602,7 +656,8 @@
     "borough": "Manhattan",
     "latitude": 40.813781,
     "longitude": -73.957055,
-    "university": "Jewish Theological Semnry of America"
+    "university": "Jewish Theological Semnry of America",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1e7b03d615f7e8d0cdbacec9d851b4bf",
@@ -613,7 +668,8 @@
     "borough": "Queens",
     "latitude": 40.705179,
     "longitude": -73.902573,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1eb372bf506d6952df43b15aec920e7c",
@@ -624,7 +680,8 @@
     "borough": "Staten Island",
     "latitude": 40.634516,
     "longitude": -74.114819,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:1f17a2b85addc7978f0fcece057f4ef7",
@@ -635,7 +692,8 @@
     "borough": "Queens",
     "latitude": 40.711195,
     "longitude": -73.853673,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:2232149c08d35cccc85205d8cecf9db5",
@@ -646,7 +704,8 @@
     "borough": "Staten Island",
     "latitude": 40.634688,
     "longitude": -74.16661,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:23066dbb4dac5f0cc8ab8b99a2b4ccee",
@@ -657,7 +716,8 @@
     "borough": "Manhattan",
     "latitude": 40.751433,
     "longitude": -74.004319,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:2311731d2ff6be516fcf239b9e813b8f",
@@ -668,7 +728,8 @@
     "borough": "Brooklyn",
     "latitude": 40.690304,
     "longitude": -73.986037,
-    "university": "St Francis College"
+    "university": "St Francis College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:236183dcfecc8d0ae3528d0ca05f7622",
@@ -679,7 +740,8 @@
     "borough": "Bronx",
     "latitude": 40.891106,
     "longitude": -73.859524,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:238830045f7fec917afba635e4c868ff",
@@ -690,7 +752,8 @@
     "borough": "Bronx",
     "latitude": 40.86681,
     "longitude": -73.863225,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:239641abfa8c5a22c60dcb876e2e5b2f",
@@ -701,7 +764,8 @@
     "borough": "Manhattan",
     "latitude": 40.7565,
     "longitude": -73.986877,
-    "university": "Touro University"
+    "university": "Touro University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:23ae2ab0daa02c135876a4c613e81125",
@@ -712,7 +776,8 @@
     "borough": "Queens",
     "latitude": 40.593153,
     "longitude": -73.784041,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:247e317f36abd76002161eba32a24826",
@@ -723,7 +788,8 @@
     "borough": "Queens",
     "latitude": 40.750899,
     "longitude": -73.861982,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:24a091dc4d37748f8d20c8fbf4799b7d",
@@ -734,7 +800,8 @@
     "borough": "Queens",
     "latitude": 40.759254,
     "longitude": -73.731831,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:24e045a8a5afde4030a0e16554d31272",
@@ -745,7 +812,8 @@
     "borough": "Staten Island",
     "latitude": 40.604805,
     "longitude": -74.1541,
-    "university": "CUNY College of Staten Island"
+    "university": "CUNY College of Staten Island",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:24f054cf513b3cde6d8bc7490f7201a4",
@@ -756,7 +824,8 @@
     "borough": "Manhattan",
     "latitude": 40.811249,
     "longitude": -73.962208,
-    "university": "Union Theological Seminary"
+    "university": "Union Theological Seminary",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:24f512c060e65a59e7145a896293cd17",
@@ -767,7 +836,8 @@
     "borough": "Manhattan",
     "latitude": 40.72949,
     "longitude": -73.99726,
-    "university": "LIU-New York University Campus"
+    "university": "LIU-New York University Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:2599dfec312b853a44b3967a3d632a13",
@@ -778,7 +848,8 @@
     "borough": "Manhattan",
     "latitude": 40.747422,
     "longitude": -73.992826,
-    "university": "Fashion Institute of Technology"
+    "university": "Fashion Institute of Technology",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:25e45e21092f0f165362a5d9e1c8a6d2",
@@ -789,7 +860,8 @@
     "borough": "Queens",
     "latitude": 40.721905,
     "longitude": -73.794974,
-    "university": "St. John's University"
+    "university": "St. John's University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:264b7f8f8a579c5347016fd3aaf03b15",
@@ -800,7 +872,8 @@
     "borough": "Brooklyn",
     "latitude": 40.619782,
     "longitude": -73.933212,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:281ed1b58917038a2ca8afb34eee5097",
@@ -811,7 +884,8 @@
     "borough": "Brooklyn",
     "latitude": 40.651891,
     "longitude": -73.958256,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:29f8d9ac1aedc6af6a4b79b47e752803",
@@ -822,7 +896,8 @@
     "borough": "Manhattan",
     "latitude": 40.764749,
     "longitude": -73.954731,
-    "university": "Cornell Univ Medical Campus"
+    "university": "Cornell Univ Medical Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:2ae4447cf0f2e4763b554fe7f16581df",
@@ -833,7 +908,8 @@
     "borough": "Queens",
     "latitude": 40.772389,
     "longitude": -73.928724,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:2b5641bc7ec78d5c9cbfd64b4e283f19",
@@ -844,7 +920,8 @@
     "borough": "Manhattan",
     "latitude": 40.714934,
     "longitude": -74.008106,
-    "university": "New York Law School"
+    "university": "New York Law School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:2c8cc67ce4e6c79f80d06dc0d521d8b9",
@@ -855,7 +932,8 @@
     "borough": "Queens",
     "latitude": 40.745349,
     "longitude": -73.909799,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:2d07b03deb842c29335797f7e4300946",
@@ -866,7 +944,8 @@
     "borough": "Manhattan",
     "latitude": 40.718729,
     "longitude": -74.011832,
-    "university": "Borough Manhattan Comm College"
+    "university": "Borough Manhattan Comm College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:2d562a3c6f43d5346a2a0a0f94f751a3",
@@ -877,7 +956,8 @@
     "borough": "Bronx",
     "latitude": 40.844682,
     "longitude": -73.883047,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:2d77682816fa96c0be4ca4aa30353f52",
@@ -888,7 +968,8 @@
     "borough": "Bronx",
     "latitude": 40.874479,
     "longitude": -73.891615,
-    "university": "CUNY Lehman College"
+    "university": "CUNY Lehman College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:306b0e90f4a5b7c0ca7d6101c5b9a8bb",
@@ -899,7 +980,8 @@
     "borough": "Staten Island",
     "latitude": 40.605707,
     "longitude": -74.179917,
-    "university": "St. Paul's Schl Nurs - SI"
+    "university": "St. Paul's Schl Nurs - SI",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:30aae3a8c9b3eaae63c36361eda495e7",
@@ -910,7 +992,8 @@
     "borough": "Manhattan",
     "latitude": 40.751786,
     "longitude": -73.981528,
-    "university": "CUNY Stella and Charles Guttman Comm"
+    "university": "CUNY Stella and Charles Guttman Comm",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:31971d0d12184840cc35513e7c596f43",
@@ -921,7 +1004,8 @@
     "borough": "Manhattan",
     "latitude": 40.773848,
     "longitude": -73.983162,
-    "university": "Juilliard School (The)"
+    "university": "Juilliard School (The)",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:31fa500d086bf3670a51c7041c46154e",
@@ -932,7 +1016,8 @@
     "borough": "Brooklyn",
     "latitude": 40.679958,
     "longitude": -73.945636,
-    "university": "Coll of New Rochelle Brooklyn Campus"
+    "university": "Coll of New Rochelle Brooklyn Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:33287cda7c7d99a02fcd26724d69300d",
@@ -943,7 +1028,8 @@
     "borough": "Brooklyn",
     "latitude": 40.671469,
     "longitude": -73.908591,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3385bf98f721fb0ee9683edb1a59a23d",
@@ -954,7 +1040,8 @@
     "borough": "Bronx",
     "latitude": 40.822908,
     "longitude": -73.81909,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3401a31539e2335141430e6be45dbf1a",
@@ -965,7 +1052,8 @@
     "borough": "Manhattan",
     "latitude": 40.801539,
     "longitude": -73.935287,
-    "university": "Touro University - Harlem"
+    "university": "Touro University - Harlem",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:3474af1c39cf86d85b6109e992d37cbf",
@@ -976,7 +1064,8 @@
     "borough": "Brooklyn",
     "latitude": 40.726063,
     "longitude": -73.950631,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3583d175adfc7409c2c9e95a69a7dc21",
@@ -987,7 +1076,8 @@
     "borough": "Staten Island",
     "latitude": 40.641766,
     "longitude": -74.076648,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:361b5dfe9b89cea512bc67979c2d284c",
@@ -998,7 +1088,8 @@
     "borough": "Brooklyn",
     "latitude": 40.635752,
     "longitude": -73.947628,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:36ca16c9a9d91bd90eb53ace85d58908",
@@ -1009,7 +1100,8 @@
     "borough": "Queens",
     "latitude": 40.745287,
     "longitude": -73.958025,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:372fb557176fa793c1c791a19ec21d2f",
@@ -1020,7 +1112,8 @@
     "borough": "Manhattan",
     "latitude": 40.729427,
     "longitude": -74.012727,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:383a6205d842453971e69413144df108",
@@ -1031,7 +1124,8 @@
     "borough": "Brooklyn",
     "latitude": 40.691687,
     "longitude": -73.981483,
-    "university": "Long Island Univ-Brooklyn Campus"
+    "university": "Long Island Univ-Brooklyn Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:3853c462a56a71d70139f55466d4b1de",
@@ -1042,7 +1136,8 @@
     "borough": "Bronx",
     "latitude": 40.823639,
     "longitude": -73.910782,
-    "university": "Boricua College - Bronx"
+    "university": "Boricua College - Bronx",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:38c9399e1af0f4a08ef042ebdd958fa8",
@@ -1053,7 +1148,8 @@
     "borough": "Brooklyn",
     "latitude": 40.640844,
     "longitude": -73.965968,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3920ee68e11373aa6c5c07ff8baefd23",
@@ -1064,7 +1160,8 @@
     "borough": "Manhattan",
     "latitude": 40.82572,
     "longitude": -73.947999,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3a55e205bd4a9e7992c2f308ff9b68c3",
@@ -1075,7 +1172,8 @@
     "borough": "Bronx",
     "latitude": 40.826595,
     "longitude": -73.917582,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3ad4b6a9eb25bd4f282791fd9f8d85f9",
@@ -1086,7 +1184,8 @@
     "borough": "Queens",
     "latitude": 40.738518,
     "longitude": -73.876871,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3c2a37f3f3e8d57778910826b2ecca04",
@@ -1097,7 +1196,8 @@
     "borough": "Staten Island",
     "latitude": 40.626105,
     "longitude": -74.077844,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3ccc892d61c2745d02f1de9a698e48af",
@@ -1108,7 +1208,8 @@
     "borough": "Brooklyn",
     "latitude": 40.576175,
     "longitude": -73.966746,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3cdb76982c6eb468613deccfc6f193b9",
@@ -1119,7 +1220,8 @@
     "borough": "Manhattan",
     "latitude": 40.741479,
     "longitude": -73.973623,
-    "university": "NYU School of Medicine"
+    "university": "NYU School of Medicine",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:3d18b534d686c37da2aea0e7e4548e23",
@@ -1130,7 +1232,8 @@
     "borough": "Manhattan",
     "latitude": 40.847891,
     "longitude": -73.933851,
-    "university": "Yeshiva University"
+    "university": "Yeshiva University",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3d3f893e57902717aab9d240ae69bcc2",
@@ -1141,7 +1244,8 @@
     "borough": "Manhattan",
     "latitude": 40.728924,
     "longitude": -73.987784,
-    "university": "St. John's University Manhattan"
+    "university": "St. John's University Manhattan",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3d9b5196db6329d2eaba964d0ef12244",
@@ -1152,7 +1256,8 @@
     "borough": "Manhattan",
     "latitude": 40.773614,
     "longitude": -73.956408,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:3da216d16900a1df47f298083bbb54a6",
@@ -1163,7 +1268,8 @@
     "borough": "Bronx",
     "latitude": 40.850905,
     "longitude": -73.845126,
-    "university": "Albert Einstein College of Medicine"
+    "university": "Albert Einstein College of Medicine",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:3e0995d50a9a4012f0fcd41feb6ebb93",
@@ -1174,7 +1280,8 @@
     "borough": "Queens",
     "latitude": 40.737118,
     "longitude": -73.824543,
-    "university": "CUNY School of Law"
+    "university": "CUNY School of Law",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:3ffd53384bc6e28b2e0f745bb4cadf1d",
@@ -1185,7 +1292,8 @@
     "borough": "Queens",
     "latitude": 40.744213,
     "longitude": -73.931304,
-    "university": "NY School for Med & Dent Assts"
+    "university": "NY School for Med & Dent Assts",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:40445613aaaba43cbd7d15448480e9ab",
@@ -1196,7 +1304,8 @@
     "borough": "Manhattan",
     "latitude": 40.729437,
     "longitude": -73.997217,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:40480ee71de606a6061beb77b72787d0",
@@ -1207,7 +1316,8 @@
     "borough": "Manhattan",
     "latitude": 40.785955,
     "longitude": -73.971293,
-    "university": "Bard Grad Ctr for Decorative Arts"
+    "university": "Bard Grad Ctr for Decorative Arts",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:406fa57f948af3b470e1617aa3652d3f",
@@ -1218,7 +1328,8 @@
     "borough": "Bronx",
     "latitude": 40.852794,
     "longitude": -73.836995,
-    "university": "Mercy University-Bronx Campus"
+    "university": "Mercy University-Bronx Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:413023d0776169213c20e63d58c3ff35",
@@ -1229,7 +1340,8 @@
     "borough": "Manhattan",
     "latitude": 40.773155,
     "longitude": -73.984945,
-    "university": "Juilliard School (The)"
+    "university": "Juilliard School (The)",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:4211bf0dccbffaff367d5382931e3ba3",
@@ -1240,7 +1352,8 @@
     "borough": "Brooklyn",
     "latitude": 40.653264,
     "longitude": -73.885964,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4222cbaa9d1a52faa5569cd395772ace",
@@ -1251,7 +1364,8 @@
     "borough": "Queens",
     "latitude": 40.762426,
     "longitude": -73.873873,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4230d4e5cb8252c60a8d3bd0167764f5",
@@ -1262,7 +1376,8 @@
     "borough": "Bronx",
     "latitude": 40.900447,
     "longitude": -73.867949,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:435d51fe9b5e054f1607b99370653268",
@@ -1273,7 +1388,8 @@
     "borough": "Manhattan",
     "latitude": 40.705769,
     "longitude": -74.014001,
-    "university": "Mildred Elley-NYC"
+    "university": "Mildred Elley-NYC",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:439d37ec9e01ec3d1eb6fc238f76aec4",
@@ -1284,7 +1400,8 @@
     "borough": "Staten Island",
     "latitude": 40.637593,
     "longitude": -74.131106,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:44799470b8a9cd3eb12adc68a31f51d5",
@@ -1295,7 +1412,8 @@
     "borough": "Manhattan",
     "latitude": 40.793102,
     "longitude": -73.951367,
-    "university": "Mt Sinai School of Medicine"
+    "university": "Mt Sinai School of Medicine",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:46c531a7c587e4cb934bdd80b2352de5",
@@ -1306,7 +1424,8 @@
     "borough": "Manhattan",
     "latitude": 40.738071,
     "longitude": -73.993804,
-    "university": "New York Conservatory for Dramatic A"
+    "university": "New York Conservatory for Dramatic A",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:4730fd961a79fd05047089be52b5f7d0",
@@ -1317,7 +1436,8 @@
     "borough": "Queens",
     "latitude": 40.727323,
     "longitude": -73.864507,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:48bf2402b3e4d6408cabf0f9d6849b4e",
@@ -1328,7 +1448,8 @@
     "borough": "Brooklyn",
     "latitude": 40.690662,
     "longitude": -73.997537,
-    "university": "Long Island Coll Hosp Sch of Nrsing"
+    "university": "Long Island Coll Hosp Sch of Nrsing",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:493ad82d7ad265cd1c1f788f9d5b813f",
@@ -1339,7 +1460,8 @@
     "borough": "Brooklyn",
     "latitude": 40.690638,
     "longitude": -73.977891,
-    "university": "Brooklyn Hospital-Caledonia Hospital"
+    "university": "Brooklyn Hospital-Caledonia Hospital",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:497687da0afcbc04b816edaac77f5cd5",
@@ -1350,7 +1472,8 @@
     "borough": "Queens",
     "latitude": 40.72215,
     "longitude": -73.843047,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4a241334f5de230291220a27606d56fa",
@@ -1361,7 +1484,8 @@
     "borough": "Manhattan",
     "latitude": 40.814763,
     "longitude": -73.941206,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4a45556b3fdf640415385d501204e650",
@@ -1372,7 +1496,8 @@
     "borough": "Brooklyn",
     "latitude": 40.655713,
     "longitude": -73.91494,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4aa679eaeaff324f424d549d42a86d74",
@@ -1383,7 +1508,8 @@
     "borough": "Queens",
     "latitude": 40.694554,
     "longitude": -73.861442,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4abafbc351230e21dcf928edc0e45919",
@@ -1394,7 +1520,8 @@
     "borough": "Manhattan",
     "latitude": 40.806182,
     "longitude": -73.954503,
-    "university": "City Seminary of NY Graduate Ctr."
+    "university": "City Seminary of NY Graduate Ctr.",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:4c0e0398476b5abe2c2cb16159fb0b8a",
@@ -1405,7 +1532,8 @@
     "borough": "Bronx",
     "latitude": 40.811636,
     "longitude": -73.924376,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4dff6715bba742f6d2cd9780c8c8df6a",
@@ -1416,7 +1544,8 @@
     "borough": "Manhattan",
     "latitude": 40.806134,
     "longitude": -73.964671,
-    "university": "Bank Street Col of Educ"
+    "university": "Bank Street Col of Educ",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:4e972c5c8f07772538acde82b61de408",
@@ -1427,7 +1556,8 @@
     "borough": "Queens",
     "latitude": 40.767929,
     "longitude": -73.882383,
-    "university": "Vaughn College"
+    "university": "Vaughn College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:4ef7549ea636d64430a7590f4de5f1f9",
@@ -1438,7 +1568,8 @@
     "borough": "Queens",
     "latitude": 40.769144,
     "longitude": -73.826975,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:51782162f92f276e5b1f0ccb098206c9",
@@ -1449,7 +1580,8 @@
     "borough": "Brooklyn",
     "latitude": 40.681826,
     "longitude": -73.956168,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:51d7c12b2be58562abcaffff5d4bdb4a",
@@ -1460,7 +1592,8 @@
     "borough": "Queens",
     "latitude": 40.701556,
     "longitude": -73.79643,
-    "university": "CUNY York College"
+    "university": "CUNY York College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:52396f3077e250df8dca482d22edb62f",
@@ -1471,7 +1604,8 @@
     "borough": "Brooklyn",
     "latitude": 40.704144,
     "longitude": -73.987996,
-    "university": "AMG School of Nursing"
+    "university": "AMG School of Nursing",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:523af71a4e82c2fcbad62d9c54bf35ac",
@@ -1482,7 +1616,8 @@
     "borough": "Manhattan",
     "latitude": 40.808236,
     "longitude": -73.947683,
-    "university": "Coll New Rochelle Rosa Parks Campus"
+    "university": "Coll New Rochelle Rosa Parks Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:529a78f91d446522046a121e93f796e8",
@@ -1493,7 +1628,8 @@
     "borough": "Manhattan",
     "latitude": 40.8144,
     "longitude": -73.941,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:52a83ac082adfd46b4c4eb58420db5a6",
@@ -1504,7 +1640,8 @@
     "borough": "Brooklyn",
     "latitude": 40.675574,
     "longitude": -73.957662,
-    "university": "Interfaith Med Ctr School of Nursing"
+    "university": "Interfaith Med Ctr School of Nursing",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:52c0394f022b9dfc9916847b2e3f8f56",
@@ -1515,7 +1652,8 @@
     "borough": "Manhattan",
     "latitude": 40.809144,
     "longitude": -73.963944,
-    "university": "Barnard College"
+    "university": "Barnard College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:52efad1ea64a98120eecc1d013d63832",
@@ -1526,7 +1664,8 @@
     "borough": "Queens",
     "latitude": 40.674784,
     "longitude": -73.809264,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:54505ef497c53cec76478c9dd4854359",
@@ -1537,7 +1676,8 @@
     "borough": "Manhattan",
     "latitude": 40.714592,
     "longitude": -74.012963,
-    "university": "Coll New Rochelle Dist Coun 31 Cmps"
+    "university": "Coll New Rochelle Dist Coun 31 Cmps",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:54e3a919e5ea7a1eaa9ba729d9fbd9c7",
@@ -1548,7 +1688,8 @@
     "borough": "Brooklyn",
     "latitude": 40.645931,
     "longitude": -74.013654,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5513fbfeaf0d0c736e53a7ad9c769a23",
@@ -1559,7 +1700,8 @@
     "borough": "Brooklyn",
     "latitude": 40.648641,
     "longitude": -73.930383,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:566d6de5a8efcaedae2cb0cd8caa30cd",
@@ -1570,7 +1712,8 @@
     "borough": "Queens",
     "latitude": 40.721905,
     "longitude": -73.794974,
-    "university": "St. John's University"
+    "university": "St. John's University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:57526aecb13e6e566c52015f61a5e475",
@@ -1581,7 +1724,8 @@
     "borough": "Manhattan",
     "latitude": 40.739109,
     "longitude": -73.98454,
-    "university": "CUNY Bernard M. Baruch College"
+    "university": "CUNY Bernard M. Baruch College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:57611a33c42955afa4b29add9a2788a2",
@@ -1592,7 +1736,8 @@
     "borough": "Manhattan",
     "latitude": 40.756863,
     "longitude": -73.972636,
-    "university": "Sotheby's Institute of Art - NY"
+    "university": "Sotheby's Institute of Art - NY",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:58c05b67e09aa179a858bc7301551203",
@@ -1603,7 +1748,8 @@
     "borough": "Staten Island",
     "latitude": 40.57194,
     "longitude": -74.111958,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5981fefbd0d2432534d94ba4950b5efa",
@@ -1614,7 +1760,8 @@
     "borough": "Manhattan",
     "latitude": 40.729873,
     "longitude": -73.994314,
-    "university": "NYU Inst for Education & Social Poli"
+    "university": "NYU Inst for Education & Social Poli",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:5a5ec2dd023b06756324be57c66f9ce9",
@@ -1625,7 +1772,8 @@
     "borough": "Queens",
     "latitude": 40.710042,
     "longitude": -73.819459,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5ad8b68e57686b852d766cff3004f926",
@@ -1636,7 +1784,8 @@
     "borough": "Bronx",
     "latitude": 40.846053,
     "longitude": -73.898348,
-    "university": "Bronx Lebanon Hospital"
+    "university": "Bronx Lebanon Hospital",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5b4308a47f409ba9d9757d507b66d29c",
@@ -1647,7 +1796,8 @@
     "borough": "Manhattan",
     "latitude": 40.717819,
     "longitude": -74.00675,
-    "university": "New York Law School"
+    "university": "New York Law School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:5bf16ed7f9ca7eb22c6cca4b4dacab2b",
@@ -1658,7 +1808,8 @@
     "borough": "Queens",
     "latitude": 40.70702,
     "longitude": -73.753797,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5c0c9a02dfd39ff37ade397d200972f3",
@@ -1669,7 +1820,8 @@
     "borough": "Queens",
     "latitude": 40.659972,
     "longitude": -73.739908,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5cacfeebafe3aa570e8801c08de0dcba",
@@ -1680,7 +1832,8 @@
     "borough": "Brooklyn",
     "latitude": 40.704623,
     "longitude": -73.987834,
-    "university": "AMG School of Nursing"
+    "university": "AMG School of Nursing",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:5cd56fba44846deb250f45e59c8332b1",
@@ -1691,7 +1844,8 @@
     "borough": "Bronx",
     "latitude": 40.886281,
     "longitude": -73.914678,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5d80002be33c91d7ef81b8bd61c7f517",
@@ -1702,7 +1856,8 @@
     "borough": "Bronx",
     "latitude": 40.84112,
     "longitude": -73.846619,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5e107a8691bd5260eb3e5f18bd9d62c8",
@@ -1713,7 +1868,8 @@
     "borough": "Queens",
     "latitude": 40.757822,
     "longitude": -73.939305,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5e390df8e9820dc314a2658598f27b62",
@@ -1724,7 +1880,8 @@
     "borough": "Brooklyn",
     "latitude": 40.694494,
     "longitude": -73.977737,
-    "university": "Brooklyn Hospital-Caledonia Hospital"
+    "university": "Brooklyn Hospital-Caledonia Hospital",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:5f712739e9d0d040ce8acf7725953a74",
@@ -1735,7 +1892,8 @@
     "borough": "Bronx",
     "latitude": 40.883636,
     "longitude": -73.894489,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:6011ab9825262c85e7922e6b103f14e2",
@@ -1746,7 +1904,8 @@
     "borough": "Bronx",
     "latitude": 40.833768,
     "longitude": -73.858356,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:6099e813be875bd2f68b575b0312b302",
@@ -1757,7 +1916,8 @@
     "borough": "Manhattan",
     "latitude": 40.763632,
     "longitude": -73.968168,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:60de68c371363a535aea393018e9b78f",
@@ -1768,7 +1928,8 @@
     "borough": "Manhattan",
     "latitude": 40.802473,
     "longitude": -73.94382,
-    "university": "Helene Fuld College of Nursing"
+    "university": "Helene Fuld College of Nursing",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:619d55a5c5250d1b3aa1aa40f42d6efc",
@@ -1779,7 +1940,8 @@
     "borough": "Manhattan",
     "latitude": 40.741394,
     "longitude": -73.99183,
-    "university": "New York Conservatory for Dramatic A"
+    "university": "New York Conservatory for Dramatic A",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:61f9d318fc837d2e4dcdf8c1119f2bdf",
@@ -1790,7 +1952,8 @@
     "borough": "Bronx",
     "latitude": 40.880729,
     "longitude": -73.907709,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:62637f3f67fddb6d57c92413e94dbf3b",
@@ -1801,7 +1964,8 @@
     "borough": "Brooklyn",
     "latitude": 40.668486,
     "longitude": -73.93364,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:62b0c40ce8078208edbe35bf7f77a41a",
@@ -1812,7 +1976,8 @@
     "borough": "Queens",
     "latitude": 40.695638,
     "longitude": -73.790179,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:63173af02d90b2c83686be3a4fbcb756",
@@ -1823,7 +1988,8 @@
     "borough": "Manhattan",
     "latitude": 40.755128,
     "longitude": -73.981348,
-    "university": "SUNY College of Optometry"
+    "university": "SUNY College of Optometry",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:6323997ff723f6eea1fac65bd0994d7f",
@@ -1834,7 +2000,8 @@
     "borough": "Manhattan",
     "latitude": 40.753489,
     "longitude": -73.980877,
-    "university": "Berkeley College - Main Campus"
+    "university": "Berkeley College - Main Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:64137089e6a55419967bf8b4d55f41f4",
@@ -1845,7 +2012,8 @@
     "borough": "Queens",
     "latitude": 40.67696,
     "longitude": -73.74567,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:649854be7f563a9f724df0a963fbc23e",
@@ -1856,7 +2024,8 @@
     "borough": "Brooklyn",
     "latitude": 40.668486,
     "longitude": -73.933673,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:64a4d7a6a341b1e5c406013a37d82bb5",
@@ -1867,7 +2036,8 @@
     "borough": "Brooklyn",
     "latitude": 40.668222,
     "longitude": -73.983426,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:64ca019a077f936ac6aa1189f7b833bb",
@@ -1878,7 +2048,8 @@
     "borough": "Manhattan",
     "latitude": 40.769707,
     "longitude": -73.982539,
-    "university": "NY Inst Tech-Manhattan Campus"
+    "university": "NY Inst Tech-Manhattan Campus",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:653bd101fb910a43ed9bae29729f948f",
@@ -1889,7 +2060,8 @@
     "borough": "Queens",
     "latitude": 40.579396,
     "longitude": -73.837735,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:66284cf527b45819781565ea645f4240",
@@ -1900,7 +2072,8 @@
     "borough": "Brooklyn",
     "latitude": 40.608019,
     "longitude": -74.003341,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:67764ba9980827e4ab45efcb9ba1450b",
@@ -1911,7 +2084,8 @@
     "borough": "Staten Island",
     "latitude": 40.59581,
     "longitude": -74.063028,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:693e924ddfac47d83dd88ead481a580b",
@@ -1922,7 +2096,8 @@
     "borough": "Bronx",
     "latitude": 40.854884,
     "longitude": -73.864147,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:6a3376847be73dc6190d69fc6b1b4baf",
@@ -1933,7 +2108,8 @@
     "borough": "Queens",
     "latitude": 40.758534,
     "longitude": -73.918625,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:6b0e15c24b65934f099e4b983554bb31",
@@ -1944,7 +2120,8 @@
     "borough": "Queens",
     "latitude": 40.585847,
     "longitude": -73.81606,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:6b750b5aa8f4de706311a05ba58cc113",
@@ -1955,7 +2132,8 @@
     "borough": "Manhattan",
     "latitude": 40.747649,
     "longitude": -73.98345,
-    "university": "Devry College of New York"
+    "university": "Devry College of New York",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:6bcc0473289142db923dcf28ba1602ca",
@@ -1966,7 +2144,8 @@
     "borough": "Brooklyn",
     "latitude": 40.697503,
     "longitude": -73.912238,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:6cf4c3064982a8e30f161319e2ca6d2d",
@@ -1977,7 +2156,8 @@
     "borough": "Manhattan",
     "latitude": 40.719376,
     "longitude": -73.979621,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:6ddde1d42675e7c308728c32e07c711b",
@@ -1988,7 +2168,8 @@
     "borough": "Brooklyn",
     "latitude": 40.701242,
     "longitude": -73.985167,
-    "university": "AMG School of Nursing"
+    "university": "AMG School of Nursing",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:6e1b979e9fb35d99308c64304f05ad83",
@@ -1999,7 +2180,8 @@
     "borough": "Manhattan",
     "latitude": 40.705769,
     "longitude": -74.014001,
-    "university": "Relay School of Education"
+    "university": "Relay School of Education",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:6e8a960fca5a0a299a9fe8eca4214538",
@@ -2010,7 +2192,8 @@
     "borough": "Bronx",
     "latitude": 40.807195,
     "longitude": -73.795415,
-    "university": "SUNY Maritime College"
+    "university": "SUNY Maritime College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:6eb31f516c420aedd08fa053e8f552e3",
@@ -2021,7 +2204,8 @@
     "borough": "Queens",
     "latitude": 40.733041,
     "longitude": -73.80988,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:6eda2c4760d485b3874f57d0f899c169",
@@ -2032,7 +2216,8 @@
     "borough": "Bronx",
     "latitude": 40.890238,
     "longitude": -73.901232,
-    "university": "Manhattan University"
+    "university": "Manhattan University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:700a92a5d137ab1ddc13f35f21e1f872",
@@ -2043,7 +2228,8 @@
     "borough": "Queens",
     "latitude": 40.715276,
     "longitude": -73.830615,
-    "university": "Plaza College"
+    "university": "Plaza College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:702313a7935fa64dfa88e4a7a12efb61",
@@ -2054,7 +2240,8 @@
     "borough": "Manhattan",
     "latitude": 40.825375,
     "longitude": -73.935514,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:71246fc08b528402bee8b81e928afbad",
@@ -2065,7 +2252,8 @@
     "borough": "Brooklyn",
     "latitude": 40.642217,
     "longitude": -73.899561,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:717971c38bd27bb381c8b3fd594c1433",
@@ -2076,7 +2264,8 @@
     "borough": "Bronx",
     "latitude": 40.874391,
     "longitude": -73.878395,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:71dfa1c0457df8246f84b48edea61132",
@@ -2087,7 +2276,8 @@
     "borough": "Manhattan",
     "latitude": 40.812386,
     "longitude": -73.961472,
-    "university": "Manhattan School of Music"
+    "university": "Manhattan School of Music",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:7372d26dd0b0ab45ca0bb5f860ed05c9",
@@ -2098,7 +2288,8 @@
     "borough": "Staten Island",
     "latitude": 40.534066,
     "longitude": -74.193237,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7514e4e3ab2647ab150eebcc55f0fa80",
@@ -2109,7 +2300,8 @@
     "borough": "Staten Island",
     "latitude": 40.609583,
     "longitude": -74.148499,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7543d9539bab4f3033401839b86edbd5",
@@ -2120,7 +2312,8 @@
     "borough": "Queens",
     "latitude": 40.672884,
     "longitude": -73.770588,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:75c69c33f53a998990c45587c5bf8fc1",
@@ -2131,7 +2324,8 @@
     "borough": "Brooklyn",
     "latitude": 40.629178,
     "longitude": -74.01188,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7729bd161464d46386b115db7f369a31",
@@ -2142,7 +2336,8 @@
     "borough": "Staten Island",
     "latitude": 40.552432,
     "longitude": -74.151112,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:77346623538c4770d31585e7c9fa5e30",
@@ -2153,7 +2348,8 @@
     "borough": "Manhattan",
     "latitude": 40.753994,
     "longitude": -73.979433,
-    "university": "Berkeley College - Main Campus"
+    "university": "Berkeley College - Main Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:79ae4e72b377b7c8a8181495d4d281b2",
@@ -2164,7 +2360,8 @@
     "borough": "Manhattan",
     "latitude": 40.804555,
     "longitude": -73.936322,
-    "university": "Mount Sinai Phillips School of Nurs."
+    "university": "Mount Sinai Phillips School of Nurs.",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:7a4c83ca6bac6ae7a44a7225992aad52",
@@ -2175,7 +2372,8 @@
     "borough": "Brooklyn",
     "latitude": 40.576765,
     "longitude": -73.986079,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7bb83076843517e6390b3d1124d6150f",
@@ -2186,7 +2384,8 @@
     "borough": "Manhattan",
     "latitude": 40.770662,
     "longitude": -73.951351,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7bbb1783e895a378f57f4378e8479f77",
@@ -2197,7 +2396,8 @@
     "borough": "Manhattan",
     "latitude": 40.810258,
     "longitude": -73.960538,
-    "university": "Teachers College - Columbia Univ"
+    "university": "Teachers College - Columbia Univ",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:7bf96e154025c8e7c0c4ed3990173bf2",
@@ -2208,7 +2408,8 @@
     "borough": "Manhattan",
     "latitude": 40.738087,
     "longitude": -73.982054,
-    "university": "School of Visual Arts"
+    "university": "School of Visual Arts",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7c7c4701c39643d06d0864463e2c27b3",
@@ -2219,7 +2420,8 @@
     "borough": "Manhattan",
     "latitude": 40.757092,
     "longitude": -73.972451,
-    "university": "Sotheby's Institute of Art - NY"
+    "university": "Sotheby's Institute of Art - NY",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:7c84a25ab2f58bc5418c49182c4beb88",
@@ -2230,7 +2432,8 @@
     "borough": "Manhattan",
     "latitude": 40.819611,
     "longitude": -73.950619,
-    "university": "CUNY City College"
+    "university": "CUNY City College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:7d28009c37204ae545cbedbe0507af4a",
@@ -2241,7 +2444,8 @@
     "borough": "Manhattan",
     "latitude": 40.754496,
     "longitude": -73.98217,
-    "university": "SUNY College of Optometry"
+    "university": "SUNY College of Optometry",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:7dca3ea1ff5d3f183b03367da6b683f1",
@@ -2252,7 +2456,8 @@
     "borough": "Brooklyn",
     "latitude": 40.661198,
     "longitude": -73.948152,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7ebd35d614226315c5a3d49b3e680723",
@@ -2263,7 +2468,8 @@
     "borough": "Bronx",
     "latitude": 40.818694,
     "longitude": -73.894138,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7f56119c3c7c8e50f5cdef7f716ce421",
@@ -2274,7 +2480,8 @@
     "borough": "Brooklyn",
     "latitude": 40.677658,
     "longitude": -74.012896,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:7f802160d6986af063f695685c0e2f8a",
@@ -2285,7 +2492,8 @@
     "borough": "Queens",
     "latitude": 40.680867,
     "longitude": -73.846488,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7f852afc1b23b84ef4dcc56926d4a762",
@@ -2296,7 +2504,8 @@
     "borough": "Manhattan",
     "latitude": 40.795928,
     "longitude": -73.96785,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:7fa06308ea830f26e865390afe3fb4a5",
@@ -2307,7 +2516,8 @@
     "borough": "Bronx",
     "latitude": 40.863003,
     "longitude": -73.89451,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:8089daecbb4c83cbbcecdf6660f02673",
@@ -2318,7 +2528,8 @@
     "borough": "Brooklyn",
     "latitude": 40.690528,
     "longitude": -73.967695,
-    "university": "St Joseph's University - Main Campus"
+    "university": "St Joseph's University - Main Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:8098a798553ce78046cd6873d95df572",
@@ -2329,7 +2540,8 @@
     "borough": "Queens",
     "latitude": 40.691193,
     "longitude": -73.850566,
-    "university": "Catholic Med Ctr Brook/Queens Sch Nr"
+    "university": "Catholic Med Ctr Brook/Queens Sch Nr",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:82501c034d690535c802aa3ab349da77",
@@ -2340,7 +2552,8 @@
     "borough": "Brooklyn",
     "latitude": 40.578091,
     "longitude": -73.935004,
-    "university": "Kingsborough Comm Coll"
+    "university": "Kingsborough Comm Coll",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:8497a170a89bf93d417cc67f74fb58c2",
@@ -2351,7 +2564,8 @@
     "borough": "Brooklyn",
     "latitude": 40.625907,
     "longitude": -73.960401,
-    "university": "Touro University - Flatbush"
+    "university": "Touro University - Flatbush",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:853a2e07667110f94cacbc6b79b24505",
@@ -2362,7 +2576,8 @@
     "borough": "Bronx",
     "latitude": 40.912812,
     "longitude": -73.908061,
-    "university": "University of Mt St Vincent"
+    "university": "University of Mt St Vincent",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:856bef58695ffb392825bcb2ab9b8425",
@@ -2373,7 +2588,8 @@
     "borough": "Queens",
     "latitude": 40.737441,
     "longitude": -73.861573,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:8727e2a7a0725736cdf83e214d3d4fd7",
@@ -2384,7 +2600,8 @@
     "borough": "Brooklyn",
     "latitude": 40.61026,
     "longitude": -73.953112,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:879f883aee3323b32a891c7f37d61eb1",
@@ -2395,7 +2612,8 @@
     "borough": "Brooklyn",
     "latitude": 40.706914,
     "longitude": -73.957588,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:88035e9952cf46e6d1ecbb1a34adb848",
@@ -2406,7 +2624,8 @@
     "borough": "Manhattan",
     "latitude": 40.802985,
     "longitude": -73.953532,
-    "university": "City Seminary of NY Graduate Ctr."
+    "university": "City Seminary of NY Graduate Ctr.",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:896a48d6b2fa69aba71244c4929fdf0a",
@@ -2417,7 +2636,8 @@
     "borough": "Manhattan",
     "latitude": 40.7848,
     "longitude": -73.9773,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:89bb408780182dce657a03c9b718121b",
@@ -2428,7 +2648,8 @@
     "borough": "Queens",
     "latitude": 40.720179,
     "longitude": -73.762305,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:89e0eb3a08c424d236910d036e066d3a",
@@ -2439,7 +2660,8 @@
     "borough": "Manhattan",
     "latitude": 40.711121,
     "longitude": -74.004805,
-    "university": "Pace University - NYC Campus"
+    "university": "Pace University - NYC Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:89e38b3ba004744901e2bc776f8783ce",
@@ -2450,7 +2672,8 @@
     "borough": "Manhattan",
     "latitude": 40.729912,
     "longitude": -74.005321,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:8b08f0abecb5d2c33471072e99c9ae90",
@@ -2461,7 +2684,8 @@
     "borough": "Manhattan",
     "latitude": 40.723286,
     "longitude": -74.00161,
-    "university": "IE New York College"
+    "university": "IE New York College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:8b5205f087b5719f34eb1c2b285d0490",
@@ -2472,7 +2696,8 @@
     "borough": "Brooklyn",
     "latitude": 40.592612,
     "longitude": -73.98865,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:8d08c0e2af87789fbc45552f091ab5c7",
@@ -2483,7 +2708,8 @@
     "borough": "Manhattan",
     "latitude": 40.730106,
     "longitude": -73.99018,
-    "university": "St. John's University Manhattan"
+    "university": "St. John's University Manhattan",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:8d0bd764a53202a46d6f459f07ced99f",
@@ -2494,7 +2720,8 @@
     "borough": "Brooklyn",
     "latitude": 40.665115,
     "longitude": -73.886148,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:8e136daad715941af77a599cc1acd480",
@@ -2505,7 +2732,8 @@
     "borough": "Queens",
     "latitude": 40.786256,
     "longitude": -73.84601,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:8e50830628473cf967353b12710261d8",
@@ -2516,7 +2744,8 @@
     "borough": "Manhattan",
     "latitude": 40.71839,
     "longitude": -74.006082,
-    "university": "The New York Acad of Art"
+    "university": "The New York Acad of Art",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:8eceb85168690403225f92fba2ff5e31",
@@ -2527,7 +2756,8 @@
     "borough": "Manhattan",
     "latitude": 40.73112,
     "longitude": -73.99578,
-    "university": "NYU Robert F Wagner Grad Sch Pub Ser"
+    "university": "NYU Robert F Wagner Grad Sch Pub Ser",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:8f1ec121baab95286f6f9f528d76dc60",
@@ -2538,7 +2768,8 @@
     "borough": "Manhattan",
     "latitude": 40.748594,
     "longitude": -73.989856,
-    "university": "CUNY School of Professional Studies"
+    "university": "CUNY School of Professional Studies",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:8f54e248244a2642e1e2703615191f39",
@@ -2549,7 +2780,8 @@
     "borough": "Queens",
     "latitude": 40.760134,
     "longitude": -73.768362,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:906e5291c4fd9c2ea85a5fc6c8d5c48c",
@@ -2560,7 +2792,8 @@
     "borough": "Manhattan",
     "latitude": 40.776343,
     "longitude": -73.961455,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:90e6fecd124c3dd9fa23bde2e93d71a7",
@@ -2571,7 +2804,8 @@
     "borough": "Queens",
     "latitude": 40.729205,
     "longitude": -73.858337,
-    "university": "St. Paul's Schl Nurs - Queens"
+    "university": "St. Paul's Schl Nurs - Queens",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:92000af129ed7cea2586bb00effeb105",
@@ -2582,7 +2816,8 @@
     "borough": "Bronx",
     "latitude": 40.864092,
     "longitude": -73.9005,
-    "university": "Monroe University"
+    "university": "Monroe University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:923406b0d8f3bc0379297fd29b5865f1",
@@ -2593,7 +2828,8 @@
     "borough": "Manhattan",
     "latitude": 40.834529,
     "longitude": -73.939664,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9267c17ac15faee4e2cd6a1385d61c7a",
@@ -2604,7 +2840,8 @@
     "borough": "Manhattan",
     "latitude": 40.705997,
     "longitude": -74.012583,
-    "university": "The King's College"
+    "university": "The King's College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:93485e8580f3e08b302a057e0e52a160",
@@ -2615,7 +2852,8 @@
     "borough": "Queens",
     "latitude": 40.700775,
     "longitude": -73.831626,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:94485dc6480ce8258b7bb2db1e4df42d",
@@ -2626,7 +2864,8 @@
     "borough": "Manhattan",
     "latitude": 40.715638,
     "longitude": -74.016132,
-    "university": "Coll New Rochelle Dist Coun 31 Cmps"
+    "university": "Coll New Rochelle Dist Coun 31 Cmps",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9453b9582a92e8ff8f6c0fb233b9a20b",
@@ -2637,7 +2876,8 @@
     "borough": "Manhattan",
     "latitude": 40.764404,
     "longitude": -73.956854,
-    "university": "Louis V Gerstner Grad Sch"
+    "university": "Louis V Gerstner Grad Sch",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:9681eb17981e7b0be56df2d1410cfbcb",
@@ -2648,7 +2888,8 @@
     "borough": "Bronx",
     "latitude": 40.818716,
     "longitude": -73.862891,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:970671df21b4eae2be004394fb1ae6a3",
@@ -2659,7 +2900,8 @@
     "borough": "Brooklyn",
     "latitude": 40.672247,
     "longitude": -73.968111,
-    "university": "Bard Brooklyn Public Library"
+    "university": "Bard Brooklyn Public Library",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9709d58ea9b5baf045e6d7672ce83e58",
@@ -2670,7 +2912,8 @@
     "borough": "Queens",
     "latitude": 40.745145,
     "longitude": -73.714846,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:98fbcf1f92e7fd436d8786f96d1d7476",
@@ -2681,7 +2924,8 @@
     "borough": "Brooklyn",
     "latitude": 40.666347,
     "longitude": -73.957642,
-    "university": "Medgar Evers College"
+    "university": "Medgar Evers College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:99c42a524f729c6caa43b048e5682309",
@@ -2692,7 +2936,8 @@
     "borough": "Manhattan",
     "latitude": 40.728792,
     "longitude": -73.994506,
-    "university": "Hebrew Union Coll - Jewish Inst"
+    "university": "Hebrew Union Coll - Jewish Inst",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:9a306601f42b0f14fe1430b01ff0d93e",
@@ -2703,7 +2948,8 @@
     "borough": "Bronx",
     "latitude": 40.903718,
     "longitude": -73.902743,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9adcf696a8a7a8026da5195272ae8221",
@@ -2714,7 +2960,8 @@
     "borough": "Bronx",
     "latitude": 40.844298,
     "longitude": -73.827885,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9bb4f7cfe09d5219121cccee3e1dcf36",
@@ -2725,7 +2972,8 @@
     "borough": "Manhattan",
     "latitude": 40.705539,
     "longitude": -74.015979,
-    "university": "NYFA"
+    "university": "NYFA",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:9bd95ef12d4546cedaa7b39002d0cf26",
@@ -2736,7 +2984,8 @@
     "borough": "Queens",
     "latitude": 40.729261,
     "longitude": -73.781907,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9c34ac86af977bbb9be0b34635ea56d9",
@@ -2747,7 +2996,8 @@
     "borough": "Brooklyn",
     "latitude": 40.605697,
     "longitude": -73.986232,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9d43356b875ea17ae06094fc70c64bc7",
@@ -2758,7 +3008,8 @@
     "borough": "Manhattan",
     "latitude": 40.76224,
     "longitude": -73.969325,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9de563b70822bd9b3f17ab7b34d38910",
@@ -2769,7 +3020,8 @@
     "borough": "Manhattan",
     "latitude": 40.73239,
     "longitude": -73.997239,
-    "university": "New York Studio School"
+    "university": "New York Studio School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:9e3aee334d3ef1a7faa80c62a58472dd",
@@ -2780,7 +3032,8 @@
     "borough": "Manhattan",
     "latitude": 40.851798,
     "longitude": -73.928894,
-    "university": "Rabbi Isaac Elchanan Theo Seminary"
+    "university": "Rabbi Isaac Elchanan Theo Seminary",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:9ee8be07f907ca448e981b1997caca31",
@@ -2791,7 +3044,8 @@
     "borough": "Queens",
     "latitude": 40.707805,
     "longitude": -73.794644,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:9f240712b603b082c105b11339a3d029",
@@ -2802,7 +3056,8 @@
     "borough": "Brooklyn",
     "latitude": 40.683132,
     "longitude": -74.000148,
-    "university": "Long Island Col Hosp Sch Nursing"
+    "university": "Long Island Col Hosp Sch Nursing",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:9f6fb5ed4ea5b9412fdc9c09a769b6b7",
@@ -2813,7 +3068,8 @@
     "borough": "Brooklyn",
     "latitude": 40.631768,
     "longitude": -73.953483,
-    "university": "CUNY Brooklyn College"
+    "university": "CUNY Brooklyn College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:a019a82fc37d567c3be212bdf4dc1ee7",
@@ -2824,7 +3080,8 @@
     "borough": "Brooklyn",
     "latitude": 40.665115,
     "longitude": -73.886148,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:a11f01ac1f7c0ac089c6661012c7572a",
@@ -2835,7 +3092,8 @@
     "borough": "Manhattan",
     "latitude": 40.743837,
     "longitude": -73.979935,
-    "university": "Amer Academy of Dramatic Arts"
+    "university": "Amer Academy of Dramatic Arts",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:a1a854ab758aab0af50cbb58e93e8600",
@@ -2846,7 +3104,8 @@
     "borough": "Manhattan",
     "latitude": 40.755062,
     "longitude": -73.979199,
-    "university": "Laboratory Inst of Merchandising"
+    "university": "Laboratory Inst of Merchandising",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:a1dcb669020b66e36c8fb3fad14fd958",
@@ -2857,7 +3116,8 @@
     "borough": "Brooklyn",
     "latitude": 40.591376,
     "longitude": -73.923962,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:a2353defe529d3fd27fef7ebf3c271a6",
@@ -2868,7 +3128,8 @@
     "borough": "Manhattan",
     "latitude": 40.749298,
     "longitude": -73.981329,
-    "university": "CUNY Graduate School"
+    "university": "CUNY Graduate School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:a36d89c436fb146cb22ebc31aad009fc",
@@ -2879,7 +3140,8 @@
     "borough": "Manhattan",
     "latitude": 40.76492,
     "longitude": -73.959551,
-    "university": "Louis V Gerstner Grad Sch"
+    "university": "Louis V Gerstner Grad Sch",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:a459c7e94758d781b68baa5c9b80c222",
@@ -2890,7 +3152,8 @@
     "borough": "Manhattan",
     "latitude": 40.750824,
     "longitude": -73.973534,
-    "university": "CUNY Central Administration"
+    "university": "CUNY Central Administration",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:a4f1eed1eef75b46b1d69b2dda94344c",
@@ -2901,7 +3164,8 @@
     "borough": "Manhattan",
     "latitude": 40.713337,
     "longitude": -73.996492,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:a7b982dc4ec30238a61baeddef4dbae4",
@@ -2912,7 +3176,8 @@
     "borough": "Queens",
     "latitude": 40.692534,
     "longitude": -73.76011,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:a9c12e501b332c82a0a1bcf8a524c6fa",
@@ -2923,7 +3188,8 @@
     "borough": "Bronx",
     "latitude": 40.826616,
     "longitude": -73.850181,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:aac228ca754138338e855489cb94bec5",
@@ -2934,7 +3200,8 @@
     "borough": "Queens",
     "latitude": 40.75764,
     "longitude": -73.86814,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:abe05cfa9d3a32abe0a3ac6a5ca9c99f",
@@ -2945,7 +3212,8 @@
     "borough": "Manhattan",
     "latitude": 40.757231,
     "longitude": -73.986704,
-    "university": "American Acad McAllister Inst"
+    "university": "American Acad McAllister Inst",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:abe0ac89fe4460f454d6b8b09e9ac248",
@@ -2956,7 +3224,8 @@
     "borough": "Queens",
     "latitude": 40.724461,
     "longitude": -73.8152,
-    "university": "Touro University - Kew Gardens"
+    "university": "Touro University - Kew Gardens",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:abe8d49f4539afc3b3410913867a23e1",
@@ -2967,7 +3236,8 @@
     "borough": "Staten Island",
     "latitude": 40.509539,
     "longitude": -74.244107,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:adab66cfeb78bb35689bb93ef08c7c6a",
@@ -2978,7 +3248,8 @@
     "borough": "Brooklyn",
     "latitude": 40.632597,
     "longitude": -73.919954,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:adb81f591e398748e9f1f6e6fd2d915f",
@@ -2989,7 +3260,8 @@
     "borough": "Manhattan",
     "latitude": 40.811997,
     "longitude": -73.960391,
-    "university": "Jewish Theological Semnry of America"
+    "university": "Jewish Theological Semnry of America",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:ae0140957dbe520524a18f4c8eeddac9",
@@ -3000,7 +3272,8 @@
     "borough": "Manhattan",
     "latitude": 40.733703,
     "longitude": -73.996597,
-    "university": "New York Grad Sch Psychoanal"
+    "university": "New York Grad Sch Psychoanal",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:ae5611805e12522b94a2b2d7df77d810",
@@ -3011,7 +3284,8 @@
     "borough": "Manhattan",
     "latitude": 40.806378,
     "longitude": -73.96319,
-    "university": "Columbia University"
+    "university": "Columbia University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:aedf914eb45626c8aae5f64c10def66d",
@@ -3022,7 +3296,8 @@
     "borough": "Queens",
     "latitude": 40.712951,
     "longitude": -73.880866,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:af8acfbc8cd3eaaa0e82395a8267c28c",
@@ -3033,7 +3308,8 @@
     "borough": "Brooklyn",
     "latitude": 40.594787,
     "longitude": -73.941146,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b0ff74d1ce1165b148b545ba811cdce7",
@@ -3044,7 +3320,8 @@
     "borough": "Manhattan",
     "latitude": 40.714462,
     "longitude": -73.988529,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b144192f59ca2c82202a2f258e9dc134",
@@ -3055,7 +3332,8 @@
     "borough": "Manhattan",
     "latitude": 40.806199,
     "longitude": -73.943302,
-    "university": "NY Col of Podiatric Medicine"
+    "university": "NY Col of Podiatric Medicine",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b25236053379b6914f6e55b5c74070d9",
@@ -3066,7 +3344,8 @@
     "borough": "Manhattan",
     "latitude": 40.772686,
     "longitude": -73.982726,
-    "university": "Juilliard School (The)"
+    "university": "Juilliard School (The)",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:b374e2b2fc5e74face18dc76be6a8465",
@@ -3077,7 +3356,8 @@
     "borough": "Bronx",
     "latitude": 40.820648,
     "longitude": -73.90463,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b39dc0b1ea61169ae55ad37f112a602e",
@@ -3088,7 +3368,8 @@
     "borough": "Brooklyn",
     "latitude": 40.686131,
     "longitude": -73.994761,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:b3df3a9708327cd901d785517e576463",
@@ -3099,7 +3380,8 @@
     "borough": "Bronx",
     "latitude": 40.869045,
     "longitude": -73.901216,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b43dccbd9814ff1239d213c864d3395d",
@@ -3110,7 +3392,8 @@
     "borough": "Bronx",
     "latitude": 40.85744,
     "longitude": -73.909281,
-    "university": "Bronx Community College"
+    "university": "Bronx Community College",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b4b39f4e6d68ffef50cb67f64975e7d9",
@@ -3121,7 +3404,8 @@
     "borough": "Queens",
     "latitude": 40.705207,
     "longitude": -73.780595,
-    "university": "NYADI"
+    "university": "NYADI",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:b643f9b12afe956b928b4bca162dc75f",
@@ -3132,7 +3416,8 @@
     "borough": "Brooklyn",
     "latitude": 40.681826,
     "longitude": -73.956168,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b67e32b84461dd0548dbdcdd49cd2f00",
@@ -3143,7 +3428,8 @@
     "borough": "Brooklyn",
     "latitude": 40.595241,
     "longitude": -73.960603,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b7334766444ef108bc25e6e2b7514582",
@@ -3154,7 +3440,8 @@
     "borough": "Queens",
     "latitude": 40.740812,
     "longitude": -73.921671,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:b7eeee1cd88e865720db28d56ff2cd7a",
@@ -3165,7 +3452,8 @@
     "borough": "Queens",
     "latitude": 40.695745,
     "longitude": -73.741137,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:bac970d8b84a1ac4462bb7f20b498908",
@@ -3176,7 +3464,8 @@
     "borough": "Brooklyn",
     "latitude": 40.704562,
     "longitude": -73.939626,
-    "university": "Boricua College - Brooklyn"
+    "university": "Boricua College - Brooklyn",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:bae4cb35049e3a3982846a7607a30791",
@@ -3187,7 +3476,8 @@
     "borough": "Queens",
     "latitude": 40.56121,
     "longitude": -73.913675,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:bb239c41457bc85fad90cf81c2ad92cc",
@@ -3198,7 +3488,8 @@
     "borough": "Queens",
     "latitude": 40.735167,
     "longitude": -73.717098,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:bc177d69b0e7e1a675b305ff83c6e1d5",
@@ -3209,7 +3500,8 @@
     "borough": "Queens",
     "latitude": 40.734497,
     "longitude": -73.755686,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:bc95b9989a4669bd5d14ce2f8c05dae6",
@@ -3220,7 +3512,8 @@
     "borough": "Manhattan",
     "latitude": 40.755726,
     "longitude": -73.956232,
-    "university": "Cornell University-Cornelnyc Tech"
+    "university": "Cornell University-Cornelnyc Tech",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:bd14f36d64479f2080bcab6e32fb54d8",
@@ -3231,7 +3524,8 @@
     "borough": "Queens",
     "latitude": 40.749728,
     "longitude": -73.953037,
-    "university": "Bank Street College of Educ-Lic"
+    "university": "Bank Street College of Educ-Lic",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:bd4d5eff8e8422e0f47b3661df7957dc",
@@ -3242,7 +3536,8 @@
     "borough": "Queens",
     "latitude": 40.755959,
     "longitude": -73.756545,
-    "university": "Queensborough Comm Coll"
+    "university": "Queensborough Comm Coll",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:bd8e0cad9ea3eafda4ad3e320d56d702",
@@ -3253,7 +3548,8 @@
     "borough": "Manhattan",
     "latitude": 40.762914,
     "longitude": -73.956376,
-    "university": "Rockefeller University"
+    "university": "Rockefeller University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:be471d75711054798c0809ae6f5b3dd9",
@@ -3264,7 +3560,8 @@
     "borough": "Brooklyn",
     "latitude": 40.619945,
     "longitude": -73.916923,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:c03d753b328fc8a50e50992de6be4273",
@@ -3275,7 +3572,8 @@
     "borough": "Manhattan",
     "latitude": 40.735476,
     "longitude": -73.997081,
-    "university": "The New School"
+    "university": "The New School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:c08dd14dff03a8b9ccb6b7940fd2de48",
@@ -3286,7 +3584,8 @@
     "borough": "Brooklyn",
     "latitude": 40.695685,
     "longitude": -73.991439,
-    "university": "CUNY NYC College of Technology"
+    "university": "CUNY NYC College of Technology",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:c0eb6ffb3e104be25e9eb1f655f7e0ee",
@@ -3297,7 +3596,8 @@
     "borough": "Manhattan",
     "latitude": 40.745831,
     "longitude": -73.993285,
-    "university": "Swedish Institute Inc"
+    "university": "Swedish Institute Inc",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:c1186118f0ae4d443d0df81b0a9f9776",
@@ -3308,7 +3608,8 @@
     "borough": "Manhattan",
     "latitude": 40.768572,
     "longitude": -73.962465,
-    "university": "NY School of Interior Design"
+    "university": "NY School of Interior Design",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:c11c39e1eeb8ee91370a4e27dd2c3030",
@@ -3319,7 +3620,8 @@
     "borough": "Brooklyn",
     "latitude": 40.631274,
     "longitude": -73.975423,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:c12faf93843b1de4f8b8b375dfee8da2",
@@ -3330,7 +3632,8 @@
     "borough": "Brooklyn",
     "latitude": 40.634485,
     "longitude": -73.889271,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:c18d839498dc3af0900202dae69c1ecc",
@@ -3341,7 +3644,8 @@
     "borough": "Queens",
     "latitude": 40.75021,
     "longitude": -73.88507,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:c2f22d3ece1503075e368ff3fd1ba930",
@@ -3352,7 +3656,8 @@
     "borough": "Queens",
     "latitude": 40.602505,
     "longitude": -73.75356,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:c40bcf55fba216a790d964b84c14e801",
@@ -3363,7 +3668,8 @@
     "borough": "Manhattan",
     "latitude": 40.804981,
     "longitude": -73.940336,
-    "university": "NY Col of Podiatric Medicine"
+    "university": "NY Col of Podiatric Medicine",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:c5158100ba47b03616f1c9d19dfe415a",
@@ -3374,7 +3680,8 @@
     "borough": "Bronx",
     "latitude": 40.84657,
     "longitude": -73.901277,
-    "university": "Bronx Lebanon Hospital"
+    "university": "Bronx Lebanon Hospital",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:c8544d24008d60fd46791492ec23f966",
@@ -3385,7 +3692,8 @@
     "borough": "Brooklyn",
     "latitude": 40.61592,
     "longitude": -73.976043,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:c9506d55349780f435c7762fefff62b3",
@@ -3396,7 +3704,8 @@
     "borough": "Queens",
     "latitude": 40.726983,
     "longitude": -73.893086,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:ca704c13f26502b754d2a7a84feecf87",
@@ -3407,7 +3716,8 @@
     "borough": "Manhattan",
     "latitude": 40.770886,
     "longitude": -73.98972,
-    "university": "CUNY John Jay Col Crim Justice"
+    "university": "CUNY John Jay Col Crim Justice",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:ce1e9f07db221ba2f67098bae289d8e5",
@@ -3418,7 +3728,8 @@
     "borough": "Manhattan",
     "latitude": 40.732845,
     "longitude": -73.983609,
-    "university": "Beth Israel Medical Center"
+    "university": "Beth Israel Medical Center",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:ce3e26314b2ed8a7bd743ab9140504aa",
@@ -3429,7 +3740,8 @@
     "borough": "Brooklyn",
     "latitude": 40.590603,
     "longitude": -73.971754,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:ce59412278939c254bc351dac52645ff",
@@ -3440,7 +3752,8 @@
     "borough": "Queens",
     "latitude": 40.776822,
     "longitude": -73.909421,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d0d861d53c42f5959816c470d7edb315",
@@ -3451,7 +3764,8 @@
     "borough": "Brooklyn",
     "latitude": 40.691631,
     "longitude": -73.951264,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d0f9f64536e8ad6862fa85219ce739c3",
@@ -3462,7 +3776,8 @@
     "borough": "Manhattan",
     "latitude": 40.760777,
     "longitude": -73.950545,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:d18a235b145df3cc0cf5784fe3b04593",
@@ -3473,7 +3788,8 @@
     "borough": "Bronx",
     "latitude": 40.829999,
     "longitude": -73.875027,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d344142066177a81bb1987c4bb5b65a3",
@@ -3484,7 +3800,8 @@
     "borough": "Brooklyn",
     "latitude": 40.672247,
     "longitude": -73.968111,
-    "university": "Bard Brooklyn Public Library"
+    "university": "Bard Brooklyn Public Library",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d43a18e107abff5a6164579a5381cf64",
@@ -3495,7 +3812,8 @@
     "borough": "Queens",
     "latitude": 40.757791,
     "longitude": -73.828878,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d4cea514e11e4a4fdb896e1c0f586733",
@@ -3506,7 +3824,8 @@
     "borough": "Manhattan",
     "latitude": 40.791992,
     "longitude": -73.952219,
-    "university": "Mt Sinai School of Medicine"
+    "university": "Mt Sinai School of Medicine",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:d676796ff4f28e191aba6ce7f6dc080d",
@@ -3517,7 +3836,8 @@
     "borough": "Queens",
     "latitude": 40.757553,
     "longitude": -73.784307,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d6dc72c0c749b16e91851b52cc256d14",
@@ -3528,7 +3848,8 @@
     "borough": "Brooklyn",
     "latitude": 40.680663,
     "longitude": -73.887342,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d7b6a850541d90d0f27a92bb7cb2d031",
@@ -3539,7 +3860,8 @@
     "borough": "Bronx",
     "latitude": 40.870286,
     "longitude": -73.828612,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d981bc27de6e0dd423aa46b0362a0c22",
@@ -3550,7 +3872,8 @@
     "borough": "Manhattan",
     "latitude": 40.74452,
     "longitude": -73.995961,
-    "university": "Swedish Institute Inc"
+    "university": "Swedish Institute Inc",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d9cf3116e074431edffa31e522158e25",
@@ -3561,7 +3884,8 @@
     "borough": "Bronx",
     "latitude": 40.847759,
     "longitude": -73.78641,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:d9cf896aaff5cc0448ce27c3e1cde525",
@@ -3572,7 +3896,8 @@
     "borough": "Staten Island",
     "latitude": 40.613282,
     "longitude": -74.092324,
-    "university": "Wagner College"
+    "university": "Wagner College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:da5e5f31efdfaf76201dcba207c502d2",
@@ -3583,7 +3908,8 @@
     "borough": "Manhattan",
     "latitude": 40.739826,
     "longitude": -73.989998,
-    "university": "Pacific College of Health & Science"
+    "university": "Pacific College of Health & Science",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:dc7e90c596445c4d916fc0e35e210122",
@@ -3594,7 +3920,8 @@
     "borough": "Bronx",
     "latitude": 40.818103,
     "longitude": -73.928044,
-    "university": "Eugenio Maria Hostos Comm College"
+    "university": "Eugenio Maria Hostos Comm College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:dd8c229c6ba501084f0fcee8361acbd5",
@@ -3605,7 +3932,8 @@
     "borough": "Brooklyn",
     "latitude": 40.648726,
     "longitude": -73.976758,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:de1e828b7f0c16b0f7cda8f9b58c0387",
@@ -3616,7 +3944,8 @@
     "borough": "Manhattan",
     "latitude": 40.760826,
     "longitude": -73.977347,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:df4caf21ed676838ad34d2018f8b20ba",
@@ -3627,7 +3956,8 @@
     "borough": "Brooklyn",
     "latitude": 40.674491,
     "longitude": -73.944005,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e1385a49ab48db2fb77d376db6ddd424",
@@ -3638,7 +3968,8 @@
     "borough": "Brooklyn",
     "latitude": 40.691916,
     "longitude": -73.989783,
-    "university": "Brooklyn Law School"
+    "university": "Brooklyn Law School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e1602c45a1d7dac205cd9ef69c6015d2",
@@ -3649,7 +3980,8 @@
     "borough": "Manhattan",
     "latitude": 40.752435,
     "longitude": -73.973125,
-    "university": "CUNY Central Administration"
+    "university": "CUNY Central Administration",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e1d41092cda8c16bc956683163eb2192",
@@ -3660,7 +3992,8 @@
     "borough": "Manhattan",
     "latitude": 40.729437,
     "longitude": -73.997217,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e28ae1e1f8b8b8a9d4fc69e01f84f733",
@@ -3671,7 +4004,8 @@
     "borough": "Manhattan",
     "latitude": 40.768745,
     "longitude": -73.959786,
-    "university": "Marymount Manhattan College"
+    "university": "Marymount Manhattan College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e31111812ca778f03c5e70e5faadd7cb",
@@ -3682,7 +4016,8 @@
     "borough": "Manhattan",
     "latitude": 40.794188,
     "longitude": -73.94347,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e343670808929d519f151157a4bb39cd",
@@ -3693,7 +4028,8 @@
     "borough": "Brooklyn",
     "latitude": 40.611058,
     "longitude": -73.980617,
-    "university": "Elyon College"
+    "university": "Elyon College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e3af2be955ff606fe8d1755457c53d5a",
@@ -3704,7 +4040,8 @@
     "borough": "Manhattan",
     "latitude": 40.748527,
     "longitude": -73.983641,
-    "university": "CUNY Graduate School"
+    "university": "CUNY Graduate School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e4139913406b8bdf4626a7d12bce79a4",
@@ -3715,7 +4052,8 @@
     "borough": "Queens",
     "latitude": 40.742939,
     "longitude": -73.825174,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e491df5fe972293cdf18220a1f01c74b",
@@ -3726,7 +4064,8 @@
     "borough": "Manhattan",
     "latitude": 40.761666,
     "longitude": -73.969481,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e4aa22fbed8f2648e941ea2d507339e7",
@@ -3737,7 +4076,8 @@
     "borough": "Bronx",
     "latitude": 40.857369,
     "longitude": -73.910202,
-    "university": "Bronx Community College"
+    "university": "Bronx Community College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e4f6f7986c136e0d74ffbb4cb725e51f",
@@ -3748,7 +4088,8 @@
     "borough": "Manhattan",
     "latitude": 40.734613,
     "longitude": -73.999168,
-    "university": "The New School"
+    "university": "The New School",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e5bd94e10930eef17786cb612f4d0c2d",
@@ -3759,7 +4100,8 @@
     "borough": "Manhattan",
     "latitude": 40.791593,
     "longitude": -73.952061,
-    "university": "Mt Sinai School of Medicine"
+    "university": "Mt Sinai School of Medicine",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e5ca0937b47c0c82666549af0b45d365",
@@ -3770,7 +4112,8 @@
     "borough": "Manhattan",
     "latitude": 40.738745,
     "longitude": -73.982252,
-    "university": "School of Visual Arts"
+    "university": "School of Visual Arts",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e5dc16e45a49c1f198513ef6fa41f215",
@@ -3781,7 +4124,8 @@
     "borough": "Bronx",
     "latitude": 40.848069,
     "longitude": -73.856978,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e6372bc7973503e781d63c6d98d8fac3",
@@ -3792,7 +4136,8 @@
     "borough": "Manhattan",
     "latitude": 40.76494,
     "longitude": -73.991211,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e6da6cf4063e2e4a10770100c1cca62a",
@@ -3803,7 +4148,8 @@
     "borough": "Brooklyn",
     "latitude": 40.672247,
     "longitude": -73.968111,
-    "university": "Bard Brooklyn Public Library"
+    "university": "Bard Brooklyn Public Library",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e712c6bcc023d57adefd02a3b76948bd",
@@ -3814,7 +4160,8 @@
     "borough": "Brooklyn",
     "latitude": 40.687383,
     "longitude": -73.966032,
-    "university": "St Joseph's University - Main Campus"
+    "university": "St Joseph's University - Main Campus",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e7732153ea48378e82129363b2125794",
@@ -3825,7 +4172,8 @@
     "borough": "Manhattan",
     "latitude": 40.768567,
     "longitude": -73.964743,
-    "university": "CUNY Hunter College"
+    "university": "CUNY Hunter College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e7b536f1ef4273c73263ac17c56e5f45",
@@ -3836,7 +4184,8 @@
     "borough": "Queens",
     "latitude": 40.760513,
     "longitude": -73.936661,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e881710c633de4f891591fd806b0b1a9",
@@ -3847,7 +4196,8 @@
     "borough": "Queens",
     "latitude": 40.760513,
     "longitude": -73.936661,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e99e623effd50be94c01940ce9038f69",
@@ -3858,7 +4208,8 @@
     "borough": "Bronx",
     "latitude": 40.849502,
     "longitude": -73.917583,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e9af454dd8d5e239a1027e70e6aa249b",
@@ -3869,7 +4220,8 @@
     "borough": "Bronx",
     "latitude": 40.854352,
     "longitude": -73.887894,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:e9de8394fa0dacd7ac709b50fb56bbff",
@@ -3880,7 +4232,8 @@
     "borough": "Manhattan",
     "latitude": 40.767984,
     "longitude": -73.984574,
-    "university": "NY Inst Tech-Manhattan Campus"
+    "university": "NY Inst Tech-Manhattan Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:e9ff0c907d0746ac46b8f56af137dbdb",
@@ -3891,7 +4244,8 @@
     "borough": "Brooklyn",
     "latitude": 40.683449,
     "longitude": -73.978549,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:ea673e0d9a67ace2f29ac7d10ad9912a",
@@ -3902,7 +4256,8 @@
     "borough": "Manhattan",
     "latitude": 40.72949,
     "longitude": -73.99726,
-    "university": "LIU-New York University Campus"
+    "university": "LIU-New York University Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:ea6cb0b426bb29c1ad180dcb899b0398",
@@ -3913,7 +4268,8 @@
     "borough": "Manhattan",
     "latitude": 40.746753,
     "longitude": -73.99414,
-    "university": "Fashion Institute of Technology"
+    "university": "Fashion Institute of Technology",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:eaf0d2b6f328adf71b3caadf496ef1a8",
@@ -3924,7 +4280,8 @@
     "borough": "Manhattan",
     "latitude": 40.785966,
     "longitude": -73.95181,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:eb43596b7587fbf445ce2fd78f1afbbb",
@@ -3935,7 +4292,8 @@
     "borough": "Manhattan",
     "latitude": 40.774259,
     "longitude": -73.984256,
-    "university": "Juilliard School (The)"
+    "university": "Juilliard School (The)",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:eb60390bf9e3ac0e288472720d921311",
@@ -3946,7 +4304,8 @@
     "borough": "Queens",
     "latitude": 40.75518,
     "longitude": -73.944306,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:eba7a58f8edf922eff6bf7c8114fddc4",
@@ -3957,7 +4316,8 @@
     "borough": "Brooklyn",
     "latitude": 40.61641,
     "longitude": -74.031397,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:ec90d6627b7edaac3beea384ed2e8314",
@@ -3968,7 +4328,8 @@
     "borough": "Queens",
     "latitude": 40.735956,
     "longitude": -73.81613,
-    "university": "CUNY Queens College"
+    "university": "CUNY Queens College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:eec118768e15a5e03d3354abda7b00da",
@@ -3979,7 +4340,8 @@
     "borough": "Manhattan",
     "latitude": 40.803027,
     "longitude": -73.934853,
-    "university": "Touro University - Harlem"
+    "university": "Touro University - Harlem",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:f08e65dfa414959d85c27b201c668486",
@@ -3990,7 +4352,8 @@
     "borough": "Queens",
     "latitude": 40.743989,
     "longitude": -73.935099,
-    "university": "Fiorello H. Laguardia Comm College"
+    "university": "Fiorello H. Laguardia Comm College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:f2bc99e0432afd4c8a3f9591fce05687",
@@ -4001,7 +4364,8 @@
     "borough": "Brooklyn",
     "latitude": 40.6948,
     "longitude": -73.992413,
-    "university": "Brooklyn Law School"
+    "university": "Brooklyn Law School",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:f373d308be3cabf2ae128397ec88299e",
@@ -4012,7 +4376,8 @@
     "borough": "Queens",
     "latitude": 40.719893,
     "longitude": -73.739047,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:f42012efff7096542739b70fe7ca1e80",
@@ -4023,7 +4388,8 @@
     "borough": "Queens",
     "latitude": 40.76823,
     "longitude": -73.738236,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:f5d108e6ba1b15a088abc91d26fae19b",
@@ -4034,7 +4400,8 @@
     "borough": "Staten Island",
     "latitude": 40.590403,
     "longitude": -74.10114,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:f5f6eed54718f2eafd942ef215910d66",
@@ -4045,7 +4412,8 @@
     "borough": "Manhattan",
     "latitude": 40.752815,
     "longitude": -73.984112,
-    "university": "CUNY Stella and Charles Guttman Comm"
+    "university": "CUNY Stella and Charles Guttman Comm",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:f770fec4ef929b2b85d5358cab40cf9c",
@@ -4056,7 +4424,8 @@
     "borough": "Manhattan",
     "latitude": 40.745559,
     "longitude": -74.0035,
-    "university": "General Theological Seminary"
+    "university": "General Theological Seminary",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:f773a83959c4644af086daa62c0bf725",
@@ -4067,7 +4436,8 @@
     "borough": "Queens",
     "latitude": 40.68691,
     "longitude": -73.824841,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:fa54ae3c9166283308cbb7a3ca611646",
@@ -4078,7 +4448,8 @@
     "borough": "Bronx",
     "latitude": 40.874479,
     "longitude": -73.891615,
-    "university": "CUNY Lehman College"
+    "university": "CUNY Lehman College",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:fa9c9c6a843b8f8f19ee5b47e78409e0",
@@ -4089,7 +4460,8 @@
     "borough": "Manhattan",
     "latitude": 40.740475,
     "longitude": -73.993354,
-    "university": "New York Conservatory for Dramatic A"
+    "university": "New York Conservatory for Dramatic A",
+    "free_public_wifi": true
   },
   {
     "id": "facdb:fb34a2830552addb2321b94e0eb9d385",
@@ -4100,7 +4472,8 @@
     "borough": "Brooklyn",
     "latitude": 40.686043,
     "longitude": -73.978402,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:fb613cea2478cef5d82c9db1fc5afa0e",
@@ -4111,7 +4484,8 @@
     "borough": "Brooklyn",
     "latitude": 40.701303,
     "longitude": -73.942481,
-    "university": "Boricua College - Brooklyn"
+    "university": "Boricua College - Brooklyn",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:fc1937affe9840293e6b5e72755ce177",
@@ -4122,7 +4496,8 @@
     "borough": "Brooklyn",
     "latitude": 40.633607,
     "longitude": -74.029507,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:fd87cf0f77f086066ba18a63bcbf83bd",
@@ -4133,7 +4508,8 @@
     "borough": "Queens",
     "latitude": 40.744922,
     "longitude": -73.945666,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "facdb:fe3efe0365330942f665f659420c7ac9",
@@ -4144,7 +4520,8 @@
     "borough": "Brooklyn",
     "latitude": 40.694786,
     "longitude": -73.928404,
-    "university": null
+    "university": null,
+    "free_public_wifi": true
   },
   {
     "id": "facdb:febdd780fd3751404b7e977594b8e389",
@@ -4155,7 +4532,8 @@
     "borough": "Manhattan",
     "latitude": 40.753473,
     "longitude": -73.980863,
-    "university": "Berkeley College - Main Campus"
+    "university": "Berkeley College - Main Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:ff3ea6720de7cddd7661b077fa4f0395",
@@ -4166,7 +4544,8 @@
     "borough": "Manhattan",
     "latitude": 40.714298,
     "longitude": -74.001559,
-    "university": "Pace University - NYC Campus"
+    "university": "Pace University - NYC Campus",
+    "free_public_wifi": false
   },
   {
     "id": "facdb:ff7e25654588a2c2b3a2ec994b8ec1c7",
@@ -4177,7 +4556,8 @@
     "borough": "Staten Island",
     "latitude": 40.531048,
     "longitude": -74.232292,
-    "university": null
+    "university": null,
+    "free_public_wifi": false
   },
   {
     "id": "nyu:60-fifth-avenue",
@@ -4188,7 +4568,8 @@
     "borough": "Manhattan",
     "latitude": 40.7357,
     "longitude": -73.9944,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:bobst-library",
@@ -4199,7 +4580,8 @@
     "borough": "Manhattan",
     "latitude": 40.7295,
     "longitude": -73.9974,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:courant-institute",
@@ -4210,7 +4592,8 @@
     "borough": "Manhattan",
     "latitude": 40.7286,
     "longitude": -73.9956,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:global-center",
@@ -4221,7 +4604,8 @@
     "borough": "Manhattan",
     "latitude": 40.7294,
     "longitude": -73.9986,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:kimmel-center",
@@ -4232,7 +4616,8 @@
     "borough": "Manhattan",
     "latitude": 40.7301,
     "longitude": -73.9977,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:paulson-center",
@@ -4243,7 +4628,8 @@
     "borough": "Manhattan",
     "latitude": 40.7271,
     "longitude": -73.9967,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:silver-center",
@@ -4254,7 +4640,8 @@
     "borough": "Manhattan",
     "latitude": 40.7301,
     "longitude": -73.9955,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:stern-tisch-hall",
@@ -4265,7 +4652,8 @@
     "borough": "Manhattan",
     "latitude": 40.7291,
     "longitude": -73.9965,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:tandon-dibner-library",
@@ -4276,7 +4664,8 @@
     "borough": "Brooklyn",
     "latitude": 40.6942,
     "longitude": -73.9865,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:tandon-rogers-hall",
@@ -4287,6 +4676,7 @@
     "borough": "Brooklyn",
     "latitude": 40.6939,
     "longitude": -73.9855,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   }
 ]

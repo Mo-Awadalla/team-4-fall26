@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError, listSpots, searchSpots } from './api';
+import { ApiError, fetchFacets, listSpots, searchSpots } from './api';
 import type { SpotPage } from './contract';
 
 /** A page shaped like the API's, with as many identical items as asked for. */
@@ -14,7 +14,8 @@ function page(total: number, count = total, offset = 0): SpotPage {
 			borough: 'Brooklyn' as const,
 			latitude: 40.73,
 			longitude: -73.95,
-			university: null
+			university: null,
+			free_public_wifi: false
 		})),
 		pagination: {
 			limit: 20,
@@ -188,5 +189,81 @@ describe('listSpots', () => {
 		expect(result.pagination.total).toBe(380);
 		expect(urls[0]).toContain('/api/spots?');
 		expect(urls[0]).not.toContain('q=');
+	});
+});
+
+describe('filters', () => {
+	it('sends the filters it is given', async () => {
+		const { urls, fetcher } = recorder(() => json(page(2)));
+
+		await searchSpots('library', {
+			filters: { borough: 'Bronx', category: 'library', free_public_wifi: true },
+			fetcher
+		});
+
+		expect(urls[0]).toContain('borough=Bronx');
+		expect(urls[0]).toContain('category=library');
+		expect(urls[0]).toContain('free_public_wifi=true');
+	});
+
+	it('omits a cleared filter rather than sending it blank', async () => {
+		// Both endpoints answer a present-but-blank parameter with 422, so a
+		// cleared dropdown has to drop the key, not send an empty value.
+		const { urls, fetcher } = recorder(() => json(page(2)));
+
+		await searchSpots('library', {
+			filters: { borough: '', category: undefined, free_public_wifi: true },
+			fetcher
+		});
+
+		expect(urls[0]).not.toContain('borough=');
+		expect(urls[0]).not.toContain('category=');
+		expect(urls[0]).toContain('free_public_wifi=true');
+	});
+
+	it('applies filters to a plain listing too, for browsing without a query', async () => {
+		const { urls, fetcher } = recorder(() => json(page(5)));
+
+		await listSpots({ filters: { borough: 'Queens' }, fetcher });
+
+		expect(urls[0]).toContain('/api/spots?');
+		expect(urls[0]).toContain('borough=Queens');
+		expect(urls[0]).not.toContain('q=');
+	});
+
+	it('sends false as a value rather than dropping it', async () => {
+		// "Without free Wi-Fi" is a filter, not an absence of one.
+		const { urls, fetcher } = recorder(() => json(page(1)));
+
+		await listSpots({ filters: { free_public_wifi: false }, fetcher });
+
+		expect(urls[0]).toContain('free_public_wifi=false');
+	});
+});
+
+describe('fetchFacets', () => {
+	it('reads the values the filter controls offer', async () => {
+		const { urls, fetcher } = recorder(() =>
+			json({
+				boroughs: [{ value: 'Manhattan', count: 151 }],
+				categories: [{ value: 'library', count: 248 }],
+				universities: [{ value: 'New York University', count: 12 }]
+			})
+		);
+
+		const facets = await fetchFacets(fetcher);
+
+		expect(urls[0]).toContain('/api/spots/facets');
+		expect(facets.boroughs[0]).toEqual({ value: 'Manhattan', count: 151 });
+	});
+
+	it('reports a transport failure as a network error', async () => {
+		const { fetcher } = recorder(() => {
+			throw new TypeError('Failed to fetch');
+		});
+
+		const failure = await fetchFacets(fetcher).catch((error: unknown) => error);
+
+		expect((failure as ApiError).code).toBe('network_error');
 	});
 });

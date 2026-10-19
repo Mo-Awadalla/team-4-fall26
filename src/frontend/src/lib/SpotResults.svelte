@@ -55,6 +55,21 @@
 					<!-- Proximity, never affiliation: see the contract. -->
 					<p class="campus">Near {spot.university}</p>
 				{/if}
+				{#if spot.free_public_wifi}
+					<!--
+						Shown only when true. False means no free public hotspot is
+						recorded within 25 m, which is not the same as no Wi-Fi, so
+						saying "no Wi-Fi" would assert more than the data supports.
+					-->
+					<p class="wifi">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M5 12.5a10 10 0 0 1 14 0" />
+							<path d="M8.5 16a5 5 0 0 1 7 0" />
+							<circle cx="12" cy="19.5" r="1" />
+						</svg>
+						Free public Wi-Fi
+					</p>
+				{/if}
 			</li>
 		{/each}
 	</ul>
@@ -129,6 +144,24 @@
 
 	.campus {
 		font-style: italic;
+	}
+
+	.wifi {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin: 10px 0 0;
+		color: var(--color-brand-hover);
+		font-size: 13px;
+		font-weight: 650;
+	}
+
+	.wifi svg {
+		width: 15px;
+		fill: none;
+		stroke: currentColor;
+		stroke-linecap: round;
+		stroke-width: 2;
 	}
 
 	button {

@@ -8,7 +8,8 @@
     "borough": "Manhattan",
     "latitude": 40.7295,
     "longitude": -73.9974,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:kimmel-center",
@@ -19,7 +20,8 @@
     "borough": "Manhattan",
     "latitude": 40.7301,
     "longitude": -73.9977,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:courant-institute",
@@ -30,7 +32,8 @@
     "borough": "Manhattan",
     "latitude": 40.7286,
     "longitude": -73.9956,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:stern-tisch-hall",
@@ -41,7 +44,8 @@
     "borough": "Manhattan",
     "latitude": 40.7291,
     "longitude": -73.9965,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:silver-center",
@@ -52,7 +56,8 @@
     "borough": "Manhattan",
     "latitude": 40.7301,
     "longitude": -73.9955,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:tandon-dibner-library",
@@ -63,7 +68,8 @@
     "borough": "Brooklyn",
     "latitude": 40.6942,
     "longitude": -73.9865,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:tandon-rogers-hall",
@@ -74,7 +80,8 @@
     "borough": "Brooklyn",
     "latitude": 40.6939,
     "longitude": -73.9855,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:global-center",
@@ -85,7 +92,8 @@
     "borough": "Manhattan",
     "latitude": 40.7294,
     "longitude": -73.9986,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:60-fifth-avenue",
@@ -96,7 +104,8 @@
     "borough": "Manhattan",
     "latitude": 40.7357,
     "longitude": -73.9944,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   },
   {
     "id": "nyu:paulson-center",
@@ -107,6 +116,7 @@
     "borough": "Manhattan",
     "latitude": 40.7271,
     "longitude": -73.9967,
-    "university": "New York University"
+    "university": "New York University",
+    "free_public_wifi": false
   }
 ]

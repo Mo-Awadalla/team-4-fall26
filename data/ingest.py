@@ -17,7 +17,7 @@ changes; nothing writes to ``spots.json`` at runtime.
 Where the records come from
 ---------------------------
 
-Two sources. The first is the city's Facilities Database (FacDB, Socrata ``ji82-xba5``),
+Three sources. The first is the city's Facilities Database (FacDB, Socrata ``ji82-xba5``),
 which is what the ``facdb:`` identifier prefix refers to. Two subsets of it are
 places a student might read in -- the ``LIBRARIES`` facility group and the
 ``COLLEGES OR UNIVERSITIES`` subgroup. Neighborhood names come from a second
@@ -32,8 +32,22 @@ at all. Those records carry the ``nyu:`` identifier prefix and name the
 institution whose building it is rather than a campus that happens to be within
 500 m.
 
-Neither source lists access conditions, and the contract has no field for one.
-Several curated buildings require a university ID to enter.
+The third is the city's public Wi-Fi hotspot locations (``yjub-udmw``), used
+only to answer one question: is there free public Wi-Fi at this spot. A hotspot
+within 25 m sets ``free_public_wifi``. That radius is tight on purpose -- the
+matches at 25 m are overwhelmingly hotspots the libraries themselves run, while
+widening it to 100 m starts counting LinkNYC kiosks on the street, which is not
+Wi-Fi anyone can use sitting down.
+
+``free_public_wifi`` is false for every curated NYU building, and that is
+correct rather than missing: those buildings have Wi-Fi that needs NYU
+credentials, and the field answers whether *anyone* can use it.
+
+No source lists hours, noise, or power outlets. The city publishes a link to
+each Queens branch's page and a weekly total of open hours for NYPL branches,
+neither of which is a schedule, so "open now" is not derivable. No source lists
+access conditions either, and the contract has no field for one: several
+curated buildings require a university ID to enter.
 
 FacDB does not list cafés, so no record maps to the published ``cafe`` category
 yet. The obvious candidate, the health department's restaurant inspection
@@ -124,6 +138,14 @@ FACILITIES_WHERE = "facgroup = 'LIBRARIES' OR facsubgrp = 'COLLEGES OR UNIVERSIT
 #: 2020 Neighborhood Tabulation Areas, for the names FacDB only codes.
 NEIGHBORHOODS_DATASET = "9nt8-h7nd"
 
+#: Public Wi-Fi hotspots, for the one amenity the open data can support.
+#:
+#: Only the free ones: the dataset also carries "Limited Free", which means a
+#: trial or a time limit, and a filter that promised Wi-Fi and delivered thirty
+#: minutes of it would be worse than not offering the filter.
+WIFI_DATASET = "yjub-udmw"
+WIFI_WHERE = "type = 'Free'"
+
 SOURCE_PREFIX = "facdb"
 
 #: A hand-maintained list of NYU buildings, kept as data rather than code so it
@@ -161,6 +183,7 @@ CONTRACT_FIELDS = (
     "latitude",
     "longitude",
     "university",
+    "free_public_wifi",
 )
 
 #: The published category vocabulary, keyed on FacDB's most specific type so
@@ -191,6 +214,15 @@ CATEGORY_BY_FACILITY_TYPE: dict[str, str | None] = {
     # residence.
     "UNIVERSITY RESIDENTIAL STRUCTURE": None,
 }
+
+#: How close a free hotspot has to be before the spot is credited with it.
+#:
+#: Measured rather than chosen. At 25 m, 203 of the 248 public libraries match,
+#: and almost every match is a hotspot the library itself operates -- NYPL, QPL
+#: and BPL run 214 of them. Widen it to 100 m and the count rises to 274, but
+#: the additions are LinkNYC kiosks on the street rather than Wi-Fi anyone can
+#: use sitting down, which is the question the field is meant to answer.
+WIFI_RADIUS_METRES = 25.0
 
 CAMPUS_CATEGORY = "university"
 
@@ -331,10 +363,14 @@ def fixture_rows(directory: Path, name: str) -> list[Any]:
     return rows
 
 
-def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any]]:
+def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any]]:
     """The raw upstream records, from the network or from a fixture directory."""
     if fixtures is not None:
-        return fixture_rows(fixtures, "facilities"), fixture_rows(fixtures, "neighborhoods")
+        return (
+            fixture_rows(fixtures, "facilities"),
+            fixture_rows(fixtures, "neighborhoods"),
+            fixture_rows(fixtures, "wifi"),
+        )
 
     token = os.environ.get(APP_TOKEN_VARIABLE) or None
     if not token:
@@ -349,7 +385,15 @@ def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any]]:
         token,
         order="nta2020",
     )
-    return facilities, neighborhoods
+    hotspots = socrata_rows(
+        WIFI_DATASET,
+        # Coordinates are all the proximity test needs; the rest of the row is
+        # provider metadata.
+        {"$select": "objectid,latitude,longitude", "$where": WIFI_WHERE},
+        token,
+        order="objectid",
+    )
+    return facilities, neighborhoods, hotspots
 
 
 # -- Normalization -----------------------------------------------------------
@@ -525,6 +569,42 @@ def haversine_metres(
     return 2 * EARTH_RADIUS_METRES * math.asin(math.sqrt(arc))
 
 
+def hotspot_points(rows: list[Any]) -> list[tuple[float, float]]:
+    """Usable coordinates from the Wi-Fi rows, ignoring ungeocoded ones."""
+    points: list[tuple[float, float]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        latitude = coordinate(row, "latitude", 90.0)
+        longitude = coordinate(row, "longitude", 180.0)
+        if latitude is not None and longitude is not None:
+            points.append((latitude, longitude))
+    return points
+
+
+def has_free_wifi(latitude: float, longitude: float, hotspots: list[tuple[float, float]]) -> bool:
+    """Whether a free public hotspot sits within :data:`WIFI_RADIUS_METRES`.
+
+    False means no free hotspot is recorded near the spot, which is not the same
+    as there being no Wi-Fi: an NYU building has Wi-Fi that needs NYU
+    credentials, and the city's dataset has no reason to know about it. The
+    field answers "can anyone use Wi-Fi here", which is the question a study
+    spot raises.
+    """
+    # A degree of latitude is about 111 km everywhere, and a degree of longitude
+    # at least 78 km at New York's latitude, so this box can only ever be
+    # generous. It turns a million haversine calls into a few thousand.
+    margin = WIFI_RADIUS_METRES / 78_000.0
+
+    return any(
+        abs(spot_latitude - latitude) <= margin
+        and abs(spot_longitude - longitude) <= margin
+        and haversine_metres(latitude, longitude, spot_latitude, spot_longitude)
+        <= WIFI_RADIUS_METRES
+        for spot_latitude, spot_longitude in hotspots
+    )
+
+
 def nearest_campus(latitude: float, longitude: float, campuses: list[Campus]) -> str | None:
     """The closest curated campus within ``CAMPUS_RADIUS_METRES``, if any.
 
@@ -540,7 +620,9 @@ def nearest_campus(latitude: float, longitude: float, campuses: list[Campus]) ->
     return within[0][1] if within else None
 
 
-def normalize(facilities: list[Any], names: dict[str, str]) -> list[dict[str, Any]]:
+def normalize(
+    facilities: list[Any], names: dict[str, str], hotspots: list[Any]
+) -> list[dict[str, Any]]:
     """The whole mapping, from raw upstream records to contract records."""
     spots: list[dict[str, Any]] = []
     skipped = 0
@@ -577,11 +659,16 @@ def normalize(facilities: list[Any], names: dict[str, str]) -> list[dict[str, An
                 "longitude": longitude,
                 # Filled in below: it depends on the rest of the snapshot.
                 "university": None,
+                "free_public_wifi": False,
             }
         )
 
     if skipped:
         warn(f"skipped {skipped} record(s) without coordinates")
+
+    points = hotspot_points(hotspots)
+    for spot in spots:
+        spot["free_public_wifi"] = has_free_wifi(spot["latitude"], spot["longitude"], points)
 
     campuses = [
         Campus(spot["name"], spot["latitude"], spot["longitude"])
@@ -715,9 +802,9 @@ def main(argv: list[str] | None = None) -> int:
     options = parser.parse_args(argv)
 
     try:
-        facilities, neighborhoods = read_sources(options.fixtures)
+        facilities, neighborhoods, hotspots = read_sources(options.fixtures)
         spots = combine(
-            normalize(facilities, neighborhood_names(neighborhoods)),
+            normalize(facilities, neighborhood_names(neighborhoods), hotspots),
             curated_spots(),
         )
     except IngestError as error:
@@ -727,7 +814,8 @@ def main(argv: list[str] | None = None) -> int:
     write_snapshot(options.output, spots)
     counts = Counter(spot["category"] for spot in spots)
     summary = ", ".join(f"{count} {name}" for name, count in sorted(counts.items()))
-    print(f"wrote {len(spots)} spots ({summary}) to {options.output}")
+    wifi = sum(1 for spot in spots if spot["free_public_wifi"])
+    print(f"wrote {len(spots)} spots ({summary}; {wifi} with free public wifi) to {options.output}")
     return 0
 
 

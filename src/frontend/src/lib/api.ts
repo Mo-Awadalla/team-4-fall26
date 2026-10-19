@@ -7,7 +7,7 @@
  * here needs to know a hostname.
  */
 
-import type { ErrorEnvelope, SpotPage } from './contract';
+import type { ErrorEnvelope, Facets, SpotFilters, SpotPage } from './contract';
 
 /** Matches the API's own default page size, so the first page agrees. */
 export const DEFAULT_LIMIT = 20;
@@ -76,8 +76,24 @@ async function get(path: string, parameters: URLSearchParams, fetcher: Fetcher):
 export type SearchOptions = {
 	limit?: number;
 	offset?: number;
+	filters?: SpotFilters;
 	fetcher?: Fetcher;
 };
+
+/**
+ * Render the filters as query parameters, omitting the ones not set.
+ *
+ * An empty string is dropped rather than sent: both endpoints reject a present
+ * but blank parameter with a 422, and a cleared dropdown should mean "no
+ * filter" rather than an error.
+ */
+function withFilters(parameters: URLSearchParams, filters: SpotFilters = {}): URLSearchParams {
+	for (const [name, value] of Object.entries(filters)) {
+		if (value === undefined || value === null || value === '') continue;
+		parameters.set(name, String(value));
+	}
+	return parameters;
+}
 
 /**
  * Search spots by a single free-text query.
@@ -97,7 +113,10 @@ export function searchSpots(query: string, options: SearchOptions = {}): Promise
 
 	return get(
 		'/api/spots/search',
-		new URLSearchParams({ q: query, limit: String(limit), offset: String(offset) }),
+		withFilters(
+			new URLSearchParams({ q: query, limit: String(limit), offset: String(offset) }),
+			options.filters
+		),
 		fetcher
 	);
 }
@@ -108,7 +127,33 @@ export function listSpots(options: SearchOptions = {}): Promise<SpotPage> {
 
 	return get(
 		'/api/spots',
-		new URLSearchParams({ limit: String(limit), offset: String(offset) }),
+		withFilters(
+			new URLSearchParams({ limit: String(limit), offset: String(offset) }),
+			options.filters
+		),
 		fetcher
 	);
+}
+
+/**
+ * The values the filter controls offer.
+ *
+ * Not hard-coded in the browser: `borough` is five fixed names, but the
+ * category vocabulary belongs to the importer and the campuses are whatever
+ * the snapshot contains, so a hard-coded list would silently stop matching
+ * when the data changes.
+ */
+export async function fetchFacets(fetcher: Fetcher = globalThis.fetch): Promise<Facets> {
+	let response: Response;
+	try {
+		response = await fetcher('/api/spots/facets', { headers: { accept: 'application/json' } });
+	} catch {
+		throw new ApiError('network_error', 'Could not reach the StudySpot API.', 0);
+	}
+
+	if (!response.ok) {
+		throw new ApiError('error', `The API returned ${response.status}.`, response.status);
+	}
+
+	return (await response.json()) as Facets;
 }
