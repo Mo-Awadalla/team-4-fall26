@@ -222,14 +222,21 @@ CONTRACT_FIELDS = (
 #: that a new upstream type fails loudly instead of landing in a near-enough
 #: bucket. ``None`` is a deliberate exclusion rather than a missing mapping.
 #:
-#: ``SPECIAL LIBRARIES`` are institutional collections -- a club's, a society's,
-#: a hospital's -- and many are open by appointment or to members only. They map
-#: to ``library`` because that is the kind of place they are; the contract has
-#: no field for access, and the application promises none.
+#: ``PUBLIC LIBRARY`` and ``SPECIAL LIBRARIES`` are kept apart rather than both
+#: published as libraries, because the difference is the one a reader cares
+#: about. A branch of NYPL, BPL or QPL is somewhere anyone can walk into; a
+#: special library is an institutional collection -- a club's, a society's, a
+#: hospital's -- and many are open by appointment or to members only. Publishing
+#: the second as ``public_library`` would claim access the data does not
+#: support, which is the same overclaim ``free_public_wifi`` and ``university``
+#: are each worded to avoid.
+#:
+#: The NYCHA community centre library is a city-run facility open to the
+#: community it sits in, so it goes with the public branches.
 CATEGORY_BY_FACILITY_TYPE: dict[str, str | None] = {
-    "PUBLIC LIBRARY": "library",
-    "NYCHA COMMUNITY CENTER - LIBRARY": "library",
-    "SPECIAL LIBRARIES": "library",
+    "PUBLIC LIBRARY": "public_library",
+    "NYCHA COMMUNITY CENTER - LIBRARY": "public_library",
+    "SPECIAL LIBRARIES": "special_library",
     "ACADEMIC LIBRARIES": "academic_library",
     "2 YEAR INDEPENDENT": "university",
     "2 YEAR PROPRIETARY": "university",
@@ -845,10 +852,22 @@ def normalize(
         else:
             spot["university"] = nearest_campus(spot["latitude"], spot["longitude"], campuses)
 
-    validate(spots)
+    # Campus records anchor the derivation above and are then dropped rather
+    # than published. A FacDB campus is an administrative point for an
+    # institution, not a room: "Daemen University-Brooklyn Branch" is a
+    # registration, and nobody can sit down in it. The application lists places
+    # a person can actually go, and access to a campus is restricted anyway.
+    #
+    # They still have to be built, because the "near which campus" label on the
+    # libraries is derived from exactly these coordinates. The curated NYU
+    # buildings are the campus study space the snapshot does publish, and those
+    # were recorded by hand from public building information.
+    published = [spot for spot in spots if spot["category"] != CAMPUS_CATEGORY]
+
+    validate(published)
     # Identifiers rather than names: a renamed facility then moves one line of
     # the snapshot instead of shifting every record after it.
-    return sorted(spots, key=lambda spot: spot["id"])
+    return sorted(published, key=lambda spot: spot["id"])
 
 
 def curated_spots(path: Path = CURATED_PATH) -> list[dict[str, Any]]:

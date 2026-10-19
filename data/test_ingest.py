@@ -30,7 +30,7 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 PUBLISHED_EXAMPLE = {
     "id": "facdb:eec118768e15a5e03d3354abda7b00da",
     "name": "125th Street Library",
-    "category": "library",
+    "category": "public_library",
     "address": "224 East 125 Street, New York, NY 10035",
     "neighborhood": "East Harlem (North)",
     "borough": "Manhattan",
@@ -44,7 +44,13 @@ PUBLISHED_EXAMPLE = {
 #: The published vocabulary. `university_building` is a campus building a
 #: student can work in, which FacDB has no equivalent for and only the curated
 #: list supplies; `cafe` has no source at all yet.
-CATEGORIES = {"library", "academic_library", "university", "university_building", "cafe"}
+CATEGORIES = {
+    "public_library",
+    "special_library",
+    "academic_library",
+    "university_building",
+    "cafe",
+}
 BOROUGHS = {"Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"}
 
 
@@ -149,8 +155,11 @@ class TestCategories:
     @pytest.mark.parametrize(
         ("facname", "expected"),
         [
-            ("125TH STREET LIBRARY", "library"),
-            ("THE GROLIER CLUB OF NEW YORK", "library"),
+            ("125TH STREET LIBRARY", "public_library"),
+            # A club's collection. Kept apart from the public branches because
+            # the difference is the one a reader cares about: many special
+            # libraries are open by appointment or to members only.
+            ("THE GROLIER CLUB OF NEW YORK", "special_library"),
             ("COLUMBIA UNIVERSITY BUTLER LIBRARY", "academic_library"),
             ("COLUMBIA UNIVERSITY", "university"),
         ],
@@ -226,7 +235,9 @@ class TestAbsentValues:
 class TestNeighborhoods:
     def test_are_2020_nta_names(self, spots: list[dict[str, Any]]) -> None:
         assert published(spots, "125th Street Library")["neighborhood"] == "East Harlem (North)"
-        assert published(spots, "Columbia University")["neighborhood"] == "Morningside Heights"
+        assert published(spots, "Columbia University Butler Library")["neighborhood"] == (
+            "Morningside Heights"
+        )
 
     def test_a_code_the_boundary_file_does_not_know_publishes_null(
         self, facilities: list[dict[str, Any]], names: dict[str, str]
@@ -238,8 +249,18 @@ class TestNeighborhoods:
 
 
 class TestUniversityIsProximity:
-    def test_a_campus_record_names_itself(self, spots: list[dict[str, Any]]) -> None:
-        assert published(spots, "Columbia University")["university"] == "Columbia University"
+    def test_a_campus_is_an_anchor_and_not_a_spot(self, spots: list[dict[str, Any]]) -> None:
+        # A FacDB campus is an administrative point for an institution rather
+        # than a room -- nobody can sit down in a registration -- so it anchors
+        # the label below without being published as somewhere to study.
+        assert not [spot for spot in spots if spot["name"] == "Columbia University"]
+        assert "university" not in {spot["category"] for spot in spots}
+
+    def test_the_anchor_still_labels_what_is_near_it(self, spots: list[dict[str, Any]]) -> None:
+        # Dropping the campus records must not drop the derivation they feed.
+        assert published(spots, "Columbia University Butler Library")["university"] == (
+            "Columbia University"
+        )
 
     def test_a_spot_inside_the_radius_names_the_closest_campus(
         self, spots: list[dict[str, Any]]
@@ -379,11 +400,12 @@ class TestCommandLine:
         assert ingest.main(["--fixtures", str(FIXTURES), "--output", str(output)]) == 0
 
         written = json.loads(output.read_text("utf-8"))
-        # Eleven facility records and four cafes -- six licences, one without a
-        # borough and one a repeat of a storefront already seen -- plus the
-        # curated buildings, which are read from the repository rather than
-        # from the network either way.
-        assert len(written) == 11 + 4 + len(ingest.curated_spots())
+        # Nine published facility records -- eleven mapped, less the two
+        # campuses, which anchor the proximity label without being spots --
+        # and four cafes from six licences, one without a borough and one a
+        # repeat of a storefront already seen. Plus the curated buildings,
+        # which are read from the repository rather than from the network.
+        assert len(written) == 9 + 4 + len(ingest.curated_spots())
 
     def test_a_missing_fixture_directory_is_reported_not_raised(self, tmp_path: Path) -> None:
         assert ingest.main(["--fixtures", str(tmp_path / "absent")]) == 1

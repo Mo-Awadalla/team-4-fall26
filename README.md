@@ -5,7 +5,7 @@
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data.
 
 > [!IMPORTANT]
-> StudySpot is deployed and working. `data/spots.json` holds 2,042 real places — 1,652 cafés with a sidewalk licence, 248 public libraries, and 142 campuses and campus buildings — 468 of them with a free public Wi-Fi hotspot nearby. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
+> StudySpot is deployed and working. `data/spots.json` holds 1,916 real places — 1,652 cafés with a sidewalk licence, 227 public library branches, 21 special libraries, and 16 academic libraries and NYU campus buildings — 465 of them with a free public Wi-Fi hotspot nearby. Every one is somewhere a person can go: the city's 126 campus records anchor the "near which campus" label but are not published as spots, because an institution's administrative point is not a room. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
 
 ## How will it work?
 

@@ -86,18 +86,27 @@ FacDB if its keys ever look the same.
 
 ## Categories
 
-`library`, `academic_library`, `university`, `university_building` and `cafe` are the published
-vocabulary. The model leaves `category` a free string on purpose, so the vocabulary lives in
+`cafe`, `public_library`, `special_library`, `academic_library` and `university_building` are the published vocabulary. The model leaves `category` a free string on purpose, so the vocabulary lives in
 `ingest.py`. The FacDB categories are keyed on its most specific facility type; `cafe` is not
 keyed on anything, because a sidewalk licence says the place serves food outdoors and not what
 kind of place it is, so there is nothing finer to map. A type nobody has mapped fails the import rather than
 landing in a near-enough bucket: inventing a category would publish a guess as data, and mapping
 it to the closest existing one would bury the fact that FacDB changed.
 
-FacDB's special libraries — a club's, a society's, a hospital's — are categorized `library`,
-because that is the kind of place they are. Many are open by appointment or to members only. The
-contract has no field for access and the application promises none: these are candidate
-locations, not guarantees of Wi-Fi, outlets, seating, quietness, or entry.
+`public_library` and `special_library` are separate because the difference is the one a reader
+cares about. A branch of NYPL, BPL or QPL is somewhere anyone can walk into. A special library is
+an institutional collection — a club's, a society's, a hospital's — and many are open by
+appointment or to members only, so publishing them as public would claim access the data does not
+support. That is the same overclaim `free_public_wifi` and `university` are each worded to avoid.
+
+The institution records in FacDB's higher-education subgroup are read but never published. An
+administrative point for "Daemen University-Brooklyn Branch" is a registration rather than a room,
+and campus access is restricted in any case; they exist here only to anchor the `university`
+label. The campus study space the snapshot does publish is the curated NYU list.
+
+None of this is a guarantee of entry. The contract has no field for access and the application
+promises none: these are candidate locations, not guarantees of Wi-Fi, outlets, seating,
+quietness, or entry.
 
 ## Absent values
 
