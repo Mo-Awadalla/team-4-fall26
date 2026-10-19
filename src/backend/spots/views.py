@@ -11,7 +11,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import StudySpot
-from .serializers import SpotQuerySerializer, StudySpotSerializer
+from .search import search
+from .serializers import (
+    SpotQuerySerializer,
+    SpotSearchQuerySerializer,
+    StudySpotSerializer,
+)
 
 #: Maps a validated query parameter to the lookup it filters with. Substring for
 #: the name, exact for the rest, all case-insensitive. A `university` or
@@ -80,3 +85,39 @@ class SpotDetailView(APIView):
         except StudySpot.DoesNotExist:
             raise NotFound(f"No study spot has the identifier {spot_id!r}.") from None
         return Response(StudySpotSerializer(spot).data)
+
+
+class SpotSearchView(APIView):
+    """``GET /spots/search`` -- study spots ranked by how well they match ``q``.
+
+    The envelope is the one ``GET /spots`` uses, so a caller can swap between
+    filtering and searching without handling two response shapes. The relevance
+    score is not part of it: it exists to order the results and would be a
+    number the contract has to keep stable for no one's benefit.
+    """
+
+    def get(self, request: Request) -> Response:
+        query = SpotSearchQuerySerializer(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        parameters = query.validated_data
+
+        limit: int = parameters["limit"]
+        offset: int = parameters["offset"]
+
+        matching = search(parameters["q"])
+
+        total = matching.count()
+        items = StudySpotSerializer(matching[offset : offset + limit], many=True).data
+
+        return Response(
+            {
+                "items": items,
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset,
+                    "count": len(items),
+                    "total": total,
+                    "has_more": offset + len(items) < total,
+                },
+            }
+        )

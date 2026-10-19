@@ -128,3 +128,48 @@ class SpotQuerySerializer(serializers.Serializer):
             )
 
         return super().to_internal_value(data)
+
+
+class SpotSearchQuerySerializer(serializers.Serializer):
+    """Query parameters for ``GET /spots/search``. Unknown parameters are rejected."""
+
+    q = serializers.CharField(
+        trim_whitespace=True,
+        min_length=1,
+        max_length=MAX_FILTER_LENGTH,
+        help_text="Free text matched against the spot name and neighborhood.",
+    )
+
+    limit = serializers.IntegerField(
+        required=False,
+        default=DEFAULT_LIMIT,
+        min_value=1,
+        max_value=MAX_LIMIT,
+        help_text=f"Page size, 1 to {MAX_LIMIT}.",
+    )
+    offset = serializers.IntegerField(
+        required=False,
+        default=0,
+        min_value=0,
+        help_text="Rows to skip before this page.",
+    )
+
+    def to_internal_value(self, data: Any) -> dict[str, Any]:
+        """Reject unknown and blank parameters, as ``GET /spots`` does."""
+        unknown = sorted(set(data) - set(self.fields))
+        if unknown:
+            raise serializers.ValidationError(
+                {name: "Unknown query parameter." for name in unknown}
+            )
+
+        blank = sorted(
+            name
+            for name in self.fields
+            if name in data and isinstance(data[name], str) and not data[name].strip()
+        )
+        if blank:
+            raise serializers.ValidationError(
+                {name: "This field may not be blank." for name in blank}
+            )
+
+        return super().to_internal_value(data)

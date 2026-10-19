@@ -70,6 +70,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Registers the trigram search functions and GIN index support that
+    # spots/search.py relies on.
+    "django.contrib.postgres",
     "rest_framework",
     "spots",
 ]
