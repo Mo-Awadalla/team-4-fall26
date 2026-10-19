@@ -55,3 +55,8 @@ output "database_identifier" {
   description = "RDS instance identifier, for stopping and starting it to preserve credits."
   value       = aws_db_instance.main.identifier
 }
+
+output "api_endpoint" {
+  description = "API Gateway endpoint behind CloudFront. Publicly reachable; see the note in cdn.tf."
+  value       = aws_apigatewayv2_api.api.api_endpoint
+}

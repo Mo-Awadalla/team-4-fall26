@@ -65,7 +65,7 @@ After making staging public, verify both boundaries and require an exact HTTP 20
 
 ```shell
 test "$(curl --silent --output /dev/null --write-out '%{http_code}' https://dev-studyspot-nyu.vercel.app/)" = 200
-curl --fail-with-body --silent --show-error https://dev-studyspot-nyu.vercel.app/api/health/live | grep -Fx '{"status":"ok"}'
+curl --fail-with-body --silent --show-error https://dev-studyspot-nyu.vercel.app/api/health/live | grep -Eq '"status":[[:space:]]*"ok"'
 ```
 
 Promote to production only after the shared staging deployment is public and both web boundaries are verified.

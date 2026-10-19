@@ -1,4 +1,4 @@
-// Strips the public /api prefix before the request reaches FastAPI.
+// Strips the public /api prefix before the request reaches Django.
 //
 // This is the CloudFront equivalent of the backend service rewrite in
 // vercel.json, and it has to agree with it: the API's routes are /health/live

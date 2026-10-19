@@ -177,16 +177,74 @@ resource "aws_lambda_function" "manage" {
 # AWS_IAM means the URL is not usable without a signed request. CloudFront signs
 # with the origin access control in cdn.tf, so the function is reachable only
 # through the distribution.
-resource "aws_lambda_function_url" "api" {
-  function_name      = aws_lambda_function.api.function_name
-  authorization_type = "AWS_IAM"
+# -- Public entry point --------------------------------------------------------
+#
+# An API Gateway HTTP API rather than a Lambda function URL, which is what this
+# stack originally used.
+#
+# Function URLs do not work in this account: the organization's service control
+# policy permits creating one but denies lambda:InvokeFunctionUrl, so every
+# request to the URL is answered with 403 by Lambda's own front door, whether it
+# is SigV4-signed by CloudFront or unauthenticated. That is a common guardrail,
+# because a function URL bypasses API Gateway and any WAF in front of it. The
+# symptom is indistinguishable from a misconfigured origin access control, so it
+# is worth recording: `aws lambda invoke` succeeds while the URL returns 403.
+#
+# An HTTP API costs $1.00 per million requests, which is immaterial here, and
+# Mangum reads an HTTP API event and a function URL event identically -- both are
+# payload format 2.0 -- so no application code changes.
+
+resource "aws_apigatewayv2_api" "api" {
+  name          = "${local.name_prefix}-api"
+  description   = "Public entry point for the StudySpot Django application"
+  protocol_type = "HTTP"
+
+  tags = {
+    Name = "${local.name_prefix}-api"
+  }
 }
 
-resource "aws_lambda_permission" "api_from_cloudfront" {
-  statement_id           = "AllowCloudFrontInvokeFunctionUrl"
-  action                 = "lambda:InvokeFunctionUrl"
-  function_name          = aws_lambda_function.api.function_name
-  principal              = "cloudfront.amazonaws.com"
-  source_arn             = aws_cloudfront_distribution.main.arn
-  function_url_auth_type = "AWS_IAM"
+resource "aws_apigatewayv2_integration" "api" {
+  api_id = aws_apigatewayv2_api.api.id
+
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.api.invoke_arn
+
+  # 2.0 is what Mangum expects, and what a function URL sent.
+  payload_format_version = "2.0"
+
+  # Shorter than the function's own timeout, so a slow request surfaces as a 504
+  # from the gateway rather than being cut off mid-response.
+  timeout_milliseconds = var.api_timeout_seconds * 1000 - 1000
+}
+
+# One catch-all route: Django owns its own URL routing, and duplicating it here
+# would be two places to change every time a path is added.
+resource "aws_apigatewayv2_route" "api" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "$default"
+  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
+}
+
+resource "aws_apigatewayv2_stage" "api" {
+  api_id = aws_apigatewayv2_api.api.id
+
+  # $default serves from the API's root path, so the gateway adds no stage
+  # prefix for the CloudFront rewrite to have to strip.
+  name        = "$default"
+  auto_deploy = true
+
+  tags = {
+    Name = "${local.name_prefix}-api"
+  }
+}
+
+resource "aws_lambda_permission" "api_from_apigateway" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  # Scoped to this API, so no other gateway in the account can invoke it.
+  source_arn = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }

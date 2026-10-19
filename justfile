@@ -169,7 +169,7 @@ aws-verify:
     @url="$({{tf}} output -raw site_url)"; \
       echo "site: $url"; \
       test "$(curl --silent --output /dev/null --write-out '%{http_code}' "$url/")" = 200; \
-      curl --fail-with-body --silent --show-error "$url/api/health/live" | grep -Fx '{"status":"ok"}'; \
+      curl --fail-with-body --silent --show-error "$url/api/health/live" | grep -Eq '"status":[[:space:]]*"ok"'; \
       echo "both boundaries answered"
 
 # AWS restarts a stopped instance by itself after seven days, so this is a
