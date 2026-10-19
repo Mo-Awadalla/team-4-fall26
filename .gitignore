@@ -32,7 +32,6 @@ test-results/
 
 # Local tooling
 .local/
-.meilisearch/
 .direnv/
 result
 result-*

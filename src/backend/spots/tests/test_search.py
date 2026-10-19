@@ -14,7 +14,7 @@ from typing import Any
 import pytest
 
 from spots.models import StudySpot
-from spots.search import INITIALISMS, THRESHOLD, expand, search
+from spots.search import INITIALISMS, THRESHOLD, expand, precise, search
 
 pytestmark = pytest.mark.django_db
 
@@ -124,10 +124,16 @@ class TestShortenedNames:
     def test_an_unknown_word_is_left_alone(self) -> None:
         assert expand("bobst") == "bobst"
 
-    def test_expansion_only_applies_to_the_whole_query(self) -> None:
-        # Expanding one word of several changes what the rest is compared
-        # against in ways that are hard to predict, so it does not.
-        assert expand("nyu library") == "nyu library"
+    def test_every_word_is_expanded(self) -> None:
+        # This used to expand only a whole-query initialism, because against a
+        # single trigram comparison replacing one word of several changed what
+        # the rest was measured against. Full text matches word by word, so it
+        # can now mean what it says.
+        assert expand("nyu library") == "New York University library"
+
+    def test_an_initialism_finds_what_it_stands_for(self, spots: list[StudySpot]) -> None:
+        assert "Elmer Holmes Bobst Library" in names("nyu library")
+        assert "Kimmel Center for University Life" not in names("nyu library")
 
     def test_every_initialism_is_stored_folded(self) -> None:
         # expand() looks up a casefolded key, so a capitalised one would never
@@ -210,3 +216,100 @@ class TestEndpoint:
         assert body["pagination"]["count"] == 1
         assert body["pagination"]["total"] > 1
         assert body["pagination"]["has_more"] is True
+
+
+class TestTheCampusIsSearchable:
+    """The gap that motivated the full-text pass.
+
+    Neither of these two names NYU, and both belong to it. Against the name
+    alone a search for the university found neither; in the real snapshot that
+    was 11 of the 14 spots related to NYU.
+    """
+
+    def test_a_campus_finds_buildings_that_do_not_name_it(self, spots: list[StudySpot]) -> None:
+        found = names("New York University")
+
+        assert "Elmer Holmes Bobst Library" in found
+        assert "Kimmel Center for University Life" in found
+
+    def test_an_initialism_for_it_works_too(self, spots: list[StudySpot]) -> None:
+        assert set(names("nyu")) == {
+            "Elmer Holmes Bobst Library",
+            "Kimmel Center for University Life",
+        }
+
+    def test_a_spot_with_no_campus_is_not_dragged_in(self, spots: list[StudySpot]) -> None:
+        assert "Baychester Library" not in names("nyu")
+
+    def test_the_name_outranks_the_campus(self, spots: list[StudySpot]) -> None:
+        # "University" is in Kimmel's name and only in Bobst's campus, which is
+        # the weighting: a word in the name counts for more than the same word
+        # in a field the spot merely sits near.
+        found = names("university")
+
+        assert found.index("Kimmel Center for University Life") < found.index(
+            "Elmer Holmes Bobst Library"
+        )
+
+
+class TestTheAddressIsSearchable:
+    def test_an_address_finds_the_spot(self, spots: list[StudySpot]) -> None:
+        # Neither name mentions Washington Square; both sit on it.
+        assert set(names("Washington Square")) == {
+            "Elmer Holmes Bobst Library",
+            "Kimmel Center for University Life",
+        }
+
+    def test_the_name_outranks_the_address(self, spots: list[StudySpot]) -> None:
+        # Address is the lowest weight on purpose: a place *called* X is almost
+        # always what was meant, not the places on X Street.
+        found = names("53rd Street")
+
+        assert found[0] == "53rd Street Library"
+
+
+class TestEveryWordHasToMatch:
+    """What a single trigram comparison could not do.
+
+    Scoring the query against the best-matching run of words meant "library
+    bobst" scored as well against every library as against the one named Bobst.
+    In the real snapshot it returned 170 results.
+    """
+
+    def test_a_second_word_narrows_instead_of_widening(self, spots: list[StudySpot]) -> None:
+        assert names("library") == [
+            "53rd Street Library",
+            "Baychester Library",
+            "Elmer Holmes Bobst Library",
+        ]
+        assert names("library bobst") == ["Elmer Holmes Bobst Library"]
+
+    def test_word_order_does_not_matter(self, spots: list[StudySpot]) -> None:
+        assert names("library bobst") == names("bobst library")
+
+    def test_a_word_that_matches_nothing_rules_the_row_out(self, spots: list[StudySpot]) -> None:
+        assert names("bobst brooklyn") == []
+
+    def test_a_quoted_phrase_is_taken_literally(self, spots: list[StudySpot]) -> None:
+        # websearch_to_tsquery, so a phrase in quotes has to appear in order.
+        assert names('"Washington Square"') != []
+        assert names('"Square Washington"') == []
+
+    def test_a_leading_minus_excludes(self, spots: list[StudySpot]) -> None:
+        assert names("library -bobst") == ["53rd Street Library", "Baychester Library"]
+
+
+class TestTheTwoPassesInOrder:
+    def test_a_spelled_query_does_not_reach_the_fuzzy_pass(self, spots: list[StudySpot]) -> None:
+        # If it did, "library bobst" would come back with every library in it:
+        # that is exactly what the trigram pass scores highly.
+        assert names("library bobst") == ["Elmer Holmes Bobst Library"]
+
+    def test_a_misspelling_falls_through_to_it(self, spots: list[StudySpot]) -> None:
+        # Postgres has never indexed "libary", so full text cannot match it at
+        # all and the trigram pass is the only thing that can.
+        assert precise("libary", StudySpot.objects.all()).count() == 0
+        assert names("libary") != []
+
+    def test_a_query_matching_neither_returns_nothing(self, spots: list[StudySpot]) -> None:
+        assert names("helicopter") == []

@@ -13,8 +13,7 @@ can never be built from different revisions:
     database sits in a private subnet: ``manage.py migrate`` from a laptop
     cannot reach it, so migrations and data loads have to run inside the VPC.
 
-The Vercel entry point is ``main.py`` beside this file. Both import the same
-ASGI application; neither owns any behavior of its own.
+Both import the same ASGI application; neither owns any behavior of its own.
 """
 
 from __future__ import annotations

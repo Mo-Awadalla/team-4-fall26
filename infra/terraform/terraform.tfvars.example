@@ -3,17 +3,17 @@
 #     cp terraform.tfvars.example terraform.tfvars
 
 environment = "staging"
-region      = "us-east-1"
+region      = "us-east-2"
 
-# -- Keeping the Vercel deployment working -------------------------------------
+# -- Reaching the database from outside the VPC --------------------------------
 #
-# Retiring Turso leaves the Vercel functions with no database unless they can
-# reach this one. Uncomment both values to give Postgres a public, TLS-only
-# endpoint restricted to the networks you name.
+# The database is private by default, which is why migrations and data loads run
+# as Lambda invocations. Uncomment both values only if something outside the VPC
+# genuinely has to reach it; they give Postgres a public, TLS-only endpoint
+# restricted to the networks you name.
 #
-# Find your Vercel plan's documented egress ranges before widening this. An
-# allowlist of 0.0.0.0/0 exposes the database to the entire internet, protected
-# only by the generated password.
+# Name the narrowest ranges that work. An allowlist of 0.0.0.0/0 exposes the
+# database to the entire internet, protected only by the generated password.
 #
 # database_publicly_accessible = true
 # database_allowed_cidrs       = ["203.0.113.0/24"]

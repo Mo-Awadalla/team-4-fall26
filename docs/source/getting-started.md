@@ -7,8 +7,8 @@ Docker Compose is the default path because it requires the fewest host tools. Ni
 Install Git and a recent Docker distribution with Docker Compose 2.23 or newer, then run:
 
 ```shell
-git clone git@github.com:2SpaceMasterRace/studyspot.git
-cd studyspot
+git clone git@github.com:gcivil-nyu-org/team-4-fall26.git
+cd team-4-fall26
 docker compose up --build --watch
 ```
 
@@ -53,11 +53,10 @@ Use `just --list` as the authoritative list of supported commands.
 |---|---|
 | Frontend | <http://localhost:7500> |
 | API liveness | <http://localhost:7501/health/live> |
-| Meilisearch | <http://localhost:7502> |
 | Documentation (`just docs`) | <http://localhost:7503> |
 | Postgres | `127.0.0.1:5432` |
 
-Application and search ports use the consecutive `7500` through `7503` range: the frontend, backend, and Meilisearch containers occupy `7500` through `7502`, and the optional documentation server uses `7503`. Postgres keeps its conventional `5432`, because every Postgres client and connection string assumes it. Browser traffic should normally enter through the frontend, which mirrors the deployed `/api/*` boundary.
+Application ports use the consecutive `7500` through `7503` range: the frontend and backend containers take `7500` and `7501`, and the optional documentation server uses `7503`. Postgres keeps its conventional `5432`, because every Postgres client and connection string assumes it. Browser traffic should normally enter through the frontend, which mirrors the deployed `/api/*` boundary.
 
 ## Local database configuration
 

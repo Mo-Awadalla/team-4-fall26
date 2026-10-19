@@ -36,7 +36,7 @@ output "database_endpoint" {
 }
 
 output "database_publicly_accessible" {
-  description = "Whether anything outside this VPC, such as the Vercel deployment, can reach the database."
+  description = "Whether anything outside this VPC can reach the database."
   value       = var.database_publicly_accessible
 }
 

@@ -9,7 +9,7 @@ NYC Open Data -> normalized snapshot -> Postgres
                                       \-> search index
 ```
 
-The frontend owns presentation and browser interaction. Django owns the HTTP boundary, the shared study-spot model, and the dataset loader. The normalized snapshot under `data/` contains cafés and other public third places and provides reproducible input for list, detail, geographic, and search behavior. Docker Compose provides the frontend, backend, database, and Meilisearch containers and waits for every service to become healthy.
+The frontend owns presentation and browser interaction. Django owns the HTTP boundary, the shared study-spot model, and the dataset loader. The normalized snapshot under `data/` contains cafés and other public third places and provides reproducible input for list, detail, geographic, and search behavior. Docker Compose provides the frontend, backend, and database containers and waits for every service to become healthy.
 
 The frontend proxies `/api/*` to Django during local development. Both deployments use the same public path boundary, and both strip the `/api` prefix at the edge, so nothing in Django knows about it.
 
@@ -26,8 +26,7 @@ Each service has one lifecycle:
 - SvelteKit can rebuild without restarting Django.
 - Django can scale independently from the frontend.
 - Postgres keeps its data across application rebuilds, and its own startup is slow enough that sharing it with the application would make every restart slow.
-- Meilisearch can restart or rebuild without restarting either application.
-- Any dedicated search index will be rebuildable from the normalized snapshot once search is implemented.
+- Search needs no process of its own: it is a generated column and two index types inside the same Postgres, rebuildable from the normalized snapshot.
 
 Packing the processes into one container would couple their failures, logs, upgrades, and shutdown behavior.
 
@@ -35,14 +34,13 @@ Postgres being a local container is itself a decision. The previous implementati
 
 ## Two deployment targets
 
-| Target | Frontend | API | Database |
-|---|---|---|---|
-| Vercel | Vercel service | Vercel Python service | None by default |
-| AWS | S3 behind CloudFront | Lambda behind CloudFront | RDS Postgres, private |
+| Part | How it is served | Database |
+|---|---|---|
+| AWS | S3 behind CloudFront, Lambda behind CloudFront `/api/*` | RDS Postgres, private subnets |
 
-One revision, two deployments, no shared state. The application is the same either way: it holds nothing between requests and opens a database connection per request, which is what a serverless function needs and what a development server does not mind. The frontend picks its SvelteKit adapter from `DEPLOY_TARGET`, producing a Vercel build or a set of prerendered files for S3.
+One revision, one deployment, no shared state. The application holds nothing between requests and opens a database connection per request, which is what a serverless function needs and what a development server does not mind. The frontend is prerendered to a set of files for S3, so the deployed site needs no server of its own.
 
-See [Deployment](deployment.md) for both, including why the Vercel deployment has no database.
+See [Deployment](deployment.md) for the stack and how it is applied.
 
 ## Current capability
 

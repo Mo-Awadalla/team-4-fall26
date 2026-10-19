@@ -92,8 +92,16 @@
 			"Free public Wi-Fi" rather than "has Wi-Fi": the data says a hotspot
 			the city publishes is within 25 m, which a campus building's
 			credentialled network is not.
+
+			The count is how many of the currently matching spots have it, so it
+			answers "is this worth ticking" before you tick it.
 		-->
-		<span>Free public Wi-Fi</span>
+		<span>
+			Free public Wi-Fi
+			{#if facets}
+				<span class="count">({facets.free_public_wifi})</span>
+			{/if}
+		</span>
 	</label>
 
 	{#if active > 0}
@@ -144,6 +152,11 @@
 		border-radius: 12px;
 		background: white;
 		cursor: pointer;
+	}
+
+	.toggle .count {
+		color: var(--color-muted);
+		font-weight: 600;
 	}
 
 	.toggle input {

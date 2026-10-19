@@ -1,7 +1,6 @@
 """ASGI entry point.
 
-Used by the Lambda handler through Mangum, and by the Vercel entry point in
-``main.py``.
+Used by the Lambda handler through Mangum.
 """
 
 import os

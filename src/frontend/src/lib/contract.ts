@@ -46,11 +46,21 @@ export type Facet = {
 	count: number;
 };
 
-/** What `GET /spots/facets` reports. */
+/**
+ * What `GET /spots/facets` reports.
+ *
+ * Every count reflects the filters and query already in force, minus the one
+ * being counted: the boroughs list keeps all five while a borough is selected,
+ * so there is still a way to switch, but its counts narrow under a category.
+ *
+ * `free_public_wifi` is a single number rather than a list because the control
+ * is a checkbox: how many spots remain if it is ticked.
+ */
 export type Facets = {
 	boroughs: Facet[];
 	categories: Facet[];
 	universities: Facet[];
+	free_public_wifi: number;
 };
 
 /**

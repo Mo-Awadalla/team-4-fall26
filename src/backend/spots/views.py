@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from .models import StudySpot
 from .search import search
 from .serializers import (
+    SpotFacetsQuerySerializer,
     SpotQuerySerializer,
     SpotSearchQuerySerializer,
     StudySpotSerializer,
@@ -127,6 +128,16 @@ class SpotSearchView(APIView):
         )
 
 
+#: The fields ``GET /spots/facets`` reports values for, mapped to the response
+#: key that carries each one. Wi-Fi is absent deliberately: a boolean has no
+#: list of values to offer, so it is reported as a single count instead.
+FACET_FIELDS = {
+    "borough": "boroughs",
+    "category": "categories",
+    "university": "universities",
+}
+
+
 class SpotFacetsView(APIView):
     """``GET /spots/facets`` -- the values the filters can take, with counts.
 
@@ -136,23 +147,54 @@ class SpotFacetsView(APIView):
     would mean a filter that silently stops matching when the snapshot changes.
 
     Counts come along because a filter offering a value that matches nothing is
-    worse than not offering it.
+    worse than not offering it. That is why this endpoint takes the request
+    already in force: counted over the whole snapshot, every number stops
+    describing what the caller would actually get the moment one filter is on,
+    and the control goes on offering values that now match nothing.
+
+    Each facet is counted with every *other* filter applied but not its own.
+    Applying a facet's own filter to itself would leave one value standing --
+    the one already chosen -- and no way to switch to another.
     """
 
     def get(self, request: Request) -> Response:
-        def facet(field: str) -> list[dict[str, Any]]:
+        query = SpotFacetsQuerySerializer(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        parameters = query.validated_data
+
+        base = StudySpot.objects.all()
+        if parameters.get("q"):
+            # Matched through a subquery rather than by counting the ranked
+            # queryset directly. Grouping over it would pull search()'s
+            # relevance expression and ordering into the GROUP BY, which counts
+            # every row on its own; the subquery keeps the ranking where it
+            # belongs and leaves a plain set of rows to aggregate.
+            ranked = search(parameters["q"], base).order_by().values("pk")
+            base = StudySpot.objects.filter(pk__in=ranked)
+
+        def narrow(excluding: str) -> QuerySet[StudySpot]:
+            """``base`` with every filter applied except ``excluding``."""
+            others = {name: value for name, value in parameters.items() if name != excluding}
+            return apply_filters(base, others)
+
+        def counts(field: str) -> list[dict[str, Any]]:
             rows = (
-                StudySpot.objects.exclude(**{f"{field}__isnull": True})
+                narrow(field)
+                .exclude(**{f"{field}__isnull": True})
+                # order_by() before grouping, because Django adds ordering
+                # columns to the GROUP BY and the default Meta ordering would
+                # otherwise split every value into one group per row.
+                .order_by()
                 .values(field)
                 .annotate(count=Count("id"))
                 .order_by("-count", field)
             )
             return [{"value": row[field], "count": row["count"]} for row in rows]
 
-        return Response(
-            {
-                "boroughs": facet("borough"),
-                "categories": facet("category"),
-                "universities": facet("university"),
-            }
-        )
+        body: dict[str, Any] = {key: counts(field) for field, key in FACET_FIELDS.items()}
+
+        # One number rather than a list: the control is a checkbox, so the only
+        # count worth having is how many spots are left when it is ticked.
+        body["free_public_wifi"] = narrow("free_public_wifi").filter(free_public_wifi=True).count()
+
+        return Response(body)
