@@ -670,3 +670,42 @@ class TestCafes:
         # lane rather than somewhere to sit with a laptop.
         assert "license_status = 'Issued'" in ingest.CAFES_WHERE
         assert "license_type = 'Sidewalk'" in ingest.CAFES_WHERE
+
+
+class TestCafesAreNotAttachedToCampuses:
+    """A cafe is a third place in its own right.
+
+    A library beside a campus is plausibly *its* library; the cafe on the same
+    corner is just a cafe. The field would also have been unreliable: FacDB
+    stores one point per institution whatever its size, so no radius separates
+    the universities students attend from the vocational schools nobody is
+    looking for.
+    """
+
+    def test_a_cafe_beside_a_campus_has_no_university(
+        self, cafes: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        # A campus placed on top of the first fixture cafe, so proximity cannot
+        # be the reason the field is empty.
+        first = ingest.normalize([], cafes, names, [])[0]
+        campus = {
+            "uid": "campus-on-the-doorstep",
+            "facname": "RIGHT NEXT DOOR UNIVERSITY",
+            "facsubgrp": "COLLEGES OR UNIVERSITIES",
+            "factype": "4-YEAR INDEPENDENT",
+            "boro": "MANHATTAN",
+            "latitude": str(first["latitude"]),
+            "longitude": str(first["longitude"]),
+        }
+
+        spots = ingest.normalize([campus], cafes, names, [])
+        for spot in spots:
+            if spot["category"] == ingest.CAFE_CATEGORY:
+                assert spot["university"] is None
+
+    def test_a_facility_beside_the_same_campus_still_gets_one(
+        self, facilities: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        # The rule is about cafes, not about switching the derivation off.
+        spots = ingest.normalize(facilities, [], names, [])
+        assert any(spot["university"] for spot in spots if spot["category"] != "university")

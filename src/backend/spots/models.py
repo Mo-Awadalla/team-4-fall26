@@ -105,9 +105,11 @@ class StudySpot(models.Model):
         blank=True,
         null=True,
         help_text=(
-            "The institution this spot belongs to, for records the importer takes "
-            "from a curated campus list. Never inferred: a spot with no curated "
-            "affiliation leaves this absent."
+            "The closest campus within 500 m, or the campus itself for a campus "
+            "record. Proximity and never affiliation: a named campus does not mean "
+            "the institution runs the place or that anyone may walk in. Cafes never "
+            "carry one, being third places in their own right rather than somewhere "
+            "reached through a campus."
         ),
     )
 

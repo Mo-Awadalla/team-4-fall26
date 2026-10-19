@@ -113,6 +113,16 @@ It names the closest campus within 500 metres, or the campus itself for a campus
 subset of FacDB named above, the same records the importer publishes as `university` spots — and
 the field is never guessed from a facility's name, its operator, or anything else.
 
+**Cafés never carry one.** A café is a third place in its own right, not somewhere you reach
+through a campus: a library beside a campus is plausibly *its* library, while the café on the
+same corner is just a café. Leaving the field set would also have been unreliable in a way no
+parameter fixes. FacDB stores one point per institution whatever its size, so Columbia's entire
+Morningside campus is a single coordinate and its nearest café is 181 metres away, while a school
+occupying one floor has one at 67 metres. Narrowing the radius therefore drops the universities
+students attend before it drops the vocational schools nobody is looking for, and `factype`,
+`capacity` and `optype` cannot tell the two apart either — Columbia and the NY School of Interior
+Design are both `4-YEAR INDEPENDENT`, and every campus record has a capacity of `0`.
+
 A named campus is not an affiliation, an endorsement, or a claim that anyone may walk in. One
 hundred and sixty-nine metres is what the data says about "125th Street Library" and "Touro
 University - Harlem", and it says nothing more than that.

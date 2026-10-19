@@ -47,6 +47,8 @@ borough names and the database refuses any other. `neighborhood` is the 2020 Nei
 
 ```{important}
 `university` is an addition to the previously agreed contract and still needs owner sign-off. It is proximity and nothing else: it names the closest campus within 500 metres, or the campus itself for a campus record, and is `null` when no campus is that close. The campus list is curated — the college and university records of the city's facilities database — and the field is never guessed from a spot's name, its operator, or anything else. It is not an affiliation, an endorsement, or an access claim: a named campus does not mean the institution is connected to the spot or that the public may use the room. In the example above, 169 metres separate a public library branch from a campus with no relationship to it.
+
+Cafés never carry one. A café is a third place in its own right rather than somewhere reached through a campus, and the measurement bears that out: FacDB stores a single point per institution whatever its size, so Columbia's whole campus is one coordinate with its nearest café 181 metres away, while a school occupying one floor has one at 67 metres. Any radius would drop the universities students attend before the vocational schools nobody is looking for.
 ```
 
 ## Listing study spots

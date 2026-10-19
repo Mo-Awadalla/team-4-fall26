@@ -828,6 +828,20 @@ def normalize(
     for spot in spots:
         if spot["category"] == CAMPUS_CATEGORY:
             spot["university"] = spot["name"]
+        elif spot["category"] == CAFE_CATEGORY:
+            # Cafes are third places in their own right, not somewhere you
+            # reach through a campus, so the field stays null however close one
+            # happens to be. A library beside a campus is plausibly *its*
+            # library; the cafe on the same corner is just a cafe.
+            #
+            # The measurement that settled it: 41% of cafes picked up a label
+            # here, and tightening the radius made it worse rather than better.
+            # FacDB stores one point per institution whatever its size, so
+            # Columbia's whole campus is a single coordinate and its nearest
+            # cafe is 181 m away, while a school occupying one floor has one at
+            # 67 m. Any radius strips the universities students attend before
+            # it strips the vocational schools nobody is looking for.
+            spot["university"] = None
         else:
             spot["university"] = nearest_campus(spot["latitude"], spot["longitude"], campuses)
 

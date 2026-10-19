@@ -28,6 +28,9 @@ export type StudySpot = {
 	/**
 	 * The closest campus within 500 m, or the campus itself for a campus record.
 	 * This is proximity and never affiliation, endorsement, or a claim of access.
+	 *
+	 * Always null for a cafe. A cafe is a third place in its own right, not
+	 * somewhere reached through a campus.
 	 */
 	university: string | null;
 	/**
