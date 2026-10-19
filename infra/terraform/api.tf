@@ -115,6 +115,9 @@ resource "aws_lambda_function" "api" {
   memory_size = var.api_memory_mb
   timeout     = var.api_timeout_seconds
 
+  # See the variable for why this is a cost control, not a tuning knob.
+  reserved_concurrent_executions = var.api_reserved_concurrency
+
   environment {
     variables = local.lambda_environment
   }
@@ -151,6 +154,9 @@ resource "aws_lambda_function" "manage" {
 
   memory_size = var.manage_memory_mb
   timeout     = var.manage_timeout_seconds
+
+  # One at a time: concurrent migrations or data loads would race each other.
+  reserved_concurrent_executions = var.manage_reserved_concurrency
 
   environment {
     variables = local.lambda_environment

@@ -265,6 +265,41 @@ variable "django_enable_admin" {
   default     = false
 }
 
+variable "api_reserved_concurrency" {
+  description = <<-EOT
+    Concurrent executions reserved for the API function.
+
+    This is a blast-radius control rather than a performance setting. Lambda and
+    API Gateway are billed per request and nothing in front of them rate-limits:
+    neither CloudFront nor the gateway does by default, so a script pointed at
+    the public endpoint spends the account's credits as fast as it can issue
+    requests. A reservation caps how fast that can happen, and caps it whether
+    the traffic arrives through CloudFront or directly.
+
+    Ten is far above what a demo needs -- a request takes about 200 ms -- and far
+    below what would empty the credit balance unnoticed. Raise it if real traffic
+    ever queues; a 429 under load is the symptom.
+
+    AWS requires at least 100 of the account's concurrency to stay unreserved.
+    This account allows 400, so the reservations here leave 389.
+  EOT
+  type        = number
+  default     = 10
+}
+
+variable "manage_reserved_concurrency" {
+  description = <<-EOT
+    Concurrent executions reserved for the management function.
+
+    One, so that two invocations cannot run at once. This function applies
+    migrations and replaces the contents of the spots table; two concurrent
+    load_spots runs would interleave a delete with an insert, and two concurrent
+    migrates would race on the same migration. Serialising it is the point.
+  EOT
+  type        = number
+  default     = 1
+}
+
 variable "log_retention_days" {
   description = "CloudWatch log retention. Logs kept forever are a slow, quiet cost."
   type        = number
