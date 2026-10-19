@@ -42,7 +42,7 @@ studyspot/
 │       ├── static/
 │       ├── package.json
 │       └── bun.lock
-├── tests/e2e/                   # Full browser-to-API tests
+├── tests/e2e/                   # Tests against a running deployment
 ├── compose.yaml                 # Local frontend, API, and Postgres services
 ├── flake.nix                    # Pinned Nix development environment
 └── justfile                     # Canonical development commands
@@ -50,7 +50,7 @@ studyspot/
 
 Tests live with the behavior they verify: frontend tests belong beside frontend components,
 backend tests belong in `src/backend/spots/tests/` beside the app they cover, data-import tests
-belong in `data/`, and complete user-flow tests belong in `tests/e2e/`.
+belong in `data/`, and tests that need a running deployment belong in `tests/e2e/`.
 
 The shared contract in `contracts/` is the boundary between the frontend, API, data importer,
 database, and search implementation. Coordinate changes to it with every affected owner. Tool

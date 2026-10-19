@@ -30,6 +30,21 @@ test-results/
 .idea/
 .DS_Store
 
+# AI coding-agent tooling. Kept on disk, out of the repository: these are
+# personal skill libraries rather than anything StudySpot builds, runs or
+# tests. .claude/settings.json is the exception and stays tracked -- it is the
+# project's own guardrail config, denying `rm -rf`, `git reset --hard` and
+# reads of .env for everyone who works here.
+.agents/
+.claude/skills/
+agent.md
+claude.md
+skills-lock.json
+
+# Notes and drafts that are not part of the project. Untracked but unignored
+# is the dangerous combination: `git add -A` sweeps it into a commit.
+scratchpad/
+
 # Local tooling
 .local/
 .direnv/
