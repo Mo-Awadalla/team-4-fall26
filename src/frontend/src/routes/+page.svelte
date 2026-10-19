@@ -37,13 +37,34 @@
 	// The hero fills the viewport until there is something below it to see.
 	let searched = $derived(status !== 'idle');
 
-	// The filter values come from the data rather than from a hard-coded list,
-	// so they are fetched once. A failure leaves the controls empty rather than
-	// breaking the page: search still works without them.
+	/**
+	 * Keep the filter controls describing the results on screen.
+	 *
+	 * The counts are promises about what picking a value returns, so they follow
+	 * `applied` rather than being fetched once: counted over the whole snapshot
+	 * they stop being true the moment anything is narrowing the results, and the
+	 * controls go on offering values that now match nothing. The endpoint leaves
+	 * each facet's own filter out, so a chosen borough still lists the other
+	 * four.
+	 *
+	 * The cost is one extra request per interaction. Returning results and facets
+	 * together would avoid it, which is what a dedicated search engine does in a
+	 * single response; two requests is the price of keeping this in Postgres.
+	 */
+	let latestFacets = 0;
+
 	$effect(() => {
-		fetchFacets()
-			.then((loaded) => (facets = loaded))
-			.catch(() => (facets = null));
+		const snapshot = applied;
+		const request = ++latestFacets;
+
+		fetchFacets({ query: snapshot.query || undefined, filters: snapshot.filters })
+			.then((loaded) => {
+				if (request === latestFacets) facets = loaded;
+			})
+			// Deliberately keeps whatever is already there. Blanking the controls
+			// because one refresh failed would take away the filters mid-use; stale
+			// counts beside working controls are the better failure.
+			.catch(() => {});
 	});
 
 	/**
@@ -52,6 +73,33 @@
 	 * behaviour, and without this the results could end up showing the wrong one.
 	 */
 	let latestSearch = 0;
+
+	/**
+	 * How long to wait after a keystroke before searching.
+	 *
+	 * Long enough that an ordinary word is one request rather than five, short
+	 * enough to feel like the results are following the typing. The ranking
+	 * itself needs no help: `search.py` already scores a prefix at 0.95, so
+	 * `bob` finds Bobst Library without anything being submitted.
+	 */
+	const TYPING_DELAY_MS = 250;
+
+	let typingTimer: ReturnType<typeof setTimeout> | undefined;
+
+	/** Search once the typing stops. */
+	function runSoon(): void {
+		clearTimeout(typingTimer);
+		typingTimer = setTimeout(() => void run(), TYPING_DELAY_MS);
+	}
+
+	/** Search now, dropping a keystroke's pending search so it cannot land after. */
+	function runNow(): void {
+		clearTimeout(typingTimer);
+		void run();
+	}
+
+	// Nothing should fire after the page is gone.
+	$effect(() => () => clearTimeout(typingTimer));
 
 	function describe(error: unknown): string {
 		if (error instanceof ApiError) {
@@ -115,23 +163,24 @@
 	}
 
 	/**
-	 * Typing changes what the box shows without fetching: a request per keystroke
-	 * would be waste, and the ranking endpoint is not debounced. The value still
-	 * matters before it is submitted, because changing a filter runs whatever the
-	 * box holds at that moment -- including nothing at all.
+	 * Typing searches, once it pauses.
+	 *
+	 * Submitting is still meaningful: it searches immediately rather than waiting
+	 * out the delay, and it is how someone who has cleared the box says so.
 	 */
 	function handleQueryInput(next: string): void {
 		query = next;
+		runSoon();
 	}
 
 	function handleSearch(submitted: string): void {
 		query = submitted;
-		void run();
+		runNow();
 	}
 
 	function handleFilters(next: SpotFilters): void {
 		filters = next;
-		void run();
+		runNow();
 	}
 
 	async function handleShowMore(): Promise<void> {
