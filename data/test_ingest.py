@@ -37,6 +37,8 @@ PUBLISHED_EXAMPLE = {
     "latitude": 40.803027,
     "longitude": -73.934853,
     "university": "Touro University - Harlem",
+    # The fixture puts a free hotspot on this branch; see fixtures/wifi.json.
+    "free_public_wifi": True,
 }
 
 #: The published vocabulary. `university_building` is a campus building a
@@ -57,8 +59,17 @@ def names() -> dict[str, str]:
 
 
 @pytest.fixture(scope="module")
-def spots(facilities: list[dict[str, Any]], names: dict[str, str]) -> list[dict[str, Any]]:
-    return ingest.normalize(facilities, names)
+def hotspots() -> list[dict[str, Any]]:
+    return ingest.fixture_rows(FIXTURES, "wifi")
+
+
+@pytest.fixture(scope="module")
+def spots(
+    facilities: list[dict[str, Any]],
+    names: dict[str, str],
+    hotspots: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return ingest.normalize(facilities, names, hotspots)
 
 
 def upstream(facilities: list[dict[str, Any]], facname: str) -> dict[str, Any]:
@@ -98,14 +109,14 @@ class TestIdentifiers:
             "address": "224 E 125 STREET",
             "latitude": "40.8030269999",
         }
-        assert ingest.normalize([edited], names)[0]["id"] == PUBLISHED_EXAMPLE["id"]
+        assert ingest.normalize([edited], names, [])[0]["id"] == PUBLISHED_EXAMPLE["id"]
 
     def test_a_repeated_upstream_key_is_an_error(
         self, facilities: list[dict[str, Any]], names: dict[str, str]
     ) -> None:
         record = upstream(facilities, "125TH STREET LIBRARY")
         with pytest.raises(ingest.IngestError, match="Duplicate identifier"):
-            ingest.normalize([record, {**record, "facname": "SOMEWHERE ELSE"}], names)
+            ingest.normalize([record, {**record, "facname": "SOMEWHERE ELSE"}], names, [])
 
     def test_a_record_without_an_upstream_key_is_an_error(
         self, facilities: list[dict[str, Any]], names: dict[str, str]
@@ -113,7 +124,7 @@ class TestIdentifiers:
         record = upstream(facilities, "125TH STREET LIBRARY")
         del record["uid"]
         with pytest.raises(ingest.IngestError, match="no uid"):
-            ingest.normalize([record], names)
+            ingest.normalize([record], names, [])
 
 
 class TestCategories:
@@ -184,14 +195,14 @@ class TestAbsentValues:
         self, facilities: list[dict[str, Any]], names: dict[str, str]
     ) -> None:
         record = {**upstream(facilities, "125TH STREET LIBRARY"), "latitude": "", "longitude": ""}
-        assert ingest.normalize([record], names) == []
+        assert ingest.normalize([record], names, []) == []
 
     def test_a_non_numeric_coordinate_is_an_error(
         self, facilities: list[dict[str, Any]], names: dict[str, str]
     ) -> None:
         record = {**upstream(facilities, "125TH STREET LIBRARY"), "latitude": "uptown"}
         with pytest.raises(ingest.IngestError, match="non-numeric latitude"):
-            ingest.normalize([record], names)
+            ingest.normalize([record], names, [])
 
 
 class TestNeighborhoods:
@@ -205,7 +216,7 @@ class TestNeighborhoods:
         # The two datasets are revised separately. Publishing "MN9999" would put
         # a code where the contract promises a name.
         record = {**upstream(facilities, "125TH STREET LIBRARY"), "nta2020": "MN9999"}
-        assert ingest.normalize([record], names)[0]["neighborhood"] is None
+        assert ingest.normalize([record], names, [])[0]["neighborhood"] is None
 
 
 class TestUniversityIsProximity:
@@ -232,7 +243,7 @@ class TestUniversityIsProximity:
             "facname": "COLUMBIA UNIVERSITY READING ROOM",
         }
         campus = upstream(facilities, "COLUMBIA UNIVERSITY")
-        published_spots = ingest.normalize([far, campus], names)
+        published_spots = ingest.normalize([far, campus], names, [])
         assert published(published_spots, "Columbia University Reading Room")["university"] is None
 
     def test_the_radius_is_500_metres(self) -> None:
@@ -310,20 +321,27 @@ class TestSnapshot:
             assert -180 <= spot["longitude"] <= 180
 
     def test_the_order_does_not_depend_on_the_upstream_order(
-        self, facilities: list[dict[str, Any]], names: dict[str, str]
+        self,
+        facilities: list[dict[str, Any]],
+        names: dict[str, str],
+        hotspots: list[dict[str, Any]],
     ) -> None:
         # Socrata pages in whatever order it likes, and a reordered snapshot is
         # a diff of every line.
-        assert ingest.normalize(list(reversed(facilities)), names) == ingest.normalize(
-            facilities, names
+        assert ingest.normalize(list(reversed(facilities)), names, hotspots) == (
+            ingest.normalize(facilities, names, hotspots)
         )
 
     def test_rerunning_writes_the_same_bytes(
-        self, facilities: list[dict[str, Any]], names: dict[str, str], tmp_path: Path
+        self,
+        facilities: list[dict[str, Any]],
+        names: dict[str, str],
+        hotspots: list[dict[str, Any]],
+        tmp_path: Path,
     ) -> None:
         first, second = tmp_path / "first.json", tmp_path / "second.json"
         for path in (first, second):
-            ingest.write_snapshot(path, ingest.normalize(facilities, names))
+            ingest.write_snapshot(path, ingest.normalize(facilities, names, hotspots))
         assert first.read_bytes() == second.read_bytes()
 
     def test_a_record_outside_the_contract_is_an_error(self) -> None:
@@ -452,6 +470,7 @@ class TestCuratedBuildings:
                         "latitude": 40.73,
                         "longitude": -73.99,
                         "university": "New York University",
+                        "free_public_wifi": False,
                     }.items()
                 )
             )
@@ -498,3 +517,50 @@ class TestCombine:
 
         with pytest.raises(ingest.IngestError, match="empty borough"):
             ingest.combine(spots, [broken])
+
+
+class TestFreePublicWifi:
+    """The one amenity the open data can support.
+
+    The claim is narrow on purpose: a free hotspot the city publishes sits
+    within 25 m. It is not "this place has Wi-Fi", because a campus building's
+    Wi-Fi needs the university's credentials and the city has no reason to know
+    about it.
+    """
+
+    def test_a_hotspot_on_the_spot_counts(self, spots: list[dict[str, Any]]) -> None:
+        assert published(spots, "125th Street Library")["free_public_wifi"] is True
+
+    def test_a_hotspot_a_metre_away_counts(self, spots: list[dict[str, Any]]) -> None:
+        assert published(spots, "Columbia University Butler Library")["free_public_wifi"] is True
+
+    def test_a_hotspot_beyond_the_radius_does_not(self, spots: list[dict[str, Any]]) -> None:
+        # The fixture puts one 40 m from this branch, outside the 25 m radius.
+        # Widening the radius is what turns the field from "Wi-Fi here" into
+        # "a kiosk somewhere on the block".
+        assert published(spots, "Cypress Hills Library")["free_public_wifi"] is False
+
+    def test_a_spot_with_no_hotspot_nearby_is_false(self, spots: list[dict[str, Any]]) -> None:
+        assert published(spots, "Great Kills Library")["free_public_wifi"] is False
+
+    def test_an_ungeocoded_hotspot_is_ignored(
+        self, facilities: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        # The real dataset carries rows with no coordinates; they cannot place
+        # anything and must not crash the import.
+        rows = [{"objectid": "x", "latitude": None, "longitude": None}]
+        assert all(
+            spot["free_public_wifi"] is False for spot in ingest.normalize(facilities, names, rows)
+        )
+
+    def test_the_value_is_always_a_boolean(self, spots: list[dict[str, Any]]) -> None:
+        # The loader writes a BooleanField; None would be rejected at load time.
+        assert all(isinstance(spot["free_public_wifi"], bool) for spot in spots)
+
+    def test_curated_campus_buildings_are_false(self) -> None:
+        # They have Wi-Fi; it needs NYU credentials. The field answers whether
+        # anyone can use it.
+        assert all(spot["free_public_wifi"] is False for spot in ingest.curated_spots())
+
+    def test_the_radius_is_tight_enough_to_mean_something(self) -> None:
+        assert ingest.WIFI_RADIUS_METRES <= 50.0

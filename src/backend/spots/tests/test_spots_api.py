@@ -86,6 +86,7 @@ CONTRACT_FIELDS = {
     "latitude",
     "longitude",
     "university",
+    "free_public_wifi",
 }
 
 

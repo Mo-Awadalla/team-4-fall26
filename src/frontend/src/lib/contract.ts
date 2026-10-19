@@ -30,6 +30,38 @@ export type StudySpot = {
 	 * This is proximity and never affiliation, endorsement, or a claim of access.
 	 */
 	university: string | null;
+	/**
+	 * Whether a free public Wi-Fi hotspot the city publishes sits within 25 m.
+	 *
+	 * False means none is recorded, not that there is no Wi-Fi: a campus
+	 * building's Wi-Fi needs the university's credentials, and the city has no
+	 * reason to know about it.
+	 */
+	free_public_wifi: boolean;
+};
+
+/** One value a filter can take, with how many spots carry it. */
+export type Facet = {
+	value: string;
+	count: number;
+};
+
+/** What `GET /spots/facets` reports. */
+export type Facets = {
+	boroughs: Facet[];
+	categories: Facet[];
+	universities: Facet[];
+};
+
+/**
+ * The filters both endpoints accept. Every one is optional, and an omitted
+ * filter means "do not narrow on this" rather than "match nothing".
+ */
+export type SpotFilters = {
+	borough?: string;
+	category?: string;
+	university?: string;
+	free_public_wifi?: boolean;
 };
 
 /** Where a page sits in the full result set. */

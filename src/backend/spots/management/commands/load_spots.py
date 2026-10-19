@@ -46,6 +46,7 @@ CONTRACT_FIELDS = {
     "latitude",
     "longitude",
     "university",
+    "free_public_wifi",
 }
 
 #: Written in batches so that a 2,000-row snapshot is a handful of statements
@@ -103,6 +104,7 @@ def to_spot(record: Any, index: int) -> StudySpot:
         longitude=record.get("longitude"),
         # Absent for every snapshot produced before the field existed.
         university=record.get("university"),
+        free_public_wifi=record.get("free_public_wifi", False),
     )
 
     try:

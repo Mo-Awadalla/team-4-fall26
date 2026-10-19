@@ -2,8 +2,9 @@
 	import { resolve } from '$app/paths';
 	import SearchBar from '$lib/SearchBar.svelte';
 	import SpotResults from '$lib/SpotResults.svelte';
-	import { ApiError, DEFAULT_LIMIT, searchSpots } from '$lib/api';
-	import type { StudySpot } from '$lib/contract';
+	import SpotFiltersBar from '$lib/SpotFilters.svelte';
+	import { ApiError, DEFAULT_LIMIT, fetchFacets, listSpots, searchSpots } from '$lib/api';
+	import type { Facets, SpotFilters, StudySpot } from '$lib/contract';
 
 	type Status = 'idle' | 'searching' | 'loaded' | 'error';
 
@@ -15,8 +16,20 @@
 	let loadingMore = $state(false);
 	let errorMessage = $state('');
 
+	let facets = $state<Facets | null>(null);
+	let filters = $state<SpotFilters>({});
+
 	// The hero fills the viewport until there is something below it to see.
 	let searched = $derived(status !== 'idle');
+
+	// The filter values come from the data rather than from a hard-coded list,
+	// so they are fetched once. A failure leaves the controls empty rather than
+	// breaking the page: search still works without them.
+	$effect(() => {
+		fetchFacets()
+			.then((loaded) => (facets = loaded))
+			.catch(() => (facets = null));
+	});
 
 	/**
 	 * Each search is tagged so a slow earlier request cannot overwrite a faster
@@ -40,15 +53,33 @@
 		return 'Something went wrong while searching.';
 	}
 
-	async function handleSearch(submitted: string): Promise<void> {
+	/**
+	 * Run whichever request the current query and filters call for.
+	 *
+	 * A query ranks; filters alone list. With neither there is nothing to show,
+	 * so the page returns to the state it loaded in rather than fetching
+	 * everything.
+	 */
+	async function run(): Promise<void> {
 		const search = ++latestSearch;
+		const trimmed = query.trim();
+		const filtering = Object.keys(filters).length > 0;
 
-		query = submitted;
+		if (!trimmed && !filtering) {
+			status = 'idle';
+			spots = [];
+			total = 0;
+			hasMore = false;
+			return;
+		}
+
 		status = 'searching';
 		errorMessage = '';
 
 		try {
-			const page = await searchSpots(submitted, { limit: DEFAULT_LIMIT });
+			const page = trimmed
+				? await searchSpots(trimmed, { limit: DEFAULT_LIMIT, filters })
+				: await listSpots({ limit: DEFAULT_LIMIT, filters });
 			if (search !== latestSearch) return;
 
 			spots = page.items;
@@ -66,13 +97,26 @@
 		}
 	}
 
+	function handleSearch(submitted: string): void {
+		query = submitted;
+		void run();
+	}
+
+	function handleFilters(next: SpotFilters): void {
+		filters = next;
+		void run();
+	}
+
 	async function handleShowMore(): Promise<void> {
 		if (loadingMore) return;
 		const search = latestSearch;
 		loadingMore = true;
 
 		try {
-			const page = await searchSpots(query, { limit: DEFAULT_LIMIT, offset: spots.length });
+			const trimmed = query.trim();
+			const page = trimmed
+				? await searchSpots(trimmed, { limit: DEFAULT_LIMIT, offset: spots.length, filters })
+				: await listSpots({ limit: DEFAULT_LIMIT, offset: spots.length, filters });
 			if (search !== latestSearch) return;
 
 			spots = [...spots, ...page.items];
@@ -116,6 +160,8 @@
 			<SearchBar onSearch={handleSearch} />
 		</section>
 
+		<SpotFiltersBar {facets} {filters} onChange={handleFilters} />
+
 		<!-- aria-live so a screen reader hears the outcome without moving focus. -->
 		<div aria-live="polite">
 			{#if status === 'searching'}
@@ -124,7 +170,12 @@
 				<p class="status error" role="alert">{errorMessage}</p>
 			{:else if status === 'loaded' && spots.length === 0}
 				<p class="status">
-					No places match <strong>{query}</strong>. Try a library, a campus, or a neighborhood.
+					{#if query.trim()}
+						No places match <strong>{query}</strong>. Try a library, a campus, or a neighborhood, or
+						clear a filter.
+					{:else}
+						No places match these filters.
+					{/if}
 				</p>
 			{:else if status === 'loaded'}
 				<SpotResults {spots} {total} {hasMore} {loadingMore} onShowMore={handleShowMore} />

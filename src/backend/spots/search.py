@@ -102,16 +102,22 @@ def score(query: str) -> Greatest:
     )
 
 
-def search(query: str) -> QuerySet[StudySpot]:
+def search(query: str, queryset: QuerySet[StudySpot] | None = None) -> QuerySet[StudySpot]:
     """Return spots matching ``query``, best first.
+
+    ``queryset`` narrows the candidates before they are ranked, which is the
+    order filtering and searching have to happen in: ranking first and filtering
+    after would drop the best matches out of a page rather than out of the
+    result set, and the count would describe something the caller never sees.
 
     Ties break on name then id, the same total ordering ``GET /spots`` uses, so
     that paging through results is stable when many share a score.
     """
     expanded = expand(query)
+    base = StudySpot.objects.all() if queryset is None else queryset
 
     return (
-        StudySpot.objects.annotate(relevance=score(expanded))
+        base.annotate(relevance=score(expanded))
         .filter(relevance__gte=THRESHOLD)
         .order_by(F("relevance").desc(), "name", "id")
     )
