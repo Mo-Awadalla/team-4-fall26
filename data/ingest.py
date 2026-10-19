@@ -215,6 +215,7 @@ CONTRACT_FIELDS = (
     "latitude",
     "longitude",
     "university",
+    "operator",
     "free_public_wifi",
 )
 
@@ -508,6 +509,25 @@ def title_case(value: str) -> str:
     return "".join(rebuilt)
 
 
+def operator(record: dict[str, Any]) -> str | None:
+    """Who runs the place, where the city records it.
+
+    This is the one field that connects a branch to its library system, and
+    nothing else in the record does. A branch is named after its neighborhood --
+    "Howard Beach", "Fresh Meadows", "Glendale" -- so without this there is no
+    way to find the 67 Queens Public Library branches by asking for them.
+
+    FacDB fills it meaningfully for the 226 public branches (91 New York Public
+    Library, 68 Brooklyn, 67 Queens) and repeats the facility's own name for the
+    academic and special libraries, where it adds nothing and does no harm.
+
+    Not title-cased. Upstream already capitalises this field, unlike ``facname``,
+    and running it through title_case() would leave "Nyu Tamiment Library"
+    exactly as wrong as it arrives.
+    """
+    return text(record.get("opname"))
+
+
 def spot_id(record: dict[str, Any]) -> str:
     uid = text(record.get("uid"))
     if not uid:
@@ -669,6 +689,11 @@ def cafe_spot(record: dict[str, Any], names: dict[str, str]) -> dict[str, Any] |
         "longitude": longitude,
         # Filled in by normalize(), from the rest of the snapshot.
         "university": None,
+        # Dining Out carries `business_legal_name`, the entity holding the
+        # licence, which is "CGM-LLNR LLC" where the trading name is "JEAN'S".
+        # That is a registration rather than an operator anyone would search
+        # for, so cafes have none.
+        "operator": None,
         "free_public_wifi": False,
     }
 
@@ -795,6 +820,7 @@ def normalize(
                 "longitude": longitude,
                 # Filled in below: it depends on the rest of the snapshot.
                 "university": None,
+                "operator": operator(record),
                 "free_public_wifi": False,
             }
         )

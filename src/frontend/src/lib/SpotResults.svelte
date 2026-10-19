@@ -51,6 +51,17 @@
 				{#if spot.address}
 					<p class="address">{spot.address}</p>
 				{/if}
+				{#if spot.operator && spot.operator !== spot.name}
+					<!--
+						Who runs it, which for a library branch is its system. Worth
+						showing because the three systems have separate membership,
+						and a branch's own name never says which one it belongs to.
+
+						Hidden when it merely repeats the name, which is what FacDB
+						stores for the academic and special libraries.
+					-->
+					<p class="operator">{spot.operator}</p>
+				{/if}
 				{#if spot.university}
 					<!-- Proximity, never affiliation: see the contract. -->
 					<p class="campus">Near {spot.university}</p>
@@ -155,6 +166,7 @@
 	}
 
 	.address,
+	.operator,
 	.campus {
 		margin: 10px 0 0;
 		color: var(--color-muted);

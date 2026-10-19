@@ -48,6 +48,7 @@ RECORDS: list[dict[str, Any]] = [
         "id": "facdb:nypl-53",
         "name": "53rd Street Library",
         "category": "public_library",
+        "operator": "New York Public Library",
         "address": "18 West 53 Street",
         "neighborhood": "Midtown-Times Square",
         "borough": "Manhattan",
@@ -396,3 +397,24 @@ class TestAnExpansionThatMatchesNothing:
     def test_a_misspelling_still_reaches_the_fuzzy_pass(self, spots: list[StudySpot]) -> None:
         # Nothing above may break the reason the second pass exists.
         assert "53rd Street Library" in names("libary")
+
+
+class TestTheOperatorIsSearchable:
+    """What makes an acronym for a library system work.
+
+    "53rd Street Library" does not say who runs it, and neither does any other
+    branch -- they are named after their neighborhoods. Only the operator does.
+    """
+
+    def test_a_system_finds_its_branches(self, spots: list[StudySpot]) -> None:
+        assert "53rd Street Library" in names("New York Public Library")
+
+    def test_its_initialism_does_too(self, spots: list[StudySpot]) -> None:
+        # The expansion exists precisely because NYPL and its words share
+        # almost no trigrams.
+        assert expand("nypl") == "New York Public Library"
+        assert "53rd Street Library" in names("nypl")
+
+    def test_a_branch_that_names_no_system_is_not_dragged_in(self, spots: list[StudySpot]) -> None:
+        # Baychester has no operator in the fixture.
+        assert "Baychester Library" not in names("nypl")

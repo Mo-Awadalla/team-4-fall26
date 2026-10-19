@@ -138,6 +138,18 @@ class StudySpot(models.Model):
         ),
     )
 
+    operator = models.TextField(
+        blank=True,
+        null=True,
+        help_text=(
+            "Who runs the place, where the city records it. For a public library "
+            "branch this is its system -- New York, Brooklyn or Queens Public "
+            "Library -- which nothing else in the record says: branches are named "
+            "after their neighborhood. Absent for cafes, whose licence names only "
+            "the company holding it."
+        ),
+    )
+
     free_public_wifi = models.BooleanField(
         default=False,
         help_text=(
@@ -159,6 +171,12 @@ class StudySpot(models.Model):
     #: second because it is the field that makes a search for a university find
     #: its buildings: 14 spots relate to NYU and only 3 say so in their name.
     #:
+    #: The operator shares the campus's weight because it answers the same kind
+    #: of question -- which institution is this -- and it is the only field that
+    #: connects a branch to its library system. Without it "qpl" could not find
+    #: the 67 Queens Public Library branches, because not one of them says so in
+    #: any other field: they are named "Howard Beach" and "Fresh Meadows".
+    #:
     #: Borough and category are in here despite each having a filter of its
     #: own, because without them the phrases people actually type did not work.
     #: "bronx public library" found three spots and put a Manhattan one first;
@@ -174,6 +192,7 @@ class StudySpot(models.Model):
         expression=(
             SearchVector("name", weight="A", config="english")
             + SearchVector("university", weight="B", config="english")
+            + SearchVector("operator", weight="B", config="english")
             + SearchVector("neighborhood", weight="C", config="english")
             + SearchVector("address", weight="D", config="english")
             + SearchVector("borough", weight="D", config="english")
