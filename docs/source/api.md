@@ -116,9 +116,40 @@ Every non-2xx response uses one envelope:
 | 500 | `internal_error` | An unhandled failure. The cause is logged, never returned. |
 | 503 | `database_unavailable` | Postgres could not answer the query, or has never been migrated. |
 
+## Searching
+
+`GET /spots/search?q=` ranks spots instead of filtering them, in the same
+envelope `GET /spots` returns. It takes `q`, `limit` and `offset`, rejects any
+other parameter, and orders results by relevance rather than by name.
+
+The difference matters at the search box. `GET /spots` answers "does this
+match": `?name=libary` returns nothing, and so does `?name=NYPL`. `search`
+answers "which of these is closest", so both find what the person meant.
+
+Scoring is a few rules rather than one opaque number. An exact name scores
+highest, then a prefix, then a substring, then an exact neighborhood. Below
+those, Postgres trigram similarity compares the query against the best-matching
+run of words in the name, which is what tolerates a misspelling and what lets a
+fragment of a long title match -- `bobst` finds *Elmer Holmes Bobst Library*. A
+neighborhood match scores lower than a name match, so a place *called*
+Greenpoint outranks a place *in* Greenpoint.
+
+Results below a relevance of 0.45 are dropped, so an unrelated query returns
+nothing rather than everything in an arbitrary order. That figure was measured
+rather than chosen: a one-character typo in a seven-letter word scores 0.5, and
+unrelated words sit near 0.33.
+
+An initialism is expanded before the query reaches Postgres, because no fuzzy
+algorithm connects `NYPL` to `New York Public Library` -- they share almost no
+trigrams. The list is in `spots/search.py` and expands only when the whole query
+is an initialism.
+
+The relevance score is not in the response. It exists to order results, and
+publishing it would be a number the contract has to keep stable for no one's
+benefit.
+
 ## Planned routes
 
-- `GET /spots/search?q=coffee`
 - `GET /health/ready`
 
 The readiness route will report required dependency failures.

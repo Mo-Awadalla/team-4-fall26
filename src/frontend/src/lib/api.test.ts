@@ -46,41 +46,38 @@ function recorder(...replies: Array<() => Response | Promise<Response>>) {
 }
 
 describe('searchSpots', () => {
-	it('filters by name and asks for the default page size', async () => {
+	it('calls the ranked search endpoint with the default page size', async () => {
 		const { urls, fetcher } = recorder(() => json(page(3)));
 
 		const result = await searchSpots('library', { fetcher });
 
 		expect(result.pagination.total).toBe(3);
 		expect(urls).toHaveLength(1);
-		expect(urls[0]).toContain('name=library');
+		expect(urls[0]).toContain('/api/spots/search');
+		expect(urls[0]).toContain('q=library');
 		expect(urls[0]).toContain('limit=20');
 		expect(urls[0]).toContain('offset=0');
 	});
 
-	it('falls back to a neighborhood match when the name finds nothing', async () => {
-		// The search box offers to find a neighborhood, but the API has no
-		// combined search: name is a substring match and neighborhood an exact
-		// one, so the fallback is what makes the placeholder honest.
-		const { urls, fetcher } = recorder(
-			() => json(page(0, 0)),
-			() => json(page(1))
-		);
+	it('is a single request', async () => {
+		// It used to be two -- name, then neighborhood if that found nothing --
+		// because no single filter could serve one search box. The ranked
+		// endpoint replaced both, and a second request here would mean the
+		// fallback had crept back in.
+		const { urls, fetcher } = recorder(() => json(page(0, 0)));
 
-		const result = await searchSpots('Greenpoint', { fetcher });
-
-		expect(result.pagination.total).toBe(1);
-		expect(urls).toHaveLength(2);
-		expect(urls[0]).toContain('name=Greenpoint');
-		expect(urls[1]).toContain('neighborhood=Greenpoint');
-	});
-
-	it('does not make the second request when the name already matched', async () => {
-		const { urls, fetcher } = recorder(() => json(page(2)));
-
-		await searchSpots('library', { fetcher });
+		await searchSpots('nothing matches this', { fetcher });
 
 		expect(urls).toHaveLength(1);
+	});
+
+	it('does not send the filter parameters the listing endpoint takes', async () => {
+		const { urls, fetcher } = recorder(() => json(page(1)));
+
+		await searchSpots('Greenpoint', { fetcher });
+
+		expect(urls[0]).not.toContain('name=');
+		expect(urls[0]).not.toContain('neighborhood=');
 	});
 
 	it('passes an offset through for paging', async () => {
@@ -97,7 +94,17 @@ describe('searchSpots', () => {
 
 		await searchSpots('100% Coffee & Tea', { fetcher });
 
-		expect(urls[0]).toContain('name=100%25+Coffee+%26+Tea');
+		expect(urls[0]).toContain('q=100%25+Coffee+%26+Tea');
+	});
+
+	it('passes a misspelling through untouched, because the server ranks it', async () => {
+		// Typo tolerance is trigram similarity in Postgres, not anything the
+		// browser should try to be clever about.
+		const { urls, fetcher } = recorder(() => json(page(1)));
+
+		await searchSpots('libary', { fetcher });
+
+		expect(urls[0]).toContain('q=libary');
 	});
 });
 
@@ -179,6 +186,7 @@ describe('listSpots', () => {
 		const result = await listSpots({ fetcher });
 
 		expect(result.pagination.total).toBe(380);
-		expect(urls[0]).not.toContain('name=');
+		expect(urls[0]).toContain('/api/spots?');
+		expect(urls[0]).not.toContain('q=');
 	});
 });

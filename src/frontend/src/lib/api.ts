@@ -40,10 +40,10 @@ function isErrorEnvelope(body: unknown): body is ErrorEnvelope {
 /** The dependency tests replace, rather than reaching for a global stub. */
 export type Fetcher = typeof globalThis.fetch;
 
-async function getSpots(parameters: URLSearchParams, fetcher: Fetcher): Promise<SpotPage> {
+async function get(path: string, parameters: URLSearchParams, fetcher: Fetcher): Promise<SpotPage> {
 	let response: Response;
 	try {
-		response = await fetcher(`/api/spots?${parameters}`, {
+		response = await fetcher(`${path}?${parameters}`, {
 			headers: { accept: 'application/json' }
 		});
 	} catch {
@@ -82,30 +82,33 @@ export type SearchOptions = {
 /**
  * Search spots by a single free-text query.
  *
- * The search box offers to find a place "or neighborhood", but `GET /spots`
- * has no combined search: `name` is a substring match and `neighborhood` is an
- * exact one, and supplying both narrows rather than widens because filters are
- * combined with AND. So this tries the name first and falls back to treating
- * the query as a neighborhood when that finds nothing, which is what makes the
- * placeholder honest.
+ * `GET /spots/search` ranks rather than filters, which is what a search box
+ * needs: "libary" and "kimel" are what people type, and `GET /spots` answers
+ * those with nothing at all. Postgres scores every candidate with trigram
+ * similarity, the best come first, and anything too weak is dropped so an
+ * unrelated query still returns nothing.
  *
- * It is deliberately two requests rather than something cleverer. The real fix
- * is the `GET /spots/search?q=` endpoint that `docs/source/api.md` lists as
- * planned; when that exists, this function becomes one call and the fallback
- * goes away.
+ * This used to be two requests -- name, then neighborhood if that found
+ * nothing -- because no single filter could serve one box. The endpoint
+ * replaces both.
  */
-export async function searchSpots(query: string, options: SearchOptions = {}): Promise<SpotPage> {
+export function searchSpots(query: string, options: SearchOptions = {}): Promise<SpotPage> {
 	const { limit = DEFAULT_LIMIT, offset = 0, fetcher = globalThis.fetch } = options;
-	const paging = { limit: String(limit), offset: String(offset) };
 
-	const byName = await getSpots(new URLSearchParams({ ...paging, name: query }), fetcher);
-	if (byName.pagination.total > 0) return byName;
-
-	return getSpots(new URLSearchParams({ ...paging, neighborhood: query }), fetcher);
+	return get(
+		'/api/spots/search',
+		new URLSearchParams({ q: query, limit: String(limit), offset: String(offset) }),
+		fetcher
+	);
 }
 
 /** Fetch one page without a filter, for a default listing. */
 export function listSpots(options: SearchOptions = {}): Promise<SpotPage> {
 	const { limit = DEFAULT_LIMIT, offset = 0, fetcher = globalThis.fetch } = options;
-	return getSpots(new URLSearchParams({ limit: String(limit), offset: String(offset) }), fetcher);
+
+	return get(
+		'/api/spots',
+		new URLSearchParams({ limit: String(limit), offset: String(offset) }),
+		fetcher
+	);
 }

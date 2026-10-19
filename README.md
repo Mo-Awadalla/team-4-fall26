@@ -38,7 +38,7 @@ The shared study-spot summary contract is intentionally small:
 }
 ```
 
-`GET /spots` and `GET /spots/{id}` are available alongside `GET /health/live`, none of them with a trailing slash. `GET /spots` pages with `limit` and `offset` and filters on `name`, `neighborhood`, `borough`, and `university`. `GET /spots/search?q=coffee` is still planned. See the [HTTP API guide](docs/source/api.md).
+`GET /spots` and `GET /spots/{id}` are available alongside `GET /health/live`, none of them with a trailing slash. `GET /spots` pages with `limit` and `offset` and filters on `name`, `neighborhood`, `borough`, and `university`. `GET /spots/search?q=` ranks results instead of filtering, tolerating misspellings and expanding initialisms. See the [HTTP API guide](docs/source/api.md).
 
 ## Development
 

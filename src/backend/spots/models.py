@@ -12,6 +12,7 @@ a curated campus list, which is most of them.
 
 from __future__ import annotations
 
+from django.contrib.postgres.indexes import GinIndex
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Upper
@@ -145,6 +146,21 @@ class StudySpot(models.Model):
             models.Index(Upper("neighborhood"), name="spots_neighborhood_idx"),
             models.Index(Upper("borough"), name="spots_borough_idx"),
             models.Index(Upper("university"), name="spots_university_idx"),
+            # Trigram indexes for the ranked search in spots/search.py. A GIN
+            # index with gin_trgm_ops is what turns a similarity comparison
+            # from a scan of every row into an index lookup, and it serves the
+            # `icontains` filter on the same column too, which a btree cannot
+            # because the pattern has a leading wildcard.
+            GinIndex(
+                fields=["name"],
+                opclasses=["gin_trgm_ops"],
+                name="spots_name_trgm_idx",
+            ),
+            GinIndex(
+                fields=["neighborhood"],
+                opclasses=["gin_trgm_ops"],
+                name="spots_neighborhood_trgm_idx",
+            ),
         ]
 
     def __str__(self) -> str:
