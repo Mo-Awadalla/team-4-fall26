@@ -1,4 +1,4 @@
-# [StudySpot](https://studyspot-nyu.vercel.app/)
+# [StudySpot](https://d1ulyrfyi06kwp.cloudfront.net)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](https://python.org)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
