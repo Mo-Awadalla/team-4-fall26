@@ -26,13 +26,15 @@ No route has a trailing slash, and the application does not redirect one onto th
 {
   "id": "facdb:eec118768e15a5e03d3354abda7b00da",
   "name": "125th Street Library",
-  "category": "library",
+  "category": "public_library",
   "address": "224 East 125 Street, New York, NY 10035",
   "neighborhood": "East Harlem (North)",
   "borough": "Manhattan",
   "latitude": 40.803027,
   "longitude": -73.934853,
-  "university": "Touro University - Harlem"
+  "university": "Touro University - Harlem",
+  "free_public_wifi": true,
+  "no_purchase_needed": true
 }
 ```
 
@@ -44,7 +46,11 @@ The records represent public third places from NYC Open Data — today the libra
 
 `university_building` is a campus building a student can work in. The city's facilities database registers institutions and administrative points rather than buildings, so these come from the curated list in `data/nyu_buildings.json` and all carry the `nyu:` identifier prefix. The institution records themselves are *not* published: an administrative point is not a room, and campus access is restricted. They are read only to anchor the `university` label.
 
-`cafe` comes from the outdoor-dining licence register: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
+`cafe` comes from the outdoor-dining licence register: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration.
+
+`no_purchase_needed` is true where sitting down costs nothing — every library and every campus building, and no café. It answers the question a reader actually has, which no single category answers, and **it is about money rather than entry**: a campus building is free and still wants the university's credentials, and a special library may be open only by appointment.
+
+It is the one field the API publishes that `data/spots.json` does not store. It is a pure function of `category`, so a column would be a copy that can fall out of step with the value beside it, and computing it in the browser would put the same rule in two languages. `NO_PURCHASE_CATEGORIES` in `spots/models.py` is the single definition, and it is an allowlist so that a category added upstream is never silently published as free. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
 sits within 25 m, derived from `yjub-udmw`. False means none is recorded, which
 is not the same as there being no Wi-Fi: a campus building's network needs the
 university's credentials, and the city has no reason to know about it. The field
@@ -132,14 +138,15 @@ Every non-2xx response uses one envelope:
 ## Filtering
 
 Both `GET /spots` and `GET /spots/search` take the same filters: `neighborhood`,
-`borough`, `category`, `university`, and `free_public_wifi`. They combine with
+`borough`, `category`, `university`, `free_public_wifi`, and `no_purchase_needed`. They combine with
 AND, so supplying two narrows rather than widens, and on the search endpoint
 they narrow the candidates *before* ranking. Filtering after ranking would drop
 the best matches out of a page rather than out of the result set, and the
 reported total would describe something the caller never sees.
 
-`free_public_wifi` takes `true` or `false`. False is a filter in its own right,
-not the absence of one.
+`free_public_wifi` and `no_purchase_needed` each take `true` or `false`. False
+is a filter in its own right -- places that do expect a purchase, which is every
+café -- not the absence of one.
 
 A present but empty parameter is a `422`, the same as an unrecognized one: a
 filter whose value was lost should fail rather than quietly widen the search.
@@ -151,7 +158,8 @@ filter whose value was lost should fail rather than quietly widen the search.
   "boroughs": [{ "value": "Manhattan", "count": 151 }],
   "categories": [{ "value": "library", "count": 248 }],
   "universities": [{ "value": "New York University", "count": 12 }],
-  "free_public_wifi": 206
+  "free_public_wifi": 465,
+  "no_purchase_needed": 264
 }
 ```
 
@@ -162,9 +170,9 @@ snapshot contains, so a hard-coded list would silently stop matching when the
 data changes. Counts are included because offering a value that matches nothing
 is worse than not offering it.
 
-`free_public_wifi` is a single number rather than a list of values, because the
-control it serves is a checkbox: the only useful count is how many spots remain
-when it is ticked.
+`free_public_wifi` and `no_purchase_needed` are single numbers rather than lists
+of values, because the controls they serve are checkboxes: the only useful count
+is how many spots remain when each is ticked.
 
 The endpoint takes every filter the listing endpoints take, plus `q`, all
 optional, and no `limit` or `offset` -- a facet list is as long as the number of
@@ -178,7 +186,8 @@ narrowing the results: under `?borough=Bronx` the unfiltered category counts
 would still offer a type the Bronx does not contain. Its own filter is left out
 so that a chosen value does not hide the alternatives -- with `?borough=Bronx`
 all five boroughs are still listed, so there is a way to switch, while
-`categories`, `universities` and `free_public_wifi` narrow to the Bronx.
+`categories`, `universities`, `free_public_wifi` and `no_purchase_needed` narrow
+to the Bronx.
 
 A client that filters should refetch this whenever the filters or the query
 change, which is one request per interaction. Returning results and facets in
