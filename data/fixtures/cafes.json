@@ -1,0 +1,80 @@
+[
+  {
+    "business_legal_name": "CGM-LLNR LLC",
+    "assumed_name_s": "JEAN'S",
+    "street": "415 LAFAYETTE STREET",
+    "city": "NEW YORK",
+    "borough": "Manhattan",
+    "postcode": "10003",
+    "nta2020": "MN0502",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "latitude": "40.728521107598",
+    "longitude": "-73.99256750253"
+  },
+  {
+    "business_legal_name": "THE BUTCHER'S DAUGHTER NOLITA LLC",
+    "assumed_name_s": "THE BUTCHER'S DAUGHTER",
+    "street": "19 KENMARE STREET",
+    "city": "NEW YORK",
+    "borough": "Manhattan",
+    "postcode": "10012",
+    "nta2020": "MN0502",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "latitude": "40.721382",
+    "longitude": "-73.995184"
+  },
+  {
+    "business_legal_name": "BUTCHERS DAUGHTER HOLDINGS LLC",
+    "assumed_name_s": "THE BUTCHER'S DAUGHTER",
+    "street": "19 KENMARE STREET",
+    "city": "NEW YORK",
+    "borough": "Manhattan",
+    "postcode": "10012",
+    "nta2020": "MN0502",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "latitude": "40.721382",
+    "longitude": "-73.995184"
+  },
+  {
+    "business_legal_name": "NO TRADING NAME CORP",
+    "assumed_name_s": null,
+    "street": "2 METROTECH CENTER",
+    "city": "BROOKLYN",
+    "borough": "Brooklyn",
+    "postcode": "11201",
+    "nta2020": "BK0201",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "latitude": "40.693421",
+    "longitude": "-73.986234"
+  },
+  {
+    "business_legal_name": "UNPLACEABLE CAFE LLC",
+    "assumed_name_s": "NOWHERE IN PARTICULAR",
+    "street": "1 NOWHERE STREET",
+    "city": "NEW YORK",
+    "borough": null,
+    "postcode": "10001",
+    "nta2020": "MN0502",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "latitude": "40.75",
+    "longitude": "-73.99"
+  },
+  {
+    "business_legal_name": "FUTURE BOUNDARY LLC",
+    "assumed_name_s": "CODE AHEAD OF THE BOUNDARY FILE",
+    "street": "100 FLATBUSH AVENUE",
+    "city": "BROOKLYN",
+    "borough": "Brooklyn",
+    "postcode": "11217",
+    "nta2020": "BK9999",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "latitude": "40.687",
+    "longitude": "-73.978"
+  }
+]
