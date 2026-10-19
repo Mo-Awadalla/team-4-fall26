@@ -5,7 +5,7 @@
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data.
 
 > [!IMPORTANT]
-> StudySpot is deployed and working. `data/spots.json` holds 390 real libraries, campuses, and campus buildings, 206 of them with a free public Wi-Fi hotspot nearby. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. The city's facilities database lists no cafés, so the published `cafe` category has no source yet; a spot detail page is the other notable gap.
+> StudySpot is deployed and working. `data/spots.json` holds 2,042 real places — 1,652 cafés with a sidewalk licence, 248 public libraries, and 142 campuses and campus buildings — 468 of them with a free public Wi-Fi hotspot nearby. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
 
 ## How will it work?
 
@@ -118,7 +118,7 @@ just dev-backend
 
 ### Loading data
 
-The data boundary lives in [`data/`](data/): `ingest.py` normalizes three NYC Open Data datasets and a curated list of NYU buildings into `spots.json`, and `test_ingest.py` verifies the mapping against a committed sample of upstream records. Copy the snapshot into the local database before using the study-spot routes:
+The data boundary lives in [`data/`](data/): `ingest.py` normalizes four NYC Open Data datasets and a curated list of NYU buildings into `spots.json`, and `test_ingest.py` verifies the mapping against a committed sample of upstream records. Copy the snapshot into the local database before using the study-spot routes:
 
 ```shell
 just load-data

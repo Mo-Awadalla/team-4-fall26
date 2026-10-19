@@ -17,12 +17,18 @@ changes; nothing writes to ``spots.json`` at runtime.
 Where the records come from
 ---------------------------
 
-Three sources. The first is the city's Facilities Database (FacDB, Socrata ``ji82-xba5``),
+Four sources. The first is the city's Facilities Database (FacDB, Socrata ``ji82-xba5``),
 which is what the ``facdb:`` identifier prefix refers to. Two subsets of it are
 places a student might read in -- the ``LIBRARIES`` facility group and the
-``COLLEGES OR UNIVERSITIES`` subgroup. Neighborhood names come from a second
-dataset, the 2020 Neighborhood Tabulation Areas (``9nt8-h7nd``), because FacDB
-publishes the NTA code and not its name.
+``COLLEGES OR UNIVERSITIES`` subgroup.
+
+The second is Dining Out NYC (``fpeh-f7ci``), the register of outdoor-dining
+licences, which the ``dining:`` prefix refers to and which is where the cafes
+come from. FacDB holds none and never will: it registers what the city
+*operates*, and a cafe is something the city *licenses*.
+
+Neighborhood names come from the 2020 Neighborhood Tabulation Areas
+(``9nt8-h7nd``), because both registers publish the NTA code and not its name.
 
 The second is ``nyu_buildings.json``, a hand-maintained list of NYU buildings
 merged over the open-data records by :func:`combine`. FacDB registers NYU as an
@@ -107,6 +113,7 @@ may walk in: 169 metres is what the data says about "125th Street Library" and
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -146,7 +153,32 @@ NEIGHBORHOODS_DATASET = "9nt8-h7nd"
 WIFI_DATASET = "yjub-udmw"
 WIFI_WHERE = "type = 'Free'"
 
+#: Dining Out NYC, the city's register of outdoor-dining licences and the
+#: successor to the retired DCA sidewalk-cafe dataset. The ``dining:``
+#: identifier prefix names this dataset.
+#:
+#: FacDB is a register of *city facilities*, which is why it holds libraries and
+#: campuses and not a single cafe. Cafes are licensed rather than operated by
+#: the city, so they live in a licence register instead. The published ``cafe``
+#: category had no source until this was found.
+CAFES_DATASET = "fpeh-f7ci"
+
+#: Issued sidewalk licences only.
+#:
+#: ``license_status`` also carries applications that were never granted, and a
+#: cafe that does not exist is worse than one the snapshot omits. ``Sidewalk``
+#: rather than ``Roadway`` because a roadway licence is a dining structure in a
+#: parking lane, which is seasonal, frequently removed, and not somewhere to sit
+#: with a laptop.
+CAFES_WHERE = "license_status = 'Issued' AND license_type = 'Sidewalk'"
+
 SOURCE_PREFIX = "facdb"
+CAFE_PREFIX = "dining"
+
+#: The category every Dining Out record takes. The licence says the place
+#: serves food outdoors, not what kind of place it is, so there is nothing
+#: finer to map.
+CAFE_CATEGORY = "cafe"
 
 #: A hand-maintained list of NYU buildings, kept as data rather than code so it
 #: can be edited without touching the importer.
@@ -363,11 +395,12 @@ def fixture_rows(directory: Path, name: str) -> list[Any]:
     return rows
 
 
-def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any]]:
+def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any], list[Any]]:
     """The raw upstream records, from the network or from a fixture directory."""
     if fixtures is not None:
         return (
             fixture_rows(fixtures, "facilities"),
+            fixture_rows(fixtures, "cafes"),
             fixture_rows(fixtures, "neighborhoods"),
             fixture_rows(fixtures, "wifi"),
         )
@@ -377,6 +410,15 @@ def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any]
         warn(f"no {APP_TOKEN_VARIABLE} set; using the shared anonymous rate limit")
 
     facilities = socrata_rows(FACILITIES_DATASET, {"$where": FACILITIES_WHERE}, token, order="uid")
+    cafes = socrata_rows(
+        CAFES_DATASET,
+        {"$where": CAFES_WHERE},
+        token,
+        # Dining Out publishes no stable row identifier, so paging is ordered on
+        # Socrata's own row id: without a total order the pages can overlap and
+        # drop records between them.
+        order=":id",
+    )
     neighborhoods = socrata_rows(
         NEIGHBORHOODS_DATASET,
         # The boundaries themselves are megabytes of geometry, and the code and
@@ -393,7 +435,7 @@ def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any]
         token,
         order="objectid",
     )
-    return facilities, neighborhoods, hotspots
+    return facilities, cafes, neighborhoods, hotspots
 
 
 # -- Normalization -----------------------------------------------------------
@@ -529,8 +571,14 @@ def neighborhood_names(rows: list[Any]) -> dict[str, str]:
     return names
 
 
-def neighborhood(record: dict[str, Any], names: dict[str, str]) -> str | None:
-    """The 2020 NTA name, or ``None`` when the source does not place the record."""
+def neighborhood(record: dict[str, Any], names: dict[str, str], identifier: str) -> str | None:
+    """The 2020 NTA name, or ``None`` when the source does not place the record.
+
+    Both upstream datasets carry ``nta2020``, which is the whole reason cafes
+    could join this snapshot without a point-in-polygon test against the
+    boundary geometry. The identifier is passed in rather than derived: a
+    Dining Out row has no ``uid`` for :func:`spot_id` to read.
+    """
     code = text(record.get("nta2020"))
     if code is None:
         return None
@@ -539,8 +587,83 @@ def neighborhood(record: dict[str, Any], names: dict[str, str]) -> str | None:
         # The two datasets are revised on their own schedules, so a code can
         # outrun the boundary file. Publishing the code instead would put a
         # string like "MN1102" where the contract promises a name.
-        warn(f"no 2020 NTA name for {code!r}; leaving {spot_id(record)} without a neighborhood")
+        warn(f"no 2020 NTA name for {code!r}; leaving {identifier} without a neighborhood")
     return name
+
+
+def cafe_id(name: str, address: str) -> str:
+    """A stable identifier for one storefront.
+
+    Dining Out publishes no row identifier that survives a re-licensing, so the
+    identity has to be derived. Name and address together are what distinguishes
+    one storefront from another, and both stay put between runs, which is what
+    :func:`write_snapshot` needs to produce a stable diff.
+    """
+    digest = hashlib.sha1(f"{name}|{address}".encode()).hexdigest()[:16]
+    return f"{CAFE_PREFIX}:{digest}"
+
+
+def cafe_address(record: dict[str, Any]) -> str | None:
+    """The address as the contract publishes it, or ``None``.
+
+    Dining Out names the pieces differently from FacDB -- ``street`` and
+    ``postcode`` rather than ``address`` and ``zipcode`` -- and stores them in
+    upper case, so they are title-cased here as the facility names are.
+    """
+    street = text(record.get("street"))
+    if street is None:
+        return None
+
+    parts = [title_case(street)]
+    city = text(record.get("city"))
+    if city:
+        parts.append(title_case(city))
+    postcode = text(record.get("postcode"))
+    parts.append(f"NY {postcode}" if postcode else "NY")
+    return ", ".join(parts)
+
+
+def cafe_spot(record: dict[str, Any], names: dict[str, str]) -> dict[str, Any] | None:
+    """Map one Dining Out row onto the contract, or ``None`` if it cannot be.
+
+    ``assumed_name_s`` is the name over the door; ``business_legal_name`` is the
+    entity that holds the licence, and is usually something like "CGM-LLNR LLC".
+    Nobody searches for that, so the trading name is preferred and the legal one
+    is only a fallback.
+    """
+    name = text(record.get("assumed_name_s")) or text(record.get("business_legal_name"))
+    address = cafe_address(record)
+    latitude = coordinate(record, "latitude", 90.0)
+    longitude = coordinate(record, "longitude", 180.0)
+    named_borough = text(record.get("borough"))
+
+    # A licence with no name, address, borough or coordinates describes nothing
+    # anyone could walk to. Unlike a facility this does not fail the import: the
+    # register is maintained for licensing rather than for mapping, and a
+    # handful of rows are missing a borough at any given time.
+    if name is None or address is None or latitude is None or longitude is None:
+        return None
+    if named_borough is None:
+        return None
+    # Dining Out already title-cases the borough where FacDB shouts it; the
+    # same mapping serves both because it is keyed on the upper-cased name.
+    where = BOROUGH_BY_FACILITY_BOROUGH.get(named_borough.upper())
+    if where is None:
+        return None
+
+    return {
+        "id": cafe_id(name, address),
+        "name": title_case(name),
+        "category": CAFE_CATEGORY,
+        "address": address,
+        "neighborhood": neighborhood(record, names, cafe_id(name, address)),
+        "borough": where,
+        "latitude": latitude,
+        "longitude": longitude,
+        # Filled in by normalize(), from the rest of the snapshot.
+        "university": None,
+        "free_public_wifi": False,
+    }
 
 
 def coordinate(record: dict[str, Any], field: str, limit: float) -> float | None:
@@ -621,9 +744,15 @@ def nearest_campus(latitude: float, longitude: float, campuses: list[Campus]) ->
 
 
 def normalize(
-    facilities: list[Any], names: dict[str, str], hotspots: list[Any]
+    facilities: list[Any], cafes: list[Any], names: dict[str, str], hotspots: list[Any]
 ) -> list[dict[str, Any]]:
-    """The whole mapping, from raw upstream records to contract records."""
+    """The whole mapping, from raw upstream records to contract records.
+
+    Both registers are normalized here rather than in separate passes so that
+    the two derivations that depend on the whole snapshot -- the Wi-Fi
+    proximity test and the nearest campus -- are applied once, to everything,
+    and cannot drift between sources.
+    """
     spots: list[dict[str, Any]] = []
     skipped = 0
 
@@ -653,7 +782,7 @@ def normalize(
                 "name": title_case(name),
                 "category": published_category,
                 "address": street_address(record),
-                "neighborhood": neighborhood(record, names),
+                "neighborhood": neighborhood(record, names, spot_id(record)),
                 "borough": borough(record),
                 "latitude": latitude,
                 "longitude": longitude,
@@ -665,6 +794,27 @@ def normalize(
 
     if skipped:
         warn(f"skipped {skipped} record(s) without coordinates")
+
+    # Licences, not facilities: one storefront can hold more than one, and a
+    # re-licensing issues a new row for a cafe that was already here. Keyed on
+    # the derived identifier, which is the storefront rather than the licence.
+    by_id: dict[str, dict[str, Any]] = {}
+    unusable = 0
+    for record in cafes:
+        if not isinstance(record, dict):
+            raise IngestError("An upstream record is not a JSON object.")
+        spot = cafe_spot(record, names)
+        if spot is None:
+            unusable += 1
+            continue
+        by_id[spot["id"]] = spot
+
+    if unusable:
+        warn(f"skipped {unusable} licence(s) that could not be placed")
+    duplicates = len(cafes) - unusable - len(by_id)
+    if duplicates:
+        warn(f"merged {duplicates} repeat licence(s) onto storefronts already seen")
+    spots.extend(by_id.values())
 
     points = hotspot_points(hotspots)
     for spot in spots:
@@ -802,9 +952,9 @@ def main(argv: list[str] | None = None) -> int:
     options = parser.parse_args(argv)
 
     try:
-        facilities, neighborhoods, hotspots = read_sources(options.fixtures)
+        facilities, cafes, neighborhoods, hotspots = read_sources(options.fixtures)
         spots = combine(
-            normalize(facilities, neighborhood_names(neighborhoods), hotspots),
+            normalize(facilities, cafes, neighborhood_names(neighborhoods), hotspots),
             curated_spots(),
         )
     except IngestError as error:
