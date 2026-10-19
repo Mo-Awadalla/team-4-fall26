@@ -1,6 +1,6 @@
 # Contributing
 
-Read the repository's [contribution guide](https://github.com/2SpaceMasterRace/studyspot/blob/main/CONTRIBUTING.md) before editing the project.
+Read the repository's [contribution guide](https://github.com/gcivil-nyu-org/team-4-fall26/blob/develop/CONTRIBUTING.md) before editing the project.
 
 
 
