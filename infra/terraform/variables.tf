@@ -130,14 +130,14 @@ variable "database_publicly_accessible" {
     Whether the database gets a public endpoint.
 
     false (default) places RDS in private subnets. Only the Lambda functions in
-    this VPC can reach it. This is the safe setting, and it means the Vercel
-    deployment has no database to talk to.
+    this VPC can reach it. This is the safe setting, and it is why migrations and
+    data loads run as Lambda invocations rather than from a laptop.
 
     true places RDS in public subnets with a public address, still TLS-only and
-    still restricted to database_allowed_cidrs. Set this if you want the existing
-    Vercel deployment to keep serving /spots after Turso is retired. The tradeoff
-    is a database endpoint reachable from the internet by anyone inside those
-    CIDRs, so pair it with a narrow allowlist.
+    still restricted to database_allowed_cidrs. Set this only if something
+    outside the VPC genuinely has to reach the database. The tradeoff is an
+    endpoint reachable from the internet by anyone inside those CIDRs, so pair
+    it with a narrow allowlist.
   EOT
   type        = bool
   default     = false
@@ -146,9 +146,8 @@ variable "database_publicly_accessible" {
 variable "database_allowed_cidrs" {
   description = <<-EOT
     CIDR blocks allowed to reach Postgres when database_publicly_accessible is
-    true. Vercel does not publish stable egress ranges on every plan, so making
-    the Vercel deployment work may mean widening this further than you would
-    like; check your plan's documented egress IPs before resorting to 0.0.0.0/0.
+    true. Name the narrowest ranges that work: an allowlist of 0.0.0.0/0 is a
+    database on the public internet behind one password.
   EOT
   type        = list(string)
   default     = []

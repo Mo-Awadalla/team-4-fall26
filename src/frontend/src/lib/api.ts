@@ -2,9 +2,9 @@
  * The browser's view of the StudySpot API.
  *
  * Every request is relative to `/api`, which works unchanged in all three
- * places this runs: Vite proxies it to the backend in development, and both
- * CloudFront and Vercel route it to the application in deployments. Nothing
- * here needs to know a hostname.
+ * places this runs: Vite proxies it to the backend in development, and
+ * CloudFront routes it to the application in the deployment. Nothing here needs
+ * to know a hostname.
  */
 
 import type { ErrorEnvelope, Facets, SpotFilters, SpotPage } from './contract';

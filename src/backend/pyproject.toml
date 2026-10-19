@@ -15,8 +15,8 @@ dependencies = [
     # Translates the Lambda function URL's event into the ASGI call Django
     # expects. See handler.py.
     "mangum>=0.19.0",
-    # Serves the admin and DRF static files from the application itself, so
-    # neither Lambda nor Vercel needs a second origin for them.
+    # Serves the admin and DRF static files from the application itself, so the
+    # Lambda function needs no second origin for them.
     "whitenoise>=6.11.0",
 ]
 

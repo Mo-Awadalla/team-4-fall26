@@ -16,4 +16,4 @@ Run the warning-strict documentation check as part of the complete repository ch
 just check
 ```
 
-Documentation is published alongside the staging app at <https://dev-studyspot-nyu.vercel.app/docs/> by Vercel.
+The documentation is not published anywhere yet. Build it locally with `just docs`; the warning-strict build also runs as part of `just check`.
