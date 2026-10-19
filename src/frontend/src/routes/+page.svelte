@@ -19,6 +19,21 @@
 	let facets = $state<Facets | null>(null);
 	let filters = $state<SpotFilters>({});
 
+	/**
+	 * The query and filters the shown results came from.
+	 *
+	 * `query` is what the search box shows, which is not the same thing: the box
+	 * can be typed in, or emptied, without being submitted. Paging has to repeat
+	 * the request that produced the visible page, and the empty-state message has
+	 * to name the query that actually found nothing, so both read this instead.
+	 *
+	 * `run()` records it when it issues a request rather than when one returns,
+	 * which is sound because of the `latestSearch` guard below: only the most
+	 * recently issued request is allowed to write results, so it is also the one
+	 * that wrote this.
+	 */
+	let applied = $state<{ query: string; filters: SpotFilters }>({ query: '', filters: {} });
+
 	// The hero fills the viewport until there is something below it to see.
 	let searched = $derived(status !== 'idle');
 
@@ -65,6 +80,8 @@
 		const trimmed = query.trim();
 		const filtering = Object.keys(filters).length > 0;
 
+		applied = { query: trimmed, filters: { ...filters } };
+
 		if (!trimmed && !filtering) {
 			status = 'idle';
 			spots = [];
@@ -97,6 +114,16 @@
 		}
 	}
 
+	/**
+	 * Typing changes what the box shows without fetching: a request per keystroke
+	 * would be waste, and the ranking endpoint is not debounced. The value still
+	 * matters before it is submitted, because changing a filter runs whatever the
+	 * box holds at that moment -- including nothing at all.
+	 */
+	function handleQueryInput(next: string): void {
+		query = next;
+	}
+
 	function handleSearch(submitted: string): void {
 		query = submitted;
 		void run();
@@ -113,10 +140,19 @@
 		loadingMore = true;
 
 		try {
-			const trimmed = query.trim();
-			const page = trimmed
-				? await searchSpots(trimmed, { limit: DEFAULT_LIMIT, offset: spots.length, filters })
-				: await listSpots({ limit: DEFAULT_LIMIT, offset: spots.length, filters });
+			// Deliberately `applied` and not the live controls: this continues the
+			// page already on screen, which the box may since have been typed in.
+			const page = applied.query
+				? await searchSpots(applied.query, {
+						limit: DEFAULT_LIMIT,
+						offset: spots.length,
+						filters: applied.filters
+					})
+				: await listSpots({
+						limit: DEFAULT_LIMIT,
+						offset: spots.length,
+						filters: applied.filters
+					});
 			if (search !== latestSearch) return;
 
 			spots = [...spots, ...page.items];
@@ -157,7 +193,7 @@
 				<p class="description">Explore cafés and public gathering places from NYC Open Data.</p>
 			</div>
 
-			<SearchBar onSearch={handleSearch} />
+			<SearchBar value={query} onInput={handleQueryInput} onSearch={handleSearch} />
 		</section>
 
 		<SpotFiltersBar {facets} {filters} onChange={handleFilters} />
@@ -170,9 +206,9 @@
 				<p class="status error" role="alert">{errorMessage}</p>
 			{:else if status === 'loaded' && spots.length === 0}
 				<p class="status">
-					{#if query.trim()}
-						No places match <strong>{query}</strong>. Try a library, a campus, or a neighborhood, or
-						clear a filter.
+					{#if applied.query}
+						No places match <strong>{applied.query}</strong>. Try a library, a campus, or a
+						neighborhood, or clear a filter.
 					{:else}
 						No places match these filters.
 					{/if}

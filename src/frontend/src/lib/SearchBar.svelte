@@ -1,18 +1,24 @@
 <script lang="ts">
 	type Props = {
-		onSearch?: (query: string) => void;
+		/** What the box shows. The page owns it; this component never stores it. */
+		value: string;
+		/** Every keystroke, so the page's copy is never behind the box. */
+		onInput: (query: string) => void;
+		onSearch: (query: string) => void;
 	};
 
-	let { onSearch }: Props = $props();
-	let query = $state('');
+	let { value, onInput, onSearch }: Props = $props();
 
+	/**
+	 * An empty submit is a real request, not a no-op.
+	 *
+	 * Clearing the text and pressing Search is how you say "no query any more",
+	 * and swallowing it meant a deleted word went on applying to everything the
+	 * page did next.
+	 */
 	function handleSubmit(event: SubmitEvent): void {
 		event.preventDefault();
-
-		const normalizedQuery = query.trim();
-		if (!normalizedQuery) return;
-
-		onSearch?.(normalizedQuery);
+		onSearch(value.trim());
 	}
 </script>
 
@@ -22,7 +28,8 @@
 		<input
 			id="spot-search"
 			name="q"
-			bind:value={query}
+			{value}
+			oninput={(event) => onInput(event.currentTarget.value)}
 			placeholder="Café, public space, or neighborhood"
 			autocomplete="off"
 		/>
