@@ -2,7 +2,9 @@
 
 .. code-block:: text
 
-    NYC Open Data -> ingest.py -> spots.json
+    NYC Open Data ---\
+                      ingest.py -> spots.json
+    nyu_buildings.json /
 
 Run it through just, which writes ``data/spots.json`` in place::
 
@@ -15,12 +17,23 @@ changes; nothing writes to ``spots.json`` at runtime.
 Where the records come from
 ---------------------------
 
-One dataset: the city's Facilities Database (FacDB, Socrata ``ji82-xba5``),
+Two sources. The first is the city's Facilities Database (FacDB, Socrata ``ji82-xba5``),
 which is what the ``facdb:`` identifier prefix refers to. Two subsets of it are
 places a student might read in -- the ``LIBRARIES`` facility group and the
 ``COLLEGES OR UNIVERSITIES`` subgroup. Neighborhood names come from a second
 dataset, the 2020 Neighborhood Tabulation Areas (``9nt8-h7nd``), because FacDB
 publishes the NTA code and not its name.
+
+The second is ``nyu_buildings.json``, a hand-maintained list of NYU buildings
+merged over the open-data records by :func:`combine`. FacDB registers NYU as an
+institution and its schools as administrative points, but not the buildings
+students study in, so without this list the snapshot has no campus study space
+at all. Those records carry the ``nyu:`` identifier prefix and name the
+institution whose building it is rather than a campus that happens to be within
+500 m.
+
+Neither source lists access conditions, and the contract has no field for one.
+Several curated buildings require a university ID to enter.
 
 FacDB does not list cafés, so no record maps to the published ``cafe`` category
 yet. The obvious candidate, the health department's restaurant inspection
@@ -112,6 +125,15 @@ FACILITIES_WHERE = "facgroup = 'LIBRARIES' OR facsubgrp = 'COLLEGES OR UNIVERSIT
 NEIGHBORHOODS_DATASET = "9nt8-h7nd"
 
 SOURCE_PREFIX = "facdb"
+
+#: A hand-maintained list of NYU buildings, kept as data rather than code so it
+#: can be edited without touching the importer.
+#:
+#: FacDB is a register of city facilities, so it carries NYU as an institution
+#: and its schools as administrative points, but none of the buildings students
+#: actually study in. These ten are recorded by hand from public building
+#: information. They are the reason the snapshot has campus study space at all.
+CURATED_PATH = HERE / "nyu_buildings.json"
 
 #: Socrata serves at most 1,000 rows per request.
 PAGE_SIZE = 1000
@@ -578,6 +600,66 @@ def normalize(facilities: list[Any], names: dict[str, str]) -> list[dict[str, An
     return sorted(spots, key=lambda spot: spot["id"])
 
 
+def curated_spots(path: Path = CURATED_PATH) -> list[dict[str, Any]]:
+    """Read the hand-maintained building records.
+
+    These arrive already in the shared contract rather than in an upstream
+    shape, so the work here is checking that they still match it. A hand-edited
+    file is exactly where a typo or a field outside the contract appears, and
+    finding it here names the record instead of failing at load time.
+    """
+    if not path.exists():
+        raise IngestError(f"No curated building list at {path}.")
+
+    records = json.loads(path.read_text("utf-8"))
+    if not isinstance(records, list):
+        raise IngestError(f"{path} must contain a JSON array of study spots.")
+
+    spots: list[dict[str, Any]] = []
+    for index, record in enumerate(records):
+        if not isinstance(record, dict):
+            raise IngestError(f"Curated record {index} is not a JSON object.")
+
+        name = record.get("id", index)
+        missing = [field for field in CONTRACT_FIELDS if field not in record]
+        if missing:
+            raise IngestError(f"Curated record {name!r} is missing {missing}.")
+
+        extra = sorted(set(record) - set(CONTRACT_FIELDS))
+        if extra:
+            raise IngestError(f"Curated record {name!r} has fields outside the contract: {extra}.")
+
+        # Rebuilt in contract order: validate() compares the key order itself,
+        # and a hand-edited file has no reason to preserve it.
+        spots.append({field: record[field] for field in CONTRACT_FIELDS})
+
+    return spots
+
+
+def combine(
+    facilities: list[dict[str, Any]], curated: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Merge the curated buildings over the open-data records.
+
+    A curated entry wins an identifier collision, because it was written by
+    someone who checked the building and the open-data row was not. Collisions
+    should not happen -- the two sources use different identifier prefixes --
+    but an importer that silently kept the wrong one would be worse than one
+    that prefers the deliberate record.
+
+    The curated entries keep the ``university`` they were given. For an
+    open-data record that field is the nearest campus within 500 m; for these it
+    is the institution whose building it is, which is the stronger claim the
+    contract allows for a campus record.
+    """
+    merged = {spot["id"]: spot for spot in facilities}
+    merged.update({spot["id"]: spot for spot in curated})
+
+    spots = sorted(merged.values(), key=lambda spot: spot["id"])
+    validate(spots)
+    return spots
+
+
 def validate(spots: list[dict[str, Any]]) -> None:
     """Refuse a snapshot ``load_spots`` would reject.
 
@@ -634,7 +716,10 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         facilities, neighborhoods = read_sources(options.fixtures)
-        spots = normalize(facilities, neighborhood_names(neighborhoods))
+        spots = combine(
+            normalize(facilities, neighborhood_names(neighborhoods)),
+            curated_spots(),
+        )
     except IngestError as error:
         warn(str(error))
         return 1

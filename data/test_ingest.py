@@ -39,7 +39,10 @@ PUBLISHED_EXAMPLE = {
     "university": "Touro University - Harlem",
 }
 
-CATEGORIES = {"library", "academic_library", "university", "cafe"}
+#: The published vocabulary. `university_building` is a campus building a
+#: student can work in, which FacDB has no equivalent for and only the curated
+#: list supplies; `cafe` has no source at all yet.
+CATEGORIES = {"library", "academic_library", "university", "university_building", "cafe"}
 BOROUGHS = {"Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"}
 
 
@@ -338,7 +341,11 @@ class TestCommandLine:
         monkeypatch.setattr(ingest.urllib.request, "urlopen", refuse)
         output = tmp_path / "spots.json"
         assert ingest.main(["--fixtures", str(FIXTURES), "--output", str(output)]) == 0
-        assert len(json.loads(output.read_text("utf-8"))) == 11
+
+        written = json.loads(output.read_text("utf-8"))
+        # Eleven fixture records plus the curated buildings, which are read
+        # from the repository rather than from the network either way.
+        assert len(written) == 11 + len(ingest.curated_spots())
 
     def test_a_missing_fixture_directory_is_reported_not_raised(self, tmp_path: Path) -> None:
         assert ingest.main(["--fixtures", str(tmp_path / "absent")]) == 1
@@ -364,3 +371,130 @@ class TestCommittedSnapshot:
         identifiers = [spot["id"] for spot in snapshot]
         assert identifiers == sorted(identifiers)
         assert len(set(identifiers)) == len(identifiers)
+
+
+@pytest.fixture
+def curated() -> list[dict[str, Any]]:
+    return ingest.curated_spots()
+
+
+class TestCuratedBuildings:
+    """The hand-maintained NYU list, which FacDB has no equivalent for.
+
+    FacDB registers NYU as an institution and its schools as administrative
+    points; none of them is a building a student can sit down in. These records
+    are the only campus study space in the snapshot, so what matters is that a
+    hand-edited file still satisfies the contract the loader enforces.
+    """
+
+    def test_every_record_matches_the_contract(self, curated: list[dict[str, Any]]) -> None:
+        for spot in curated:
+            assert tuple(spot) == ingest.CONTRACT_FIELDS
+
+    def test_identifiers_carry_the_source_prefix(self, curated: list[dict[str, Any]]) -> None:
+        # `nyu:` rather than `facdb:`, and a colon rather than a hyphen, so the
+        # source stays parseable for anything that splits on the separator.
+        for spot in curated:
+            assert spot["id"].startswith("nyu:")
+
+    def test_the_institution_is_named_rather_than_inferred(
+        self, curated: list[dict[str, Any]]
+    ) -> None:
+        # For an open-data record `university` is the nearest campus within
+        # 500 m. For these it is the institution whose building it is, which is
+        # the stronger claim the contract allows for a campus record.
+        for spot in curated:
+            assert spot["university"] == "New York University"
+
+    def test_a_missing_file_is_an_error(self, tmp_path: Path) -> None:
+        with pytest.raises(ingest.IngestError, match="No curated building list"):
+            ingest.curated_spots(tmp_path / "absent.json")
+
+    def test_a_json_object_is_an_error(self, tmp_path: Path) -> None:
+        path = tmp_path / "curated.json"
+        path.write_text('{"id": "nyu:x"}', encoding="utf-8")
+        with pytest.raises(ingest.IngestError, match="JSON array"):
+            ingest.curated_spots(path)
+
+    def test_a_missing_field_names_the_record(self, tmp_path: Path) -> None:
+        path = tmp_path / "curated.json"
+        path.write_text(json.dumps([{"id": "nyu:x", "name": "X"}]), encoding="utf-8")
+        with pytest.raises(ingest.IngestError, match="nyu:x.*missing"):
+            ingest.curated_spots(path)
+
+    def test_a_field_outside_the_contract_is_an_error(
+        self, tmp_path: Path, curated: list[dict[str, Any]]
+    ) -> None:
+        # A tenth field fails the load rather than being dropped, so the
+        # importer refuses it where the record can still be named.
+        record = {**curated[0], "wifi": True}
+        path = tmp_path / "curated.json"
+        path.write_text(json.dumps([record]), encoding="utf-8")
+        with pytest.raises(
+            ingest.IngestError, match="outside the shared contract|outside the contract"
+        ):
+            ingest.curated_spots(path)
+
+    def test_key_order_is_rebuilt_rather_than_trusted(self, tmp_path: Path) -> None:
+        # validate() compares key order, and a hand-edited file has no reason
+        # to preserve it.
+        reversed_record = {
+            field: value
+            for field, value in reversed(
+                list(
+                    {
+                        "id": "nyu:x",
+                        "name": "X",
+                        "category": "university_building",
+                        "address": None,
+                        "neighborhood": None,
+                        "borough": "Manhattan",
+                        "latitude": 40.73,
+                        "longitude": -73.99,
+                        "university": "New York University",
+                    }.items()
+                )
+            )
+        }
+        path = tmp_path / "curated.json"
+        path.write_text(json.dumps(reversed_record and [reversed_record]), encoding="utf-8")
+
+        assert tuple(ingest.curated_spots(path)[0]) == ingest.CONTRACT_FIELDS
+
+
+class TestCombine:
+    def test_both_sources_reach_the_snapshot(
+        self, spots: list[dict[str, Any]], curated: list[dict[str, Any]]
+    ) -> None:
+        merged = ingest.combine(spots, curated)
+
+        assert len(merged) == len(spots) + len(curated)
+        assert any(spot["id"].startswith("facdb:") for spot in merged)
+        assert any(spot["id"].startswith("nyu:") for spot in merged)
+
+    def test_the_curated_record_wins_an_identifier_collision(
+        self, spots: list[dict[str, Any]], curated: list[dict[str, Any]]
+    ) -> None:
+        # The prefixes make this impossible in practice; keeping the wrong one
+        # silently would be worse than preferring the deliberate record.
+        clash = {**curated[0], "id": spots[0]["id"]}
+
+        merged = ingest.combine(spots, [clash])
+
+        assert len(merged) == len(spots)
+        assert next(s for s in merged if s["id"] == clash["id"])["name"] == clash["name"]
+
+    def test_the_result_is_sorted_by_identifier(
+        self, spots: list[dict[str, Any]], curated: list[dict[str, Any]]
+    ) -> None:
+        merged = ingest.combine(spots, curated)
+
+        assert [spot["id"] for spot in merged] == sorted(spot["id"] for spot in merged)
+
+    def test_a_curated_record_breaking_the_contract_fails_the_merge(
+        self, spots: list[dict[str, Any]], curated: list[dict[str, Any]]
+    ) -> None:
+        broken = {**curated[0], "borough": ""}
+
+        with pytest.raises(ingest.IngestError, match="empty borough"):
+            ingest.combine(spots, [broken])
