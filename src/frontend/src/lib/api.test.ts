@@ -242,19 +242,62 @@ describe('filters', () => {
 });
 
 describe('fetchFacets', () => {
-	it('reads the values the filter controls offer', async () => {
-		const { urls, fetcher } = recorder(() =>
-			json({
-				boroughs: [{ value: 'Manhattan', count: 151 }],
-				categories: [{ value: 'library', count: 248 }],
-				universities: [{ value: 'New York University', count: 12 }]
-			})
-		);
+	const facetBody = () =>
+		json({
+			boroughs: [{ value: 'Manhattan', count: 151 }],
+			categories: [{ value: 'library', count: 248 }],
+			universities: [{ value: 'New York University', count: 12 }],
+			free_public_wifi: 206
+		});
 
-		const facets = await fetchFacets(fetcher);
+	it('reads the values the filter controls offer', async () => {
+		const { urls, fetcher } = recorder(facetBody);
+
+		const facets = await fetchFacets({ fetcher });
 
 		expect(urls[0]).toContain('/api/spots/facets');
 		expect(facets.boroughs[0]).toEqual({ value: 'Manhattan', count: 151 });
+	});
+
+	it('reads the Wi-Fi count as a single number', async () => {
+		const { fetcher } = recorder(facetBody);
+
+		expect((await fetchFacets({ fetcher })).free_public_wifi).toBe(206);
+	});
+
+	it('asks for nothing when no filter is in force', async () => {
+		const { urls, fetcher } = recorder(facetBody);
+
+		await fetchFacets({ fetcher });
+
+		// Not a trailing '?': the counts describe the whole snapshot.
+		expect(urls[0]).toBe('/api/spots/facets');
+	});
+
+	it('passes the active filters along', async () => {
+		const { urls, fetcher } = recorder(facetBody);
+
+		await fetchFacets({ filters: { borough: 'Bronx', free_public_wifi: true }, fetcher });
+
+		expect(urls[0]).toContain('borough=Bronx');
+		expect(urls[0]).toContain('free_public_wifi=true');
+	});
+
+	it('passes the query along, so the counts describe the search', async () => {
+		const { urls, fetcher } = recorder(facetBody);
+
+		await fetchFacets({ query: 'library', fetcher });
+
+		expect(urls[0]).toContain('q=library');
+	});
+
+	it('drops a filter that was cleared', async () => {
+		const { urls, fetcher } = recorder(facetBody);
+
+		await fetchFacets({ filters: { borough: '' }, fetcher });
+
+		// An empty value is a 422 at both endpoints, so it is omitted instead.
+		expect(urls[0]).toBe('/api/spots/facets');
 	});
 
 	it('reports a transport failure as a network error', async () => {
@@ -262,7 +305,7 @@ describe('fetchFacets', () => {
 			throw new TypeError('Failed to fetch');
 		});
 
-		const failure = await fetchFacets(fetcher).catch((error: unknown) => error);
+		const failure = await fetchFacets({ fetcher }).catch((error: unknown) => error);
 
 		expect((failure as ApiError).code).toBe('network_error');
 	});

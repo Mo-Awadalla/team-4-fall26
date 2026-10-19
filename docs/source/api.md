@@ -142,7 +142,8 @@ filter whose value was lost should fail rather than quietly widen the search.
 {
   "boroughs": [{ "value": "Manhattan", "count": 151 }],
   "categories": [{ "value": "library", "count": 248 }],
-  "universities": [{ "value": "New York University", "count": 12 }]
+  "universities": [{ "value": "New York University", "count": 12 }],
+  "free_public_wifi": 206
 }
 ```
 
@@ -153,15 +154,43 @@ snapshot contains, so a hard-coded list would silently stop matching when the
 data changes. Counts are included because offering a value that matches nothing
 is worse than not offering it.
 
+`free_public_wifi` is a single number rather than a list of values, because the
+control it serves is a checkbox: the only useful count is how many spots remain
+when it is ticked.
+
+The endpoint takes every filter the listing endpoints take, plus `q`, all
+optional, and no `limit` or `offset` -- a facet list is as long as the number of
+distinct values, and paging it would mean a control that offers only some of
+them. With nothing supplied it describes the whole snapshot.
+
+**Each count reflects the request already in force, except for its own filter.**
+A count is a promise about what picking that value returns, and counted over the
+whole table every one of them stops being true the moment anything else is
+narrowing the results: under `?borough=Bronx` the unfiltered category counts
+would still offer a type the Bronx does not contain. Its own filter is left out
+so that a chosen value does not hide the alternatives -- with `?borough=Bronx`
+all five boroughs are still listed, so there is a way to switch, while
+`categories`, `universities` and `free_public_wifi` narrow to the Bronx.
+
+A client that filters should refetch this whenever the filters or the query
+change, which is one request per interaction. Returning results and facets in
+one response would avoid that; two requests is the cost of keeping ranking and
+counting in Postgres.
+
 ## Searching
 
 `GET /spots/search?q=` ranks spots instead of filtering them, in the same
-envelope `GET /spots` returns. It takes `q`, `limit` and `offset`, rejects any
-other parameter, and orders results by relevance rather than by name.
+envelope `GET /spots` returns. It takes `q`, the filters above, `limit` and
+`offset`, rejects any other parameter, and orders results by relevance rather
+than by name.
 
 The difference matters at the search box. `GET /spots` answers "does this
 match": `?name=libary` returns nothing, and so does `?name=NYPL`. `search`
 answers "which of these is closest", so both find what the person meant.
+
+Because a prefix scores highly, the endpoint also serves search-as-you-type:
+`bob` ranks *Elmer Holmes Bobst Library* without anything being submitted, so a
+client can call it on a debounced keystroke rather than only on a form submit.
 
 Scoring is a few rules rather than one opaque number. An exact name scores
 highest, then a prefix, then a substring, then an exact neighborhood. Below

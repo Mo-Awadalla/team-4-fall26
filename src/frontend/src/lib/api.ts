@@ -135,18 +135,37 @@ export function listSpots(options: SearchOptions = {}): Promise<SpotPage> {
 	);
 }
 
+export type FacetOptions = {
+	filters?: SpotFilters;
+	/** The free text the search endpoint ranks by, when a search is in force. */
+	query?: string;
+	fetcher?: Fetcher;
+};
+
 /**
- * The values the filter controls offer.
+ * The values the filter controls offer, for the request currently in force.
  *
  * Not hard-coded in the browser: `borough` is five fixed names, but the
  * category vocabulary belongs to the importer and the campuses are whatever
  * the snapshot contains, so a hard-coded list would silently stop matching
  * when the data changes.
+ *
+ * The filters and query are passed along because a count is a promise about
+ * what picking that value returns. Counted over the whole snapshot, every one
+ * of them stops being true as soon as anything else is narrowing the results.
  */
-export async function fetchFacets(fetcher: Fetcher = globalThis.fetch): Promise<Facets> {
+export async function fetchFacets(options: FacetOptions = {}): Promise<Facets> {
+	const { fetcher = globalThis.fetch } = options;
+
+	const parameters = withFilters(new URLSearchParams(), options.filters);
+	if (options.query) parameters.set('q', options.query);
+	// Left bare when nothing is in force, rather than ending in a lone `?`.
+	const search = parameters.toString();
+	const path = search ? `/api/spots/facets?${search}` : '/api/spots/facets';
+
 	let response: Response;
 	try {
-		response = await fetcher('/api/spots/facets', { headers: { accept: 'application/json' } });
+		response = await fetcher(path, { headers: { accept: 'application/json' } });
 	} catch {
 		throw new ApiError('network_error', 'Could not reach the StudySpot API.', 0);
 	}
