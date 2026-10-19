@@ -1,0 +1,1050 @@
+[
+  {
+    "nta2020": "BK0101",
+    "ntaname": "Greenpoint"
+  },
+  {
+    "nta2020": "BK0102",
+    "ntaname": "Williamsburg"
+  },
+  {
+    "nta2020": "BK0103",
+    "ntaname": "South Williamsburg"
+  },
+  {
+    "nta2020": "BK0104",
+    "ntaname": "East Williamsburg"
+  },
+  {
+    "nta2020": "BK0201",
+    "ntaname": "Brooklyn Heights"
+  },
+  {
+    "nta2020": "BK0202",
+    "ntaname": "Downtown Brooklyn-DUMBO-Boerum Hill"
+  },
+  {
+    "nta2020": "BK0203",
+    "ntaname": "Fort Greene"
+  },
+  {
+    "nta2020": "BK0204",
+    "ntaname": "Clinton Hill"
+  },
+  {
+    "nta2020": "BK0261",
+    "ntaname": "Brooklyn Navy Yard"
+  },
+  {
+    "nta2020": "BK0301",
+    "ntaname": "Bedford-Stuyvesant (West)"
+  },
+  {
+    "nta2020": "BK0302",
+    "ntaname": "Bedford-Stuyvesant (East)"
+  },
+  {
+    "nta2020": "BK0401",
+    "ntaname": "Bushwick (West)"
+  },
+  {
+    "nta2020": "BK0402",
+    "ntaname": "Bushwick (East)"
+  },
+  {
+    "nta2020": "BK0471",
+    "ntaname": "The Evergreens Cemetery"
+  },
+  {
+    "nta2020": "BK0501",
+    "ntaname": "Cypress Hills"
+  },
+  {
+    "nta2020": "BK0502",
+    "ntaname": "East New York (North)"
+  },
+  {
+    "nta2020": "BK0503",
+    "ntaname": "East New York-New Lots"
+  },
+  {
+    "nta2020": "BK0504",
+    "ntaname": "Spring Creek-Starrett City"
+  },
+  {
+    "nta2020": "BK0505",
+    "ntaname": "East New York-City Line"
+  },
+  {
+    "nta2020": "BK0571",
+    "ntaname": "Highland Park-Cypress Hills Cemeteries (South)"
+  },
+  {
+    "nta2020": "BK0601",
+    "ntaname": "Carroll Gardens-Cobble Hill-Gowanus-Red Hook"
+  },
+  {
+    "nta2020": "BK0602",
+    "ntaname": "Park Slope"
+  },
+  {
+    "nta2020": "BK0701",
+    "ntaname": "Windsor Terrace-South Slope"
+  },
+  {
+    "nta2020": "BK0702",
+    "ntaname": "Sunset Park (West)"
+  },
+  {
+    "nta2020": "BK0703",
+    "ntaname": "Sunset Park (Central)"
+  },
+  {
+    "nta2020": "BK0771",
+    "ntaname": "Green-Wood Cemetery"
+  },
+  {
+    "nta2020": "BK0801",
+    "ntaname": "Prospect Heights"
+  },
+  {
+    "nta2020": "BK0802",
+    "ntaname": "Crown Heights (North)"
+  },
+  {
+    "nta2020": "BK0891",
+    "ntaname": "Lincoln Terrace Park"
+  },
+  {
+    "nta2020": "BK0901",
+    "ntaname": "Crown Heights (South)"
+  },
+  {
+    "nta2020": "BK0902",
+    "ntaname": "Prospect Lefferts Gardens-Wingate"
+  },
+  {
+    "nta2020": "BK1001",
+    "ntaname": "Bay Ridge"
+  },
+  {
+    "nta2020": "BK1002",
+    "ntaname": "Dyker Heights"
+  },
+  {
+    "nta2020": "BK1061",
+    "ntaname": "Fort Hamilton"
+  },
+  {
+    "nta2020": "BK1091",
+    "ntaname": "Dyker Beach Park"
+  },
+  {
+    "nta2020": "BK1101",
+    "ntaname": "Bensonhurst"
+  },
+  {
+    "nta2020": "BK1102",
+    "ntaname": "Bath Beach"
+  },
+  {
+    "nta2020": "BK1103",
+    "ntaname": "Gravesend (West)"
+  },
+  {
+    "nta2020": "BK1201",
+    "ntaname": "Sunset Park (East)-Borough Park (West)"
+  },
+  {
+    "nta2020": "BK1202",
+    "ntaname": "Borough Park"
+  },
+  {
+    "nta2020": "BK1203",
+    "ntaname": "Kensington"
+  },
+  {
+    "nta2020": "BK1204",
+    "ntaname": "Mapleton-Midwood (West)"
+  },
+  {
+    "nta2020": "BK1301",
+    "ntaname": "Gravesend (South)"
+  },
+  {
+    "nta2020": "BK1302",
+    "ntaname": "Coney Island-Sea Gate"
+  },
+  {
+    "nta2020": "BK1303",
+    "ntaname": "Brighton Beach"
+  },
+  {
+    "nta2020": "BK1391",
+    "ntaname": "Calvert Vaux Park"
+  },
+  {
+    "nta2020": "BK1401",
+    "ntaname": "Flatbush"
+  },
+  {
+    "nta2020": "BK1402",
+    "ntaname": "Flatbush (West)-Ditmas Park-Parkville"
+  },
+  {
+    "nta2020": "BK1403",
+    "ntaname": "Midwood"
+  },
+  {
+    "nta2020": "BK1501",
+    "ntaname": "Gravesend (East)-Homecrest"
+  },
+  {
+    "nta2020": "BK1502",
+    "ntaname": "Madison"
+  },
+  {
+    "nta2020": "BK1503",
+    "ntaname": "Sheepshead Bay-Manhattan Beach-Gerritsen Beach"
+  },
+  {
+    "nta2020": "BK1601",
+    "ntaname": "Ocean Hill"
+  },
+  {
+    "nta2020": "BK1602",
+    "ntaname": "Brownsville"
+  },
+  {
+    "nta2020": "BK1701",
+    "ntaname": "East Flatbush-Erasmus"
+  },
+  {
+    "nta2020": "BK1702",
+    "ntaname": "East Flatbush-Farragut"
+  },
+  {
+    "nta2020": "BK1703",
+    "ntaname": "East Flatbush-Rugby"
+  },
+  {
+    "nta2020": "BK1704",
+    "ntaname": "East Flatbush-Remsen Village"
+  },
+  {
+    "nta2020": "BK1771",
+    "ntaname": "Holy Cross Cemetery"
+  },
+  {
+    "nta2020": "BK1801",
+    "ntaname": "Flatlands"
+  },
+  {
+    "nta2020": "BK1802",
+    "ntaname": "Marine Park-Mill Basin-Bergen Beach"
+  },
+  {
+    "nta2020": "BK1803",
+    "ntaname": "Canarsie"
+  },
+  {
+    "nta2020": "BK1891",
+    "ntaname": "Marine Park-Plumb Island"
+  },
+  {
+    "nta2020": "BK1892",
+    "ntaname": "McGuire Fields"
+  },
+  {
+    "nta2020": "BK1893",
+    "ntaname": "Canarsie Park & Pier"
+  },
+  {
+    "nta2020": "BK5591",
+    "ntaname": "Prospect Park"
+  },
+  {
+    "nta2020": "BK5691",
+    "ntaname": "Barren Island-Floyd Bennett Field"
+  },
+  {
+    "nta2020": "BK5692",
+    "ntaname": "Jamaica Bay (West)"
+  },
+  {
+    "nta2020": "BK5693",
+    "ntaname": "Shirley Chisholm State Park"
+  },
+  {
+    "nta2020": "BX0101",
+    "ntaname": "Mott Haven-Port Morris"
+  },
+  {
+    "nta2020": "BX0102",
+    "ntaname": "Melrose"
+  },
+  {
+    "nta2020": "BX0201",
+    "ntaname": "Hunts Point"
+  },
+  {
+    "nta2020": "BX0202",
+    "ntaname": "Longwood"
+  },
+  {
+    "nta2020": "BX0291",
+    "ntaname": "North & South Brother Islands"
+  },
+  {
+    "nta2020": "BX0301",
+    "ntaname": "Morrisania"
+  },
+  {
+    "nta2020": "BX0302",
+    "ntaname": "Claremont Village-Claremont (East)"
+  },
+  {
+    "nta2020": "BX0303",
+    "ntaname": "Crotona Park East"
+  },
+  {
+    "nta2020": "BX0391",
+    "ntaname": "Crotona Park"
+  },
+  {
+    "nta2020": "BX0401",
+    "ntaname": "Concourse-Concourse Village"
+  },
+  {
+    "nta2020": "BX0402",
+    "ntaname": "Highbridge"
+  },
+  {
+    "nta2020": "BX0403",
+    "ntaname": "Mount Eden-Claremont (West)"
+  },
+  {
+    "nta2020": "BX0491",
+    "ntaname": "Yankee Stadium-Macombs Dam Park"
+  },
+  {
+    "nta2020": "BX0492",
+    "ntaname": "Claremont Park"
+  },
+  {
+    "nta2020": "BX0501",
+    "ntaname": "University Heights (South)-Morris Heights"
+  },
+  {
+    "nta2020": "BX0502",
+    "ntaname": "Mount Hope"
+  },
+  {
+    "nta2020": "BX0503",
+    "ntaname": "Fordham Heights"
+  },
+  {
+    "nta2020": "BX0601",
+    "ntaname": "West Farms"
+  },
+  {
+    "nta2020": "BX0602",
+    "ntaname": "Tremont"
+  },
+  {
+    "nta2020": "BX0603",
+    "ntaname": "Belmont"
+  },
+  {
+    "nta2020": "BX0701",
+    "ntaname": "University Heights (North)-Fordham"
+  },
+  {
+    "nta2020": "BX0702",
+    "ntaname": "Bedford Park"
+  },
+  {
+    "nta2020": "BX0703",
+    "ntaname": "Norwood"
+  },
+  {
+    "nta2020": "BX0801",
+    "ntaname": "Kingsbridge Heights-Van Cortlandt Village"
+  },
+  {
+    "nta2020": "BX0802",
+    "ntaname": "Kingsbridge-Marble Hill"
+  },
+  {
+    "nta2020": "BX0803",
+    "ntaname": "Riverdale-Spuyten Duyvil"
+  },
+  {
+    "nta2020": "BX0901",
+    "ntaname": "Soundview-Bruckner-Bronx River"
+  },
+  {
+    "nta2020": "BX0902",
+    "ntaname": "Soundview-Clason Point"
+  },
+  {
+    "nta2020": "BX0903",
+    "ntaname": "Castle Hill-Unionport"
+  },
+  {
+    "nta2020": "BX0904",
+    "ntaname": "Parkchester"
+  },
+  {
+    "nta2020": "BX0991",
+    "ntaname": "Soundview Park"
+  },
+  {
+    "nta2020": "BX1001",
+    "ntaname": "Westchester Square"
+  },
+  {
+    "nta2020": "BX1002",
+    "ntaname": "Throgs Neck-Schuylerville"
+  },
+  {
+    "nta2020": "BX1003",
+    "ntaname": "Pelham Bay-Country Club-City Island"
+  },
+  {
+    "nta2020": "BX1004",
+    "ntaname": "Co-op City"
+  },
+  {
+    "nta2020": "BX1071",
+    "ntaname": "Hart Island"
+  },
+  {
+    "nta2020": "BX1091",
+    "ntaname": "Ferry Point Park-St. Raymond Cemetery"
+  },
+  {
+    "nta2020": "BX1101",
+    "ntaname": "Pelham Parkway-Van Nest"
+  },
+  {
+    "nta2020": "BX1102",
+    "ntaname": "Morris Park"
+  },
+  {
+    "nta2020": "BX1103",
+    "ntaname": "Pelham Gardens"
+  },
+  {
+    "nta2020": "BX1104",
+    "ntaname": "Allerton"
+  },
+  {
+    "nta2020": "BX1161",
+    "ntaname": "Hutchinson Metro Center"
+  },
+  {
+    "nta2020": "BX1201",
+    "ntaname": "Williamsbridge-Olinville"
+  },
+  {
+    "nta2020": "BX1202",
+    "ntaname": "Eastchester-Edenwald-Baychester"
+  },
+  {
+    "nta2020": "BX1203",
+    "ntaname": "Wakefield-Woodlawn"
+  },
+  {
+    "nta2020": "BX1271",
+    "ntaname": "Woodlawn Cemetery"
+  },
+  {
+    "nta2020": "BX2691",
+    "ntaname": "Van Cortlandt Park"
+  },
+  {
+    "nta2020": "BX2791",
+    "ntaname": "Bronx Park"
+  },
+  {
+    "nta2020": "BX2891",
+    "ntaname": "Pelham Bay Park"
+  },
+  {
+    "nta2020": "MN0101",
+    "ntaname": "Financial District-Battery Park City"
+  },
+  {
+    "nta2020": "MN0102",
+    "ntaname": "Tribeca-Civic Center"
+  },
+  {
+    "nta2020": "MN0191",
+    "ntaname": "The Battery-Governors Island-Ellis Island-Liberty Island"
+  },
+  {
+    "nta2020": "MN0201",
+    "ntaname": "SoHo-Little Italy-Hudson Square"
+  },
+  {
+    "nta2020": "MN0202",
+    "ntaname": "Greenwich Village"
+  },
+  {
+    "nta2020": "MN0203",
+    "ntaname": "West Village"
+  },
+  {
+    "nta2020": "MN0301",
+    "ntaname": "Chinatown-Two Bridges"
+  },
+  {
+    "nta2020": "MN0302",
+    "ntaname": "Lower East Side"
+  },
+  {
+    "nta2020": "MN0303",
+    "ntaname": "East Village"
+  },
+  {
+    "nta2020": "MN0401",
+    "ntaname": "Chelsea-Hudson Yards"
+  },
+  {
+    "nta2020": "MN0402",
+    "ntaname": "Hell's Kitchen"
+  },
+  {
+    "nta2020": "MN0501",
+    "ntaname": "Midtown South-Flatiron-Union Square"
+  },
+  {
+    "nta2020": "MN0502",
+    "ntaname": "Midtown-Times Square"
+  },
+  {
+    "nta2020": "MN0601",
+    "ntaname": "Stuyvesant Town-Peter Cooper Village"
+  },
+  {
+    "nta2020": "MN0602",
+    "ntaname": "Gramercy"
+  },
+  {
+    "nta2020": "MN0603",
+    "ntaname": "Murray Hill-Kips Bay"
+  },
+  {
+    "nta2020": "MN0604",
+    "ntaname": "East Midtown-Turtle Bay"
+  },
+  {
+    "nta2020": "MN0661",
+    "ntaname": "United Nations"
+  },
+  {
+    "nta2020": "MN0701",
+    "ntaname": "Upper West Side-Lincoln Square"
+  },
+  {
+    "nta2020": "MN0702",
+    "ntaname": "Upper West Side (Central)"
+  },
+  {
+    "nta2020": "MN0703",
+    "ntaname": "Upper West Side-Manhattan Valley"
+  },
+  {
+    "nta2020": "MN0801",
+    "ntaname": "Upper East Side-Lenox Hill-Roosevelt Island"
+  },
+  {
+    "nta2020": "MN0802",
+    "ntaname": "Upper East Side-Carnegie Hill"
+  },
+  {
+    "nta2020": "MN0803",
+    "ntaname": "Upper East Side-Yorkville"
+  },
+  {
+    "nta2020": "MN0901",
+    "ntaname": "Morningside Heights"
+  },
+  {
+    "nta2020": "MN0902",
+    "ntaname": "Manhattanville-West Harlem"
+  },
+  {
+    "nta2020": "MN0903",
+    "ntaname": "Hamilton Heights-Sugar Hill"
+  },
+  {
+    "nta2020": "MN1001",
+    "ntaname": "Harlem (South)"
+  },
+  {
+    "nta2020": "MN1002",
+    "ntaname": "Harlem (North)"
+  },
+  {
+    "nta2020": "MN1101",
+    "ntaname": "East Harlem (South)"
+  },
+  {
+    "nta2020": "MN1102",
+    "ntaname": "East Harlem (North)"
+  },
+  {
+    "nta2020": "MN1191",
+    "ntaname": "Randall's Island"
+  },
+  {
+    "nta2020": "MN1201",
+    "ntaname": "Washington Heights (South)"
+  },
+  {
+    "nta2020": "MN1202",
+    "ntaname": "Washington Heights (North)"
+  },
+  {
+    "nta2020": "MN1203",
+    "ntaname": "Inwood"
+  },
+  {
+    "nta2020": "MN1291",
+    "ntaname": "Highbridge Park"
+  },
+  {
+    "nta2020": "MN1292",
+    "ntaname": "Inwood Hill Park"
+  },
+  {
+    "nta2020": "MN6491",
+    "ntaname": "Central Park"
+  },
+  {
+    "nta2020": "QN0101",
+    "ntaname": "Astoria (North)-Ditmars-Steinway"
+  },
+  {
+    "nta2020": "QN0102",
+    "ntaname": "Old Astoria-Hallets Point"
+  },
+  {
+    "nta2020": "QN0103",
+    "ntaname": "Astoria (Central)"
+  },
+  {
+    "nta2020": "QN0104",
+    "ntaname": "Astoria (East)-Woodside (North)"
+  },
+  {
+    "nta2020": "QN0105",
+    "ntaname": "Queensbridge-Ravenswood-Dutch Kills"
+  },
+  {
+    "nta2020": "QN0151",
+    "ntaname": "Rikers Island"
+  },
+  {
+    "nta2020": "QN0161",
+    "ntaname": "Sunnyside Yards (North)"
+  },
+  {
+    "nta2020": "QN0171",
+    "ntaname": "St. Michael's Cemetery"
+  },
+  {
+    "nta2020": "QN0191",
+    "ntaname": "Astoria Park"
+  },
+  {
+    "nta2020": "QN0201",
+    "ntaname": "Long Island City-Hunters Point"
+  },
+  {
+    "nta2020": "QN0202",
+    "ntaname": "Sunnyside"
+  },
+  {
+    "nta2020": "QN0203",
+    "ntaname": "Woodside"
+  },
+  {
+    "nta2020": "QN0261",
+    "ntaname": "Sunnyside Yards (South)"
+  },
+  {
+    "nta2020": "QN0271",
+    "ntaname": "Calvary & Mount Zion Cemeteries"
+  },
+  {
+    "nta2020": "QN0301",
+    "ntaname": "Jackson Heights"
+  },
+  {
+    "nta2020": "QN0302",
+    "ntaname": "East Elmhurst"
+  },
+  {
+    "nta2020": "QN0303",
+    "ntaname": "North Corona"
+  },
+  {
+    "nta2020": "QN0401",
+    "ntaname": "Elmhurst"
+  },
+  {
+    "nta2020": "QN0402",
+    "ntaname": "Corona"
+  },
+  {
+    "nta2020": "QN0501",
+    "ntaname": "Maspeth"
+  },
+  {
+    "nta2020": "QN0502",
+    "ntaname": "Ridgewood"
+  },
+  {
+    "nta2020": "QN0503",
+    "ntaname": "Glendale"
+  },
+  {
+    "nta2020": "QN0504",
+    "ntaname": "Middle Village"
+  },
+  {
+    "nta2020": "QN0571",
+    "ntaname": "Mount Olivet & All Faiths Cemeteries"
+  },
+  {
+    "nta2020": "QN0572",
+    "ntaname": "Middle Village Cemetery"
+  },
+  {
+    "nta2020": "QN0573",
+    "ntaname": "St. John Cemetery"
+  },
+  {
+    "nta2020": "QN0574",
+    "ntaname": "Highland Park-Cypress Hills Cemeteries (North)"
+  },
+  {
+    "nta2020": "QN0601",
+    "ntaname": "Rego Park"
+  },
+  {
+    "nta2020": "QN0602",
+    "ntaname": "Forest Hills"
+  },
+  {
+    "nta2020": "QN0701",
+    "ntaname": "College Point"
+  },
+  {
+    "nta2020": "QN0702",
+    "ntaname": "Whitestone-Beechhurst"
+  },
+  {
+    "nta2020": "QN0703",
+    "ntaname": "Bay Terrace-Clearview"
+  },
+  {
+    "nta2020": "QN0704",
+    "ntaname": "Murray Hill-Broadway Flushing"
+  },
+  {
+    "nta2020": "QN0705",
+    "ntaname": "East Flushing"
+  },
+  {
+    "nta2020": "QN0706",
+    "ntaname": "Queensboro Hill"
+  },
+  {
+    "nta2020": "QN0707",
+    "ntaname": "Flushing-Willets Point"
+  },
+  {
+    "nta2020": "QN0761",
+    "ntaname": "Fort Totten"
+  },
+  {
+    "nta2020": "QN0791",
+    "ntaname": "Kissena Park"
+  },
+  {
+    "nta2020": "QN0801",
+    "ntaname": "Kew Gardens Hills"
+  },
+  {
+    "nta2020": "QN0802",
+    "ntaname": "Pomonok-Electchester-Hillcrest"
+  },
+  {
+    "nta2020": "QN0803",
+    "ntaname": "Fresh Meadows-Utopia"
+  },
+  {
+    "nta2020": "QN0804",
+    "ntaname": "Jamaica Estates-Holliswood"
+  },
+  {
+    "nta2020": "QN0805",
+    "ntaname": "Jamaica Hills-Briarwood"
+  },
+  {
+    "nta2020": "QN0871",
+    "ntaname": "Mount Hebron & Cedar Grove Cemeteries"
+  },
+  {
+    "nta2020": "QN0891",
+    "ntaname": "Cunningham Park"
+  },
+  {
+    "nta2020": "QN0901",
+    "ntaname": "Kew Gardens"
+  },
+  {
+    "nta2020": "QN0902",
+    "ntaname": "Richmond Hill"
+  },
+  {
+    "nta2020": "QN0903",
+    "ntaname": "South Richmond Hill"
+  },
+  {
+    "nta2020": "QN0904",
+    "ntaname": "Ozone Park (North)"
+  },
+  {
+    "nta2020": "QN0905",
+    "ntaname": "Woodhaven"
+  },
+  {
+    "nta2020": "QN1001",
+    "ntaname": "South Ozone Park"
+  },
+  {
+    "nta2020": "QN1002",
+    "ntaname": "Ozone Park"
+  },
+  {
+    "nta2020": "QN1003",
+    "ntaname": "Howard Beach-Lindenwood"
+  },
+  {
+    "nta2020": "QN1091",
+    "ntaname": "Spring Creek Park"
+  },
+  {
+    "nta2020": "QN1101",
+    "ntaname": "Auburndale"
+  },
+  {
+    "nta2020": "QN1102",
+    "ntaname": "Bayside"
+  },
+  {
+    "nta2020": "QN1103",
+    "ntaname": "Douglaston-Little Neck"
+  },
+  {
+    "nta2020": "QN1104",
+    "ntaname": "Oakland Gardens-Hollis Hills"
+  },
+  {
+    "nta2020": "QN1191",
+    "ntaname": "Alley Pond Park"
+  },
+  {
+    "nta2020": "QN1201",
+    "ntaname": "Jamaica"
+  },
+  {
+    "nta2020": "QN1202",
+    "ntaname": "South Jamaica"
+  },
+  {
+    "nta2020": "QN1203",
+    "ntaname": "Baisley Park"
+  },
+  {
+    "nta2020": "QN1204",
+    "ntaname": "Springfield Gardens (North)-Rochdale Village"
+  },
+  {
+    "nta2020": "QN1205",
+    "ntaname": "St. Albans"
+  },
+  {
+    "nta2020": "QN1206",
+    "ntaname": "Hollis"
+  },
+  {
+    "nta2020": "QN1301",
+    "ntaname": "Glen Oaks-Floral Park-New Hyde Park"
+  },
+  {
+    "nta2020": "QN1302",
+    "ntaname": "Bellerose"
+  },
+  {
+    "nta2020": "QN1303",
+    "ntaname": "Queens Village"
+  },
+  {
+    "nta2020": "QN1304",
+    "ntaname": "Cambria Heights"
+  },
+  {
+    "nta2020": "QN1305",
+    "ntaname": "Laurelton"
+  },
+  {
+    "nta2020": "QN1306",
+    "ntaname": "Springfield Gardens (South)-Brookville"
+  },
+  {
+    "nta2020": "QN1307",
+    "ntaname": "Rosedale"
+  },
+  {
+    "nta2020": "QN1371",
+    "ntaname": "Montefiore Cemetery"
+  },
+  {
+    "nta2020": "QN1401",
+    "ntaname": "Far Rockaway-Bayswater"
+  },
+  {
+    "nta2020": "QN1402",
+    "ntaname": "Rockaway Beach-Arverne-Edgemere"
+  },
+  {
+    "nta2020": "QN1403",
+    "ntaname": "Breezy Point-Belle Harbor-Rockaway Park-Broad Channel"
+  },
+  {
+    "nta2020": "QN1491",
+    "ntaname": "Rockaway Community Park"
+  },
+  {
+    "nta2020": "QN8081",
+    "ntaname": "LaGuardia Airport"
+  },
+  {
+    "nta2020": "QN8191",
+    "ntaname": "Flushing Meadows-Corona Park"
+  },
+  {
+    "nta2020": "QN8291",
+    "ntaname": "Forest Park"
+  },
+  {
+    "nta2020": "QN8381",
+    "ntaname": "John F. Kennedy International Airport"
+  },
+  {
+    "nta2020": "QN8491",
+    "ntaname": "Jamaica Bay (East)"
+  },
+  {
+    "nta2020": "QN8492",
+    "ntaname": "Jacob Riis Park-Fort Tilden-Breezy Point Tip"
+  },
+  {
+    "nta2020": "SI0101",
+    "ntaname": "St. George-New Brighton"
+  },
+  {
+    "nta2020": "SI0102",
+    "ntaname": "Tompkinsville-Stapleton-Clifton-Fox Hills"
+  },
+  {
+    "nta2020": "SI0103",
+    "ntaname": "Rosebank-Shore Acres-Park Hill"
+  },
+  {
+    "nta2020": "SI0104",
+    "ntaname": "West New Brighton-Silver Lake-Grymes Hill"
+  },
+  {
+    "nta2020": "SI0105",
+    "ntaname": "Westerleigh-Castleton Corners"
+  },
+  {
+    "nta2020": "SI0106",
+    "ntaname": "Port Richmond"
+  },
+  {
+    "nta2020": "SI0107",
+    "ntaname": "Mariner's Harbor-Arlington-Graniteville"
+  },
+  {
+    "nta2020": "SI0191",
+    "ntaname": "Snug Harbor"
+  },
+  {
+    "nta2020": "SI0201",
+    "ntaname": "Grasmere-Arrochar-South Beach-Dongan Hills"
+  },
+  {
+    "nta2020": "SI0202",
+    "ntaname": "New Dorp-Midland Beach"
+  },
+  {
+    "nta2020": "SI0203",
+    "ntaname": "Todt Hill-Emerson Hill-Lighthouse Hill-Manor Heights"
+  },
+  {
+    "nta2020": "SI0204",
+    "ntaname": "New Springville-Willowbrook-Bulls Head-Travis"
+  },
+  {
+    "nta2020": "SI0291",
+    "ntaname": "Freshkills Park (North)"
+  },
+  {
+    "nta2020": "SI0301",
+    "ntaname": "Oakwood-Richmondtown"
+  },
+  {
+    "nta2020": "SI0302",
+    "ntaname": "Great Kills-Eltingville"
+  },
+  {
+    "nta2020": "SI0303",
+    "ntaname": "Arden Heights-Rossville"
+  },
+  {
+    "nta2020": "SI0304",
+    "ntaname": "Annadale-Huguenot-Prince's Bay-Woodrow"
+  },
+  {
+    "nta2020": "SI0305",
+    "ntaname": "Tottenville-Charleston"
+  },
+  {
+    "nta2020": "SI0391",
+    "ntaname": "Freshkills Park (South)"
+  },
+  {
+    "nta2020": "SI9561",
+    "ntaname": "Fort Wadsworth"
+  },
+  {
+    "nta2020": "SI9591",
+    "ntaname": "Hoffman & Swinburne Islands"
+  },
+  {
+    "nta2020": "SI9592",
+    "ntaname": "Miller Field"
+  },
+  {
+    "nta2020": "SI9593",
+    "ntaname": "Great Kills Park"
+  }
+]
