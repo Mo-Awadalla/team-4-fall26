@@ -36,12 +36,12 @@ No route has a trailing slash, and the application does not redirect one onto th
 }
 ```
 
-The records represent cafés and other public third places from NYC Open Data. They are candidate gathering and study locations; the API must not imply that unverified amenities are available. This response shape belongs to the shared contract. Changes require review from frontend, API, data, and search owners.
+The records represent public third places from NYC Open Data — today the libraries and campuses of the city's facilities database. They are candidate gathering and study locations; the API must not imply that unverified amenities are available. This response shape belongs to the shared contract. Changes require review from frontend, API, data, and search owners.
 
-`category` currently takes one of `library`, `academic_library`, `university`, or `cafe`. The API does not constrain it: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration. `borough` is one of the five borough names and the database refuses any other. `neighborhood` is the 2020 Neighborhood Tabulation Area name and is `null` when NYC Open Data does not place the record in one.
+`category` currently takes one of `library`, `academic_library`, or `university`. `cafe` is part of the published vocabulary and has no source yet: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration. `borough` is one of the five borough names and the database refuses any other. `neighborhood` is the 2020 Neighborhood Tabulation Area name and is `null` when NYC Open Data does not place the record in one.
 
 ```{important}
-`university` is an addition to the previously agreed contract and still needs owner sign-off. It names the institution a spot belongs to, and only for records the importer takes from a curated campus list; it is never inferred, so every other spot leaves it `null`. It is not an endorsement or an access claim: a named campus does not mean the public may use the room.
+`university` is an addition to the previously agreed contract and still needs owner sign-off. It is proximity and nothing else: it names the closest campus within 500 metres, or the campus itself for a campus record, and is `null` when no campus is that close. The campus list is curated — the college and university records of the city's facilities database — and the field is never guessed from a spot's name, its operator, or anything else. It is not an affiliation, an endorsement, or an access claim: a named campus does not mean the institution is connected to the spot or that the public may use the room. In the example above, 169 metres separate a public library branch from a campus with no relationship to it.
 ```
 
 ## Listing study spots

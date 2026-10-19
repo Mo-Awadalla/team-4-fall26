@@ -74,13 +74,17 @@ migrate:
 makemigrations:
     cd src/backend && uv run python manage.py makemigrations
 
-# pytest exits 5 when it collects nothing, which is not a failure here: the data
-# suite arrives with the importer, on a different branch from the API.
-
 # Run the backend and data test suites. Needs Postgres: `just start-db`.
 test:
     cd src/backend && uv run pytest
-    cd data && uv run --project ../src/backend pytest . || [ "$?" -eq 5 ]
+    cd data && uv run --project ../src/backend pytest .
+
+# Regenerate data/spots.json from NYC Open Data, then `just load-data` to serve
+# it. The snapshot stays in version control, so this is only needed when the
+# upstream data or the mapping changes. Set NYC_OPEN_DATA_APP_TOKEN in .env for
+# a personal rate limit instead of the shared anonymous one.
+ingest:
+    cd data && uv run --project ../src/backend python ingest.py
 
 # Copy data/spots.json into the local database.
 load-data:
