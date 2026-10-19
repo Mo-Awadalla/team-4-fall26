@@ -38,7 +38,13 @@ No route has a trailing slash, and the application does not redirect one onto th
 
 The records represent public third places from NYC Open Data — today the libraries and campuses of the city's facilities database. They are candidate gathering and study locations; the API must not imply that unverified amenities are available. This response shape belongs to the shared contract. Changes require review from frontend, API, data, and search owners.
 
-`category` currently takes one of `library`, `academic_library`, `university`, or `university_building`. `university_building` is a campus building a student can work in; the city's facilities database registers institutions and administrative points rather than buildings, so these come from the curated list in `data/nyu_buildings.json` and all carry the `nyu:` identifier prefix. `cafe` is part of the published vocabulary and has no source yet: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
+`category` currently takes one of `cafe`, `public_library`, `special_library`, `academic_library` and `university_building`.
+
+`public_library` and `special_library` are kept apart because the difference is the one a reader cares about: a branch of NYPL, BPL or QPL is somewhere anyone can walk into, while a special library is an institutional collection — a club's, a society's, a hospital's — and many are open by appointment or to members only.
+
+`university_building` is a campus building a student can work in. The city's facilities database registers institutions and administrative points rather than buildings, so these come from the curated list in `data/nyu_buildings.json` and all carry the `nyu:` identifier prefix. The institution records themselves are *not* published: an administrative point is not a room, and campus access is restricted. They are read only to anchor the `university` label.
+
+`cafe` comes from the outdoor-dining licence register: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
 sits within 25 m, derived from `yjub-udmw`. False means none is recorded, which
 is not the same as there being no Wi-Fi: a campus building's network needs the
 university's credentials, and the city has no reason to know about it. The field
