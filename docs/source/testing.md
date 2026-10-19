@@ -8,7 +8,9 @@ Tests live with the code they verify.
 | Study-spot routes | `src/backend/spots/tests/test_spots_api.py` | pytest with pytest-django |
 | Dataset loader | `src/backend/spots/tests/test_load_spots.py` | pytest with pytest-django |
 | Data import | `data/test_ingest.py` | pytest |
-| Full system | `tests/e2e/` | Playwright |
+| Search ranking | `src/backend/spots/tests/test_search.py` | pytest with pytest-django |
+| Filter counts | `src/backend/spots/tests/test_facets.py` | pytest with pytest-django |
+| A running deployment | `tests/e2e/` | pytest over HTTP |
 
 Run every currently supported check:
 
@@ -26,6 +28,34 @@ just test
 ```
 
 Both `just check` and `just test` run on every pull request and on the pre-push hook.
+
+## End-to-end tests are separate
+
+`tests/e2e/` drives a *running* StudySpot over HTTP, so it needs a base URL and
+is skipped without one:
+
+```shell
+STUDYSPOT_E2E_URL=https://d1ulyrfyi06kwp.cloudfront.net just test-e2e
+```
+
+It is deliberately outside `just check` and `just test`, which have to pass on
+a checkout with nothing running.
+
+These exist because every other suite substitutes something for the part it is
+not testing -- a test database, a mocked `fetch`, committed fixtures -- so none
+of them can see a failure in the seams: CloudFront routing `/api/*` to the
+wrong origin, a migration never applied, a deployed database nobody loaded. The
+first run of this suite found exactly such a bug, a mistyped URL serving a raw
+S3 error document instead of the application's 404 page.
+
+They assert invariants rather than counts, because `data/spots.json` is
+regenerated whenever the upstream data changes and a test pinned to "48 spots
+in the Bronx" would fail on a perfectly good snapshot. Everything in them is a
+`GET`, so they are safe to run against the deployed site.
+
+They do not drive a browser. Component behaviour is covered by the frontend
+suite, which runs in a real browser against a mocked API; nothing currently
+tests a real browser against a real API, and `tests/e2e/README.md` says so.
 
 ## The tests need Postgres
 

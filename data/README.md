@@ -32,26 +32,47 @@ its errors name the record and the loader's arrive at deployment time.
 
 ## Where the records come from
 
-One dataset: the city's [Facilities Database][facdb] (FacDB, Socrata `ji82-xba5`), which is what
-the `facdb:` identifier prefix refers to. Two subsets of it are places a student might read in —
-the `LIBRARIES` facility group and the `COLLEGES OR UNIVERSITIES` subgroup — which is 380 public,
-academic, and institutional libraries and campuses across the five boroughs. Neighborhood names
-come from a second dataset, the [2020 Neighborhood Tabulation Areas][nta] (`9nt8-h7nd`), because
-FacDB publishes the NTA code and not its name.
+The city's [Facilities Database][facdb] (FacDB, Socrata `ji82-xba5`), which is what the `facdb:`
+identifier prefix refers to. Two subsets of it are places a student might read in — the
+`LIBRARIES` facility group and the `COLLEGES OR UNIVERSITIES` subgroup — which is 390 public,
+academic, and institutional libraries and campuses across the five boroughs.
+
+Cafés come from [Dining Out NYC][dining] (`fpeh-f7ci`), the city's register of outdoor-dining
+licences and what the `dining:` prefix refers to. Only `Issued` `Sidewalk` licences: the register
+also carries applications that were never granted, and a café that does not exist is worse than
+one the snapshot omits, while a `Roadway` licence is a dining structure in a parking lane rather
+than somewhere to sit with a laptop. That is about 1,650 storefronts.
+
+Neighborhood names come from the [2020 Neighborhood Tabulation Areas][nta] (`9nt8-h7nd`), because
+both registers publish the NTA code and not its name — which is the reason cafés could join this
+snapshot at all, without a point-in-polygon test against the boundary geometry.
 
 Requests identify themselves and page politely. `NYC_OPEN_DATA_APP_TOKEN` raises the rate limit
 from the shared anonymous pool to a personal one; the importer runs without it, and the token is
 read from the environment so it never reaches version control.
 
-FacDB lists no cafés, so no record maps to the published `cafe` category yet. The obvious
-candidate, the health department's restaurant inspection results, is an inspection log rather
-than a directory of open businesses: it keeps establishments that closed years ago and carries no
-2020 NTA, so publishing it as study spots would assert more than the data supports. A café source
-is an open question, not a missing line of code.
+FacDB itself lists no cafés, and never will: it is a register of facilities the city *operates*,
+while a café is a business the city *licenses*. Looking only there is what made the `cafe`
+category look sourceless for so long.
+
+The health department's restaurant inspection results remain the wrong answer. That is an
+inspection log rather than a directory of open businesses: it keeps establishments that closed
+years ago and carries no 2020 NTA, so publishing it as study spots would assert more than the
+data supports.
+
+What a licence does and does not say is worth stating. It says the business was granted the right
+to put tables on the sidewalk, which is good evidence the place exists and has seating. It says
+nothing about hours, Wi-Fi, power, noise, or whether anyone may sit with a laptop and one coffee
+for three hours. The contract has no field for any of that and the application promises none.
 
 ## Identifiers
 
-An identifier is the source prefix and FacDB's own `uid`, as in
+A café identifier is `dining:` and a digest of the name and address, as in
+`dining:f56fccab0d4bb1ba`. Dining Out publishes no row identifier that survives a re-licensing,
+so identity has to be derived, and name plus address is what distinguishes one storefront from
+another and stays put between runs. One storefront holding two licences is therefore one spot.
+
+A facility identifier is the source prefix and FacDB's own `uid`, as in
 `facdb:eec118768e15a5e03d3354abda7b00da`. The digest is upstream's, derived from the source
 record, and the importer treats it as the record's identity rather than computing one of its own.
 
@@ -65,9 +86,11 @@ FacDB if its keys ever look the same.
 
 ## Categories
 
-`library`, `academic_library`, `university`, and `cafe` are the published vocabulary. The model
-leaves `category` a free string on purpose, so the vocabulary lives in `ingest.py`, keyed on
-FacDB's most specific facility type. A type nobody has mapped fails the import rather than
+`library`, `academic_library`, `university`, `university_building` and `cafe` are the published
+vocabulary. The model leaves `category` a free string on purpose, so the vocabulary lives in
+`ingest.py`. The FacDB categories are keyed on its most specific facility type; `cafe` is not
+keyed on anything, because a sidewalk licence says the place serves food outdoors and not what
+kind of place it is, so there is nothing finer to map. A type nobody has mapped fails the import rather than
 landing in a near-enough bucket: inventing a category would publish a guess as data, and mapping
 it to the closest existing one would bury the fact that FacDB changed.
 
@@ -94,5 +117,6 @@ A named campus is not an affiliation, an endorsement, or a claim that anyone may
 hundred and sixty-nine metres is what the data says about "125th Street Library" and "Touro
 University - Harlem", and it says nothing more than that.
 
+[dining]: https://data.cityofnewyork.us/resource/fpeh-f7ci
 [facdb]: https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5
 [nta]: https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd

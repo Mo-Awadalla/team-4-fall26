@@ -123,10 +123,26 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # No custom_error_response blocks. They apply to every behavior in the
-  # distribution, so mapping 404 to the SvelteKit shell would also rewrite the
-  # API's own 404 and 503 bodies into HTML. site-rewrite.js handles the frontend
-  # case at the edge instead, leaving API errors untouched.
+  # Custom error responses apply to every behavior in the distribution, which
+  # is why only 403 is mapped and 404 is left alone. Mapping 404 would rewrite
+  # the API's own `not_found` envelope into HTML, and a client parsing JSON
+  # would get a page instead.
+  #
+  # 403 is unambiguous here: the API has no authentication and never returns
+  # one, so the only thing that produces it is S3. A missing key reads as
+  # AccessDenied rather than NoSuchKey because the OAC policy deliberately
+  # grants GetObject and not ListBucket -- without permission to list, S3 will
+  # not confirm that a key is absent. Left unmapped, a mistyped URL served the
+  # visitor a raw S3 XML error document.
+  #
+  # The short TTL keeps a genuine 403 during a deployment -- a file uploaded a
+  # moment later -- from being cached as missing for an hour.
+  custom_error_response {
+    error_code            = 403
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 10
+  }
 
   restrictions {
     geo_restriction {

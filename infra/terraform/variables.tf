@@ -16,7 +16,20 @@ variable "project" {
 }
 
 variable "environment" {
-  description = "Deployment environment. Used in resource names, so one account can hold several."
+  description = <<-EOT
+    Deployment environment. Used in resource names, so one account can hold
+    several.
+
+    It is not a branch name and does not track one: the repository integrates
+    on develop and releases on main, while this names a stack.
+
+    Changing it on a stack that already exists replaces that stack. It feeds
+    name_prefix, which names the database, the site bucket, both Lambda
+    functions, their log groups and the database secret, and Terraform renames
+    none of those in place -- it destroys and recreates them, taking the
+    database and everything uploaded to the bucket with them. Create a second
+    stack with a different value; do not rename a live one.
+  EOT
   type        = string
   default     = "staging"
 
