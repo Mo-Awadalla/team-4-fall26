@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 
+	import { mapsUrl } from './maps';
 	import type { StudySpot } from './contract';
 
 	type Props = {
@@ -110,6 +111,22 @@
 						{/if}
 					</p>
 				{/if}
+
+				<p class="actions">
+					<!--
+						A link, not an embedded map: it opens the viewer's own maps app with
+						the place pinned, where walking and subway directions are one tap
+						away. Nothing is loaded from anyone else to render this card.
+					-->
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+					<a class="maps" href={mapsUrl(spot)} rel="noreferrer noopener" target="_blank">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+							<circle cx="12" cy="10" r="2.4" />
+						</svg>
+						Maps
+					</a>
+				</p>
 			</li>
 		{/each}
 	</ul>
@@ -210,6 +227,40 @@
 	.badge svg {
 		width: 15px;
 		flex: none;
+		fill: none;
+		stroke: currentColor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 2;
+	}
+
+	.actions {
+		display: flex;
+		gap: 10px;
+		margin: 14px 0 0;
+		padding-top: 14px;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.maps {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		min-height: 34px;
+		padding: 0 14px;
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+		font-size: 13px;
+		font-weight: 650;
+		transition: border-color 160ms ease;
+	}
+
+	.maps:hover {
+		border-color: var(--color-text);
+	}
+
+	.maps svg {
+		width: 15px;
 		fill: none;
 		stroke: currentColor;
 		stroke-linecap: round;

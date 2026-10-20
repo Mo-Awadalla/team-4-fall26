@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { StudySpot } from '$lib/contract';
+	import { mapsUrl } from '$lib/maps';
 	import type { Nearby, NearestStation } from '$lib/server/snapshot';
 
 	let { data }: { data: { spot: StudySpot; nearby: Nearby[]; station: NearestStation | null } } =
@@ -41,11 +42,9 @@
 		return metres < 100 ? `${Math.round(metres / 10) * 10} m` : `${Math.round(metres / 50) * 50} m`;
 	}
 
-	// A plain geo link: it opens the viewer's own map application and needs no
-	// API key, no script from anyone else, and no request on page load.
-	const directions = $derived(
-		`https://www.openstreetmap.org/?mlat=${spot.latitude}&mlon=${spot.longitude}#map=18/${spot.latitude}/${spot.longitude}`
-	);
+	// The same target the result cards use: a hyperlink that opens the viewer's
+	// own maps app, where walking and subway directions are one tap away.
+	const directions = $derived(mapsUrl(spot));
 </script>
 
 <svelte:head>
@@ -146,13 +145,13 @@
 			</dl>
 
 			<!--
-				An absolute URL to openstreetmap.org, which opens the viewer's own map
-				application. resolve() is for this application's own routes, and the
-				rule cannot tell that a derived string is external.
+				An absolute URL to Google Maps. resolve() is for this application's
+				own routes, and the rule cannot tell that a derived string is
+				external.
 			-->
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a class="directions" href={directions} rel="noreferrer noopener" target="_blank">
-				Open in a map ↗
+				Open in Maps ↗
 			</a>
 		</article>
 
