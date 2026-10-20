@@ -21,7 +21,8 @@ function page(total: number, count = total, offset = 0): SpotPage {
 			subway_station: 'Bedford Av',
 			subway_routes: 'L',
 			subway_metres: 180,
-			subway_step_free: 'none'
+			subway_step_free: 'none',
+			nearby_spots: 12
 		})),
 		pagination: {
 			limit: 20,

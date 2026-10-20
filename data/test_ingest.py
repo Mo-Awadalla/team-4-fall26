@@ -50,6 +50,7 @@ PUBLISHED_EXAMPLE = {
     "subway_routes": None,
     "subway_metres": None,
     "subway_step_free": None,
+    "nearby_spots": 0,
 }
 
 #: The published vocabulary. `university_building` is a campus building a
@@ -530,6 +531,7 @@ class TestCuratedBuildings:
                         "subway_routes": None,
                         "subway_metres": None,
                         "subway_step_free": None,
+                        "nearby_spots": 0,
                     }.items()
                 )
             )

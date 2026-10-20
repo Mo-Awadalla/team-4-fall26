@@ -170,6 +170,18 @@ class StudySpot(models.Model):
         ),
     )
 
+    nearby_spots = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        help_text=(
+            "How many other study spots are within 400 m, about a five-minute walk. "
+            "A count of places, not of people: a cafe on a dense stretch may be "
+            "empty and an isolated library may be packed. It says how busy the "
+            "surrounding streets are, and whether there is anywhere else to go if "
+            "this one is full."
+        ),
+    )
+
     free_public_wifi = models.BooleanField(
         default=False,
         help_text=(
@@ -260,6 +272,7 @@ class StudySpot(models.Model):
             models.Index(Upper("university"), name="spots_university_idx"),
             models.Index(fields=["free_public_wifi"], name="spots_wifi_idx"),
             models.Index(fields=["no_purchase_needed"], name="spots_cost_idx"),
+            models.Index(fields=["nearby_spots"], name="spots_nearby_idx"),
             # Trigram indexes for the ranked search in spots/search.py. A GIN
             # index with gin_trgm_ops is what turns a similarity comparison
             # from a scan of every row into an index lookup, and it serves the

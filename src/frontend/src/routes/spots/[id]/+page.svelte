@@ -108,6 +108,22 @@
 					</dd>
 				{/if}
 
+				<dt>Options nearby</dt>
+				<dd>
+					{#if spot.nearby_spots === 0}
+						Nothing else within a five-minute walk.
+						<span class="note">If it is full, the next place is a longer trip.</span>
+					{:else}
+						{spot.nearby_spots}
+						other study {spot.nearby_spots === 1 ? 'spot' : 'spots'} within a five-minute walk.
+						<!--
+							Places, not people. The card's Quiet/Moderate/Busy reads off
+							this same number; here it is the number itself, because a
+							detail page is where someone decides whether to make the trip.
+						-->
+					{/if}
+				</dd>
+
 				<dt>Cost</dt>
 				<dd>
 					{#if spot.no_purchase_needed}

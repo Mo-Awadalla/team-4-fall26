@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 
+	import Busyness from './Busyness.svelte';
 	import { mapsUrl } from './maps';
 	import { orderByTrunk, routeColour, routeTextColour, walkMinutes } from './subway';
 	import type { StudySpot } from './contract';
@@ -174,6 +175,8 @@
 						{/if}
 					</p>
 				{/if}
+
+				<Busyness nearby={spot.nearby_spots} />
 
 				<p class="actions">
 					<!--

@@ -41,6 +41,7 @@ class StudySpotSerializer(serializers.ModelSerializer):
             "subway_routes",
             "subway_metres",
             "subway_step_free",
+            "nearby_spots",
         ]
 
 
