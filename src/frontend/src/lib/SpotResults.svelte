@@ -244,6 +244,8 @@
 	}
 
 	li {
+		display: flex;
+		flex-direction: column;
 		padding: 20px;
 		border: 1px solid var(--color-border);
 		border-radius: 18px;
@@ -342,10 +344,17 @@
 		stroke-width: 2;
 	}
 
+	/*
+		`auto` on the top margin, not a fixed 14px: the cards are grid items and
+		stretch to the tallest in their row, so a fixed margin left this row
+		floating at a different height in every card. An address that wraps to
+		two lines is enough to break the line-up.
+	*/
 	.actions {
 		display: flex;
 		gap: 10px;
-		margin: 14px 0 0;
+		margin: 18px 0 0;
+		margin-top: auto;
 		padding-top: 14px;
 		border-top: 1px solid var(--color-border);
 	}
@@ -363,9 +372,16 @@
 		transition: border-color 160ms ease;
 	}
 
+	/*
+		The margin reset matters: the "Show more" rule below sets
+		`margin: 28px auto 0`, which also matched this button and pushed it 28px
+		down and `auto` across — the two sat at different heights and drifted
+		apart.
+	*/
 	.actions button {
 		display: inline-flex;
 		min-height: 34px;
+		margin: 0;
 		align-items: center;
 		gap: 6px;
 		padding: 0 14px;
