@@ -102,6 +102,7 @@ CONTRACT_FIELDS = {
     "subway_routes",
     "subway_metres",
     "subway_step_free",
+    "nearby_spots",
 }
 
 

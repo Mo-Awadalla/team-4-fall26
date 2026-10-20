@@ -133,6 +133,7 @@ class TestEveryContractFieldIsWritten:
             "subway_routes": "A B C D E F M",
             "subway_metres": 409,
             "subway_step_free": "full",
+            "nearby_spots": 41,
         }
         assert set(record) == CONTRACT_FIELDS, "the fixture must cover the whole contract"
 

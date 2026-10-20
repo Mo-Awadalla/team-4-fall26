@@ -232,6 +232,7 @@ class TestOneSpot:
             "subway_routes",
             "subway_metres",
             "subway_step_free",
+            "nearby_spots",
         }
 
     def test_an_unknown_identifier_is_a_404(self) -> None:

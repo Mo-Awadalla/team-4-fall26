@@ -29,6 +29,7 @@ function spot(overrides: Partial<StudySpot> = {}): StudySpot {
 		subway_routes: null,
 		subway_metres: null,
 		subway_step_free: null,
+		nearby_spots: 0,
 		...overrides
 	};
 }

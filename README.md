@@ -42,7 +42,8 @@ The shared study-spot summary contract is intentionally small:
   "subway_station": "125 St",
   "subway_routes": "4 5 6",
   "subway_metres": 180,
-  "subway_step_free": "full"
+  "subway_step_free": "full",
+  "nearby_spots": 23
 }
 ```
 

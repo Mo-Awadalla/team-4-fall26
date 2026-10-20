@@ -15,7 +15,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:kimmel-center",
@@ -33,7 +34,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:courant-institute",
@@ -51,7 +53,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:stern-tisch-hall",
@@ -69,7 +72,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:silver-center",
@@ -87,7 +91,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:tandon-dibner-library",
@@ -105,7 +110,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:tandon-rogers-hall",
@@ -123,7 +129,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:global-center",
@@ -141,7 +148,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:60-fifth-avenue",
@@ -159,7 +167,8 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:paulson-center",
@@ -177,6 +186,7 @@
     "subway_station": null,
     "subway_routes": null,
     "subway_metres": null,
-    "subway_step_free": null
+    "subway_step_free": null,
+    "nearby_spots": 0
   }
 ]

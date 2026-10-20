@@ -76,6 +76,14 @@ export type StudySpot = {
 	subway_routes: string | null;
 	subway_metres: number | null;
 	subway_step_free: string | null;
+	/**
+	 * How many other study spots are within 400 m, about a five-minute walk.
+	 *
+	 * A count of places, not of people: a café on a dense stretch may be empty
+	 * and an isolated library may be packed. It says how lively the surrounding
+	 * block is, and whether there is anywhere else to go if this one is full.
+	 */
+	nearby_spots: number;
 };
 
 /** One value a filter can take, with how many spots carry it. */

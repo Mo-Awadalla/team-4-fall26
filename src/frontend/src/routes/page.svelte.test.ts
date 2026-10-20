@@ -43,7 +43,8 @@ function spot(id: string, name: string): StudySpot {
 		subway_station: 'W 4 St-Wash Sq',
 		subway_routes: 'A C E',
 		subway_metres: 409,
-		subway_step_free: 'full'
+		subway_step_free: 'full',
+		nearby_spots: 41
 	};
 }
 
