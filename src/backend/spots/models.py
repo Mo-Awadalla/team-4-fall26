@@ -25,31 +25,6 @@ MAX_LIMIT = 100
 #: Filter values are trimmed, must not be blank, and are bounded.
 MAX_FILTER_LENGTH = 120
 
-#: Categories where sitting down costs nothing.
-#:
-#: This answers the question a student actually asks -- "can I work here without
-#: buying something?" -- which no single category answers: it is true of all the
-#: libraries and of the campus buildings, and false only of cafes.
-#:
-#: **It is about money and not about entry.** A special library may be open by
-#: appointment, an academic library may want a university ID, and an NYU
-#: building wants NYU credentials. The contract has no field for access and the
-#: application promises none; this one says only that nobody will ask you to buy
-#: a coffee.
-#:
-#: An allowlist rather than its inverse, so that a category added upstream is
-#: not silently published as free. The vocabulary belongs to ``data/ingest.py``
-#: and this is the one place the API has an opinion about it, so the two have to
-#: be changed together.
-NO_PURCHASE_CATEGORIES = frozenset(
-    {
-        "public_library",
-        "special_library",
-        "academic_library",
-        "university_building",
-    }
-)
-
 
 class Borough(models.TextChoices):
     """The five New York City boroughs."""
@@ -150,6 +125,17 @@ class StudySpot(models.Model):
         ),
     )
 
+    no_purchase_needed = models.BooleanField(
+        default=False,
+        help_text=(
+            "Whether sitting down here costs nothing. True of every library and "
+            "campus building, false only of cafes. About money rather than entry: "
+            "a campus building is free and still wants the university's "
+            "credentials. Derived by the importer from the category, like every "
+            "other field that follows from the data rather than coming with it."
+        ),
+    )
+
     free_public_wifi = models.BooleanField(
         default=False,
         help_text=(
@@ -239,6 +225,7 @@ class StudySpot(models.Model):
             models.Index(Upper("borough"), name="spots_borough_idx"),
             models.Index(Upper("university"), name="spots_university_idx"),
             models.Index(fields=["free_public_wifi"], name="spots_wifi_idx"),
+            models.Index(fields=["no_purchase_needed"], name="spots_cost_idx"),
             # Trigram indexes for the ranked search in spots/search.py. A GIN
             # index with gin_trgm_ops is what turns a similarity comparison
             # from a scan of every row into an index lookup, and it serves the

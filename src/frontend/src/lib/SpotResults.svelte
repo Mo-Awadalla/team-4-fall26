@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	import type { StudySpot } from './contract';
 
 	type Props = {
@@ -42,7 +44,14 @@
 	<ul>
 		{#each spots as spot (spot.id)}
 			<li>
-				<h3>{spot.name}</h3>
+				<h3>
+					<!--
+						Every detail page is prerendered, so this is a real document
+						rather than a route the browser has to assemble: the link
+						works on a fresh tab, in a shared message, and to a crawler.
+					-->
+					<a href={resolve(`/spots/${spot.id}` as '/')}>{spot.name}</a>
+				</h3>
 				<p class="meta">
 					<span class="category">{readableCategory(spot.category)}</span>
 					<span aria-hidden="true">·</span>
@@ -141,6 +150,10 @@
 		border: 1px solid var(--color-border);
 		border-radius: 18px;
 		background: white;
+	}
+
+	h3 a:hover {
+		text-decoration: underline;
 	}
 
 	h3 {
