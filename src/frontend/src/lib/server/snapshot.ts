@@ -47,7 +47,17 @@ function findSnapshot(): string {
 	}
 }
 
+export type Station = {
+	name: string;
+	routes: string[];
+	latitude: number;
+	longitude: number;
+	/** `full`, `partial` (one direction only), or `none`. The MTA's own three. */
+	step_free: 'full' | 'partial' | 'none';
+};
+
 let cached: StudySpot[] | null = null;
+let cachedStations: Station[] | null = null;
 
 /** Every spot in the committed snapshot. */
 export function allSpots(): StudySpot[] {
@@ -63,8 +73,19 @@ export function spotById(id: string): StudySpot | undefined {
 	return allSpots().find((spot) => spot.id === id);
 }
 
+/** Every subway station, from the committed list. */
+export function allStations(): Station[] {
+	if (cachedStations === null) {
+		const path = findSnapshot().replace('spots.json', 'subway_stations.json');
+		cachedStations = JSON.parse(readFileSync(path, 'utf-8')) as Station[];
+	}
+	return cachedStations;
+}
+
+type Point = { latitude: number; longitude: number };
+
 /** Metres between two points on the earth, by the haversine formula. */
-function metresBetween(a: StudySpot, b: StudySpot): number {
+function metresBetween(a: Point, b: Point): number {
 	const EARTH_RADIUS_METRES = 6_371_000;
 	const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 
@@ -94,4 +115,33 @@ export function nearbySpots(spot: StudySpot, limit = 4, within = 800): Nearby[] 
 		.filter((candidate) => candidate.metres <= within)
 		.sort((a, b) => a.metres - b.metres || a.spot.name.localeCompare(b.spot.name))
 		.slice(0, limit);
+}
+
+export type NearestStation = { station: Station; metres: number };
+
+/**
+ * The closest subway station, or `null` when none is within a reasonable walk.
+ *
+ * 91% of spots have one inside 800 m; 89 are more than 1.2 km from any, mostly
+ * on Staten Island, where the railway is not the subway. Past the cutoff the
+ * honest answer is that there isn't one nearby, rather than a number no one
+ * would act on -- the furthest is 7.7 km.
+ *
+ * Measured to the station rather than to an entrance. The MTA publishes
+ * entrances too and they would be closer to the truth, but a station can span
+ * two avenues and an entrance list invites a precision the rest of this
+ * snapshot does not have: the spot coordinates are themselves building
+ * centroids.
+ */
+export function nearestStation(spot: StudySpot, within = 1200): NearestStation | null {
+	let best: NearestStation | null = null;
+
+	for (const station of allStations()) {
+		const metres = metresBetween(spot, station);
+		if (metres <= within && (best === null || metres < best.metres)) {
+			best = { station, metres };
+		}
+	}
+
+	return best;
 }

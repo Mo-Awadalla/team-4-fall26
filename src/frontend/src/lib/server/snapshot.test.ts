@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { allSpots, nearbySpots, spotById } from './snapshot';
+import { allSpots, allStations, nearbySpots, nearestStation, spotById } from './snapshot';
 
 describe('reading the snapshot', () => {
 	it('finds the committed file', () => {
@@ -110,5 +110,61 @@ describe('what is nearby', () => {
 		const [nearest] = nearbySpots(anchor!, 1, 1000);
 		expect(nearest.metres).toBeGreaterThan(0);
 		expect(nearest.metres).toBeLessThan(200);
+	});
+});
+
+describe('the nearest subway', () => {
+	const bobst = spotById('nyu:bobst-library');
+
+	it('reads the committed station list', () => {
+		expect(allStations().length).toBeGreaterThan(400);
+	});
+
+	it('merges a complex into one station', () => {
+		// The MTA publishes one row per line, so W 4 St-Wash Sq arrives twice --
+		// as "A C E" and as "B D F M" at identical coordinates. Unmerged, a page
+		// would show half the trains.
+		const w4 = allStations().filter((station) => station.name.startsWith('W 4 St'));
+		expect(w4).toHaveLength(1);
+		expect(w4[0].routes).toEqual(expect.arrayContaining(['A', 'C', 'E', 'B', 'D', 'F', 'M']));
+	});
+
+	it('finds the closest one, not merely a close one', () => {
+		const found = nearestStation(bobst!);
+		expect(found).not.toBeNull();
+
+		const closest = allStations()
+			.map((station) => ({
+				station,
+				metres: Math.hypot(
+					(station.latitude - bobst!.latitude) * 111_000,
+					(station.longitude - bobst!.longitude) * 84_000
+				)
+			}))
+			.sort((a, b) => a.metres - b.metres)[0];
+		expect(found!.station.name).toBe(closest.station.name);
+	});
+
+	it('returns nothing when none is within the cutoff', () => {
+		// Rather than a number nobody would act on: the furthest spot from any
+		// station is 7.7 km away, on Staten Island.
+		expect(nearestStation(bobst!, 1)).toBeNull();
+	});
+
+	it('reports one of the three accessibility states', () => {
+		for (const station of allStations()) {
+			expect(['full', 'partial', 'none']).toContain(station.step_free);
+		}
+	});
+
+	it('places every station inside the city', () => {
+		// The same check the importer now applies to spots, after one arrived
+		// geocoded into Massachusetts Bay.
+		for (const station of allStations()) {
+			expect(station.latitude).toBeGreaterThan(40.47);
+			expect(station.latitude).toBeLessThan(40.93);
+			expect(station.longitude).toBeGreaterThan(-74.3);
+			expect(station.longitude).toBeLessThan(-73.68);
+		}
 	});
 });

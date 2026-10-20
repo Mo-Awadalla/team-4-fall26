@@ -1,9 +1,25 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { StudySpot } from '$lib/contract';
-	import type { Nearby } from '$lib/server/snapshot';
+	import type { Nearby, NearestStation } from '$lib/server/snapshot';
 
-	let { data }: { data: { spot: StudySpot; nearby: Nearby[] } } = $props();
+	let { data }: { data: { spot: StudySpot; nearby: Nearby[]; station: NearestStation | null } } =
+		$props();
+
+	/**
+	 * How the MTA's three accessibility states read.
+	 *
+	 * `partial` is one direction only -- a platform you can reach going one way
+	 * and not the other -- which is worth saying rather than rounding to either
+	 * of the others. `none` is stated rather than left out: for someone who
+	 * needs step-free access, silence is the one unhelpful answer, and here the
+	 * MTA is making a positive claim rather than failing to record one.
+	 */
+	const STEP_FREE: Record<string, string> = {
+		full: 'step-free',
+		partial: 'step-free in one direction only',
+		none: 'no step-free access'
+	};
 
 	const spot = $derived(data.spot);
 
@@ -89,6 +105,19 @@
 						someone decides whether they are allowed in.
 					-->
 					<dd>{spot.university} <span class="note">— nearby, not affiliated</span></dd>
+				{/if}
+
+				{#if data.station}
+					<dt>Nearest subway</dt>
+					<dd>
+						{data.station.station.name}
+						<span class="routes">{data.station.station.routes.join(' ')}</span>
+						<span class="note">
+							— {walkingDistance(data.station.metres)} away, {STEP_FREE[
+								data.station.station.step_free
+							]}
+						</span>
+					</dd>
 				{/if}
 
 				<dt>Cost</dt>
@@ -265,6 +294,17 @@
 		margin: 6px 0 0;
 		font-size: 15px;
 		line-height: 1.55;
+	}
+
+	.routes {
+		display: inline-block;
+		padding: 1px 7px;
+		border-radius: 999px;
+		color: white;
+		background: var(--color-text);
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.06em;
 	}
 
 	.note {
