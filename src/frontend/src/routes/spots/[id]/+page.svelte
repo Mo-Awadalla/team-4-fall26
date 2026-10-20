@@ -1,0 +1,346 @@
+<script lang="ts">
+	import { resolve } from '$app/paths';
+	import type { StudySpot } from '$lib/contract';
+	import type { Nearby } from '$lib/server/snapshot';
+
+	let { data }: { data: { spot: StudySpot; nearby: Nearby[] } } = $props();
+
+	const spot = $derived(data.spot);
+
+	/**
+	 * The importer's vocabulary is snake_case because the category belongs to
+	 * the data. Presenting it is this page's job, as it is the card's.
+	 */
+	function readableCategory(category: string): string {
+		const words = category.replace(/_/g, ' ');
+		return words.charAt(0).toUpperCase() + words.slice(1);
+	}
+
+	function place(of: StudySpot): string {
+		return of.neighborhood ? `${of.neighborhood}, ${of.borough}` : of.borough;
+	}
+
+	/** Rounded, because a metre of precision would be false confidence. */
+	function walkingDistance(metres: number): string {
+		return metres < 100 ? `${Math.round(metres / 10) * 10} m` : `${Math.round(metres / 50) * 50} m`;
+	}
+
+	// A plain geo link: it opens the viewer's own map application and needs no
+	// API key, no script from anyone else, and no request on page load.
+	const directions = $derived(
+		`https://www.openstreetmap.org/?mlat=${spot.latitude}&mlon=${spot.longitude}#map=18/${spot.latitude}/${spot.longitude}`
+	);
+</script>
+
+<svelte:head>
+	<title>{spot.name} — StudySpot</title>
+	<meta
+		name="description"
+		content="{spot.name}, {readableCategory(spot.category).toLowerCase()} in {place(spot)}."
+	/>
+</svelte:head>
+
+<div class="page">
+	<header>
+		<a class="brand" href={resolve('/')} aria-label="StudySpot home">
+			<svg viewBox="0 0 32 32" aria-hidden="true">
+				<path d="M7 7.5h18v17H7z"></path>
+				<path d="M11 12h10M11 16h10M11 20h6"></path>
+			</svg>
+			<span>StudySpot</span>
+		</a>
+	</header>
+
+	<main>
+		<a class="back" href={resolve('/')}>← All study spots</a>
+
+		<article>
+			<p class="eyebrow">{readableCategory(spot.category)}</p>
+			<h1>{spot.name}</h1>
+			<p class="where">{place(spot)}</p>
+
+			{#if spot.no_purchase_needed || spot.free_public_wifi}
+				<p class="badges">
+					{#if spot.no_purchase_needed}
+						<span class="badge">No purchase needed</span>
+					{/if}
+					{#if spot.free_public_wifi}
+						<span class="badge">Free public Wi-Fi</span>
+					{/if}
+				</p>
+			{/if}
+
+			<dl>
+				{#if spot.address}
+					<dt>Address</dt>
+					<dd>{spot.address}</dd>
+				{/if}
+
+				{#if spot.operator && spot.operator !== spot.name}
+					<dt>Run by</dt>
+					<dd>{spot.operator}</dd>
+				{/if}
+
+				{#if spot.university}
+					<dt>Nearest campus</dt>
+					<!--
+						Proximity and never affiliation. Spelled out here rather than
+						left to a reader's assumption, because a detail page is where
+						someone decides whether they are allowed in.
+					-->
+					<dd>{spot.university} <span class="note">— nearby, not affiliated</span></dd>
+				{/if}
+
+				<dt>Cost</dt>
+				<dd>
+					{#if spot.no_purchase_needed}
+						Nothing to sit down.
+						<span class="note">About money, not entry: some places still ask who you are.</span>
+					{:else}
+						A purchase is expected.
+					{/if}
+				</dd>
+
+				<dt>Wi-Fi</dt>
+				<dd>
+					{#if spot.free_public_wifi}
+						A free public hotspot the city publishes sits within 25 m.
+					{:else}
+						<!--
+							The careful wording the whole contract turns on: false means
+							unrecorded, not absent.
+						-->
+						No free public hotspot is recorded within 25 m.
+						<span class="note">That is not the same as having no Wi-Fi.</span>
+					{/if}
+				</dd>
+			</dl>
+
+			<!--
+				An absolute URL to openstreetmap.org, which opens the viewer's own map
+				application. resolve() is for this application's own routes, and the
+				rule cannot tell that a derived string is external.
+			-->
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+			<a class="directions" href={directions} rel="noreferrer noopener" target="_blank">
+				Open in a map ↗
+			</a>
+		</article>
+
+		{#if data.nearby.length > 0}
+			<section aria-labelledby="nearby-title">
+				<h2 id="nearby-title">Also within a short walk</h2>
+				<ul>
+					{#each data.nearby as entry (entry.spot.id)}
+						<li>
+							<a href={resolve(`/spots/${entry.spot.id}` as '/')}>
+								<span class="name">{entry.spot.name}</span>
+								<span class="meta">
+									{readableCategory(entry.spot.category)} · {walkingDistance(entry.metres)} away
+								</span>
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
+	</main>
+</div>
+
+<style>
+	.page {
+		min-height: 100vh;
+		padding: 0 24px 64px;
+	}
+
+	header,
+	main {
+		width: min(760px, 100%);
+		margin: 0 auto;
+	}
+
+	header {
+		display: flex;
+		align-items: center;
+		height: 76px;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+		color: var(--color-brand);
+		font-size: 20px;
+		font-weight: 750;
+		letter-spacing: -0.04em;
+	}
+
+	.brand svg {
+		width: 30px;
+		height: 30px;
+		fill: none;
+		stroke: currentColor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 2;
+	}
+
+	.back {
+		display: inline-block;
+		margin-bottom: 24px;
+		color: var(--color-muted);
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.back:hover {
+		color: var(--color-text);
+	}
+
+	article {
+		padding: 32px;
+		border: 1px solid var(--color-border);
+		border-radius: 20px;
+		background: white;
+	}
+
+	.eyebrow {
+		margin: 0 0 10px;
+		color: var(--color-brand-hover);
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: clamp(1.8rem, 4vw, 2.6rem);
+		font-weight: 750;
+		letter-spacing: -0.04em;
+		line-height: 1.1;
+	}
+
+	.where {
+		margin: 10px 0 0;
+		color: var(--color-muted);
+		font-size: 15px;
+	}
+
+	.badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin: 20px 0 0;
+	}
+
+	.badge {
+		padding: 6px 12px;
+		border-radius: 999px;
+		color: var(--color-brand-hover);
+		background: #fff1f4;
+		font-size: 13px;
+		font-weight: 650;
+	}
+
+	dl {
+		margin: 28px 0 0;
+		padding: 24px 0 0;
+		border-top: 1px solid var(--color-border);
+	}
+
+	dt {
+		margin-top: 18px;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	dt:first-child {
+		margin-top: 0;
+	}
+
+	dd {
+		margin: 6px 0 0;
+		font-size: 15px;
+		line-height: 1.55;
+	}
+
+	.note {
+		color: var(--color-muted);
+		font-size: 13px;
+	}
+
+	.directions {
+		display: inline-block;
+		min-height: 44px;
+		margin-top: 28px;
+		padding: 12px 20px;
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		font-size: 15px;
+		font-weight: 650;
+		transition: border-color 160ms ease;
+	}
+
+	.directions:hover {
+		border-color: var(--color-text);
+	}
+
+	section {
+		margin-top: 40px;
+	}
+
+	h2 {
+		margin: 0 0 16px;
+		font-size: 17px;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+
+	ul {
+		display: grid;
+		gap: 10px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	li a {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 4px 16px;
+		padding: 16px 20px;
+		border: 1px solid var(--color-border);
+		border-radius: 14px;
+		background: white;
+		transition: border-color 160ms ease;
+	}
+
+	li a:hover {
+		border-color: var(--color-text);
+	}
+
+	.name {
+		font-size: 15px;
+		font-weight: 650;
+	}
+
+	.meta {
+		color: var(--color-muted);
+		font-size: 13px;
+	}
+
+	@media (max-width: 560px) {
+		.page {
+			padding: 0 15px 40px;
+		}
+
+		article {
+			padding: 24px 20px;
+		}
+	}
+</style>

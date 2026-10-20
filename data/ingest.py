@@ -217,6 +217,29 @@ CONTRACT_FIELDS = (
     "university",
     "operator",
     "free_public_wifi",
+    "no_purchase_needed",
+)
+
+#: Categories where sitting down costs nothing.
+#:
+#: The question a student actually asks -- "can I work here without buying
+#: something?" -- which no single category answers: true of every library and
+#: of the campus buildings, false only of cafes.
+#:
+#: **About money and not entry.** A special library may be open by appointment,
+#: an academic library may want a university ID, and an NYU building wants NYU
+#: credentials. The contract has no field for access and the application
+#: promises none; this one says only that nobody will ask you to buy a coffee.
+#:
+#: An allowlist rather than its inverse, so a category added below is not
+#: silently published as free: whoever adds one has to decide.
+NO_PURCHASE_CATEGORIES = frozenset(
+    {
+        "public_library",
+        "special_library",
+        "academic_library",
+        "university_building",
+    }
 )
 
 #: The published category vocabulary, keyed on FacDB's most specific type so
@@ -695,6 +718,8 @@ def cafe_spot(record: dict[str, Any], names: dict[str, str]) -> dict[str, Any] |
         # for, so cafes have none.
         "operator": None,
         "free_public_wifi": False,
+        # A cafe is where you buy something. That is what a cafe is.
+        "no_purchase_needed": False,
     }
 
 
@@ -822,6 +847,7 @@ def normalize(
                 "university": None,
                 "operator": operator(record),
                 "free_public_wifi": False,
+                "no_purchase_needed": published_category in NO_PURCHASE_CATEGORIES,
             }
         )
 
