@@ -4158,20 +4158,6 @@
     "no_purchase_needed": false
   },
   {
-    "id": "dining:3034b9b84253a637",
-    "name": "Enzo's of Arthur Ave",
-    "category": "cafe",
-    "address": "2339 & 2343 Arthur Ave, Bronx, NY 10458",
-    "neighborhood": null,
-    "borough": "Bronx",
-    "latitude": 42.126441,
-    "longitude": -70.848088,
-    "university": null,
-    "operator": null,
-    "free_public_wifi": false,
-    "no_purchase_needed": false
-  },
-  {
     "id": "dining:303757d9486c305f",
     "name": "Dante",
     "category": "cafe",

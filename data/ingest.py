@@ -303,6 +303,19 @@ BOROUGH_BY_FACILITY_BOROUGH = {
 #: About a tenth of a metre, and what the published example record shows.
 COORDINATE_DIGITS = 6
 
+#: A generous box around the five boroughs, as (south, north, west, east).
+#:
+#: The model already rejects a latitude outside -90..90, which catches a null
+#: island or a swapped pair and nothing else. Upstream geocoding fails in a
+#: narrower way: Dining Out placed "Enzo's of Arthur Ave" -- a real address in
+#: the Bronx -- at 42.126441,-70.848088, which is in Massachusetts Bay. The
+#: record passed every check, and would have put a Bronx restaurant in the
+#: Atlantic on any map and given it a nearest subway 284 km away.
+#:
+#: Deliberately loose: the point is to catch a record in another state, not to
+#: adjudicate the waterline.
+NYC_BOUNDS = (40.47, 40.93, -74.30, -73.68)
+
 EARTH_RADIUS_METRES = 6_371_000.0
 
 #: Initialisms FacDB shouts for a reason, and which title case would mangle.
@@ -693,6 +706,8 @@ def cafe_spot(record: dict[str, Any], names: dict[str, str]) -> dict[str, Any] |
     # handful of rows are missing a borough at any given time.
     if name is None or address is None or latitude is None or longitude is None:
         return None
+    if not in_new_york_city(latitude, longitude):
+        return None
     if named_borough is None:
         return None
     # Dining Out already title-cases the borough where FacDB shouts it; the
@@ -721,6 +736,12 @@ def cafe_spot(record: dict[str, Any], names: dict[str, str]) -> dict[str, Any] |
         # A cafe is where you buy something. That is what a cafe is.
         "no_purchase_needed": False,
     }
+
+
+def in_new_york_city(latitude: float, longitude: float) -> bool:
+    """Whether a point is plausibly in the five boroughs."""
+    south, north, west, east = NYC_BOUNDS
+    return south <= latitude <= north and west <= longitude <= east
 
 
 def coordinate(record: dict[str, Any], field: str, limit: float) -> float | None:
@@ -830,6 +851,13 @@ def normalize(
         if latitude is None or longitude is None:
             # Nothing can place these on a map, and the model requires both.
             # Upstream ungeocoded rows should not fail a whole import.
+            skipped += 1
+            continue
+
+        if not in_new_york_city(latitude, longitude):
+            # Geocoded, but not to here. Publishing it would put the spot in
+            # the wrong place on a map and give it nonsense neighbours.
+            warn(f"{spot_id(record)} is at {latitude},{longitude}, outside the city; skipping")
             skipped += 1
             continue
 

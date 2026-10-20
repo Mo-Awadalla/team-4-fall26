@@ -805,3 +805,45 @@ class TestCostFollowsTheCategory:
         # The set is an allowlist, so a category added to the vocabulary has to
         # be decided about rather than defaulting to free.
         assert "coworking_space" not in ingest.NO_PURCHASE_CATEGORIES
+
+
+class TestCoordinatesMustBeInTheCity:
+    """Upstream geocoding fails in a narrower way than the model checks for.
+
+    Dining Out placed "Enzo's of Arthur Ave" -- a real address in the Bronx --
+    at 42.126441,-70.848088, which is in Massachusetts Bay. Latitude and
+    longitude were both valid, the borough said Bronx, and the record passed
+    every check: it would have appeared in the Atlantic on a map and been given
+    a nearest subway 284 km away.
+    """
+
+    def test_a_facility_outside_the_city_is_skipped(
+        self, facilities: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        record = {
+            **upstream(facilities, "125TH STREET LIBRARY"),
+            "latitude": "42.126441",
+            "longitude": "-70.848088",
+        }
+        assert ingest.normalize([record], [], names, []) == []
+
+    def test_a_cafe_outside_the_city_is_dropped(
+        self, cafes: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        record = {**cafes[0], "latitude": "42.126441", "longitude": "-70.848088"}
+        assert ingest.cafe_spot(record, names) is None
+
+    def test_a_spot_inside_it_is_kept(
+        self, facilities: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        # The check must not be so tight that it drops real records.
+        assert (
+            len(ingest.normalize([upstream(facilities, "125TH STREET LIBRARY")], [], names, []))
+            == 1
+        )
+
+    def test_the_committed_snapshot_is_entirely_inside_it(
+        self, snapshot: list[dict[str, Any]]
+    ) -> None:
+        for spot in snapshot:
+            assert ingest.in_new_york_city(spot["latitude"], spot["longitude"]), spot["id"]

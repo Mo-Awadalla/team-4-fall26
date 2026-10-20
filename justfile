@@ -79,6 +79,11 @@ test:
     cd src/backend && uv run pytest
     cd data && uv run --project ../src/backend pytest .
 
+# Refresh the subway station list the detail pages measure against. Rarely
+# needed: the output is committed and the subway system changes slowly.
+ingest-subway:
+    cd data && uv run --project ../src/backend python subway.py
+
 # End-to-end tests against a running deployment. Needs STUDYSPOT_E2E_URL; see
 # tests/e2e/README.md. Deliberately outside `just test`, which must pass with
 # nothing running.
