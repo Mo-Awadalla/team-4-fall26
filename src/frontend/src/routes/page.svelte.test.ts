@@ -171,6 +171,20 @@ describe('paging', () => {
 });
 
 describe('the place card', () => {
+	it('offers a link straight into a maps app', async () => {
+		// A hyperlink rather than an embedded map: nothing is loaded from
+		// anyone else to render a card.
+		render(Home);
+
+		await box().fill('library');
+		await searchButton().click();
+		await expect.element(page.getByText('Bobst Library')).toBeInTheDocument();
+
+		const maps = page.getByRole('link', { name: 'Maps' }).first();
+		await expect.element(maps).toBeInTheDocument();
+		expect(await maps.element().getAttribute('href')).toContain('google.com/maps');
+	});
+
 	it('names who runs the place', async () => {
 		// A branch is named after its neighbourhood, so its own name never says
 		// which library system it belongs to -- and the three have separate
