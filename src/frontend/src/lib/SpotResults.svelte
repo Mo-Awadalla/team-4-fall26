@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 
 	import { mapsUrl } from './maps';
+	import { routeColour, routeTextColour, walkMinutes } from './subway';
 	import type { StudySpot } from './contract';
 
 	type Props = {
@@ -72,6 +73,26 @@
 					-->
 					<p class="operator">{spot.operator}</p>
 				{/if}
+				{#if spot.subway_station && spot.subway_routes && spot.subway_metres !== null}
+					<!--
+						Which trains, then how long the walk. Lines are coloured
+						because people read the colour faster than the letter, and
+						the walk is in minutes because nobody converts 409 m.
+					-->
+					<p class="subway">
+						<span class="bullets">
+							{#each spot.subway_routes.split(' ') as route (route)}
+								<span
+									class="bullet"
+									style:background={routeColour(route)}
+									style:color={routeTextColour(route)}>{route}</span
+								>
+							{/each}
+						</span>
+						{walkMinutes(spot.subway_metres)} min walk · {spot.subway_station}
+					</p>
+				{/if}
+
 				{#if spot.university}
 					<!-- Proximity, never affiliation: see the contract. -->
 					<p class="campus">Near {spot.university}</p>
@@ -193,6 +214,33 @@
 	.category {
 		color: var(--color-brand-hover);
 		font-weight: 650;
+	}
+
+	.subway {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px 7px;
+		margin: 10px 0 0;
+		color: var(--color-muted);
+		font-size: 13px;
+	}
+
+	.bullets {
+		display: inline-flex;
+		gap: 3px;
+	}
+
+	.bullet {
+		display: inline-flex;
+		width: 17px;
+		height: 17px;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 1;
 	}
 
 	.address,

@@ -39,7 +39,11 @@ function spot(id: string, name: string): StudySpot {
 		university: null,
 		operator: 'New York Public Library',
 		free_public_wifi: false,
-		no_purchase_needed: true
+		no_purchase_needed: true,
+		subway_station: 'W 4 St-Wash Sq',
+		subway_routes: 'A C E',
+		subway_metres: 409,
+		subway_step_free: 'full'
 	};
 }
 

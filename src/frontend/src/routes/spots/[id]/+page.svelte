@@ -2,25 +2,10 @@
 	import { resolve } from '$app/paths';
 	import type { StudySpot } from '$lib/contract';
 	import { mapsUrl } from '$lib/maps';
-	import type { Nearby, NearestStation } from '$lib/server/snapshot';
+	import { routeColour, routeTextColour, STEP_FREE, walkMinutes } from '$lib/subway';
+	import type { Nearby } from '$lib/server/snapshot';
 
-	let { data }: { data: { spot: StudySpot; nearby: Nearby[]; station: NearestStation | null } } =
-		$props();
-
-	/**
-	 * How the MTA's three accessibility states read.
-	 *
-	 * `partial` is one direction only -- a platform you can reach going one way
-	 * and not the other -- which is worth saying rather than rounding to either
-	 * of the others. `none` is stated rather than left out: for someone who
-	 * needs step-free access, silence is the one unhelpful answer, and here the
-	 * MTA is making a positive claim rather than failing to record one.
-	 */
-	const STEP_FREE: Record<string, string> = {
-		full: 'step-free',
-		partial: 'step-free in one direction only',
-		none: 'no step-free access'
-	};
+	let { data }: { data: { spot: StudySpot; nearby: Nearby[] } } = $props();
 
 	const spot = $derived(data.spot);
 
@@ -106,16 +91,20 @@
 					<dd>{spot.university} <span class="note">— nearby, not affiliated</span></dd>
 				{/if}
 
-				{#if data.station}
+				{#if spot.subway_station && spot.subway_routes && spot.subway_metres !== null}
 					<dt>Nearest subway</dt>
 					<dd>
-						{data.station.station.name}
-						<span class="routes">{data.station.station.routes.join(' ')}</span>
-						<span class="note">
-							— {walkingDistance(data.station.metres)} away, {STEP_FREE[
-								data.station.station.step_free
-							]}
+						<span class="bullets">
+							{#each spot.subway_routes.split(' ') as route (route)}
+								<span
+									class="bullet"
+									style:background={routeColour(route)}
+									style:color={routeTextColour(route)}>{route}</span
+								>
+							{/each}
 						</span>
+						{walkMinutes(spot.subway_metres)} min walk · {spot.subway_station}
+						<span class="note">— {STEP_FREE[spot.subway_step_free ?? 'none']}</span>
 					</dd>
 				{/if}
 
@@ -295,15 +284,22 @@
 		line-height: 1.55;
 	}
 
-	.routes {
-		display: inline-block;
-		padding: 1px 7px;
-		border-radius: 999px;
-		color: white;
-		background: var(--color-text);
-		font-size: 12px;
+	.bullets {
+		display: inline-flex;
+		gap: 3px;
+		vertical-align: -3px;
+	}
+
+	.bullet {
+		display: inline-flex;
+		width: 18px;
+		height: 18px;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		font-size: 11px;
 		font-weight: 700;
-		letter-spacing: 0.06em;
+		line-height: 1;
 	}
 
 	.note {

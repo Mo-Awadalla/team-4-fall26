@@ -17,7 +17,11 @@ function page(total: number, count = total, offset = 0): SpotPage {
 			university: null,
 			operator: 'Brooklyn Public Library',
 			free_public_wifi: false,
-			no_purchase_needed: true
+			no_purchase_needed: true,
+			subway_station: 'Bedford Av',
+			subway_routes: 'L',
+			subway_metres: 180,
+			subway_step_free: 'none'
 		})),
 		pagination: {
 			limit: 20,

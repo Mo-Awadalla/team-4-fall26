@@ -35,7 +35,11 @@ No route has a trailing slash, and the application does not redirect one onto th
   "university": "Touro University - Harlem",
   "operator": "New York Public Library",
   "free_public_wifi": true,
-  "no_purchase_needed": true
+  "no_purchase_needed": true,
+  "subway_station": "125 St",
+  "subway_routes": "4 5 6",
+  "subway_metres": 180,
+  "subway_step_free": "full"
 }
 ```
 
@@ -48,6 +52,8 @@ The records represent public third places from NYC Open Data — today the libra
 `university_building` is a campus building a student can work in. The city's facilities database registers institutions and administrative points rather than buildings, so these come from the curated list in `data/nyu_buildings.json` and all carry the `nyu:` identifier prefix. The institution records themselves are *not* published: an administrative point is not a room, and campus access is restricted. They are read only to anchor the `university` label.
 
 `cafe` comes from the outdoor-dining licence register: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration.
+
+`subway_station`, `subway_routes`, `subway_metres` and `subway_step_free` are the nearest station within 1.2 km, derived by the importer from the MTA's own list. All four are null together — 88 of 1,915 spots have none that close, mostly on Staten Island where the railway is not the subway. The distance is straight-line rather than walking, `routes` is space separated as the MTA publishes it, and `step_free` keeps their three states: `full`, `none`, and `partial` for a platform reachable going one way and not the other.
 
 `no_purchase_needed` is true where sitting down costs nothing — every library and every campus building, and no café. It answers the question a reader actually has, which no single category answers, and **it is about money rather than entry**: a campus building is free and still wants the university's credentials, and a special library may be open only by appointment.
 

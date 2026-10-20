@@ -63,6 +63,19 @@ export type StudySpot = {
 	 * university's credentials.
 	 */
 	no_purchase_needed: boolean;
+	/**
+	 * The nearest subway station within 1.2 km, derived by the importer.
+	 *
+	 * All four are null together — 88 of 1,915 spots have none that close,
+	 * mostly on Staten Island, where the railway is not the subway. `routes` is
+	 * space separated the way the MTA publishes it; `metres` is straight-line
+	 * rather than walking distance; `step_free` is `full`, `partial` (one
+	 * direction only) or `none`.
+	 */
+	subway_station: string | null;
+	subway_routes: string | null;
+	subway_metres: number | null;
+	subway_step_free: string | null;
 };
 
 /** One value a filter can take, with how many spots carry it. */
