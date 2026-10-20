@@ -136,6 +136,40 @@ class StudySpot(models.Model):
         ),
     )
 
+    #: The nearest subway station within 1.2 km, derived by the importer.
+    #:
+    #: Four columns rather than one JSON blob, because they are four scalars
+    #: and the rest of this model is flat. ``subway_routes`` is space-joined the
+    #: way the MTA publishes it and the way a sign reads.
+    #:
+    #: All four are null together: 88 of 1,915 spots have no station that close,
+    #: mostly on Staten Island where the railway is not the subway.
+    subway_station = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Nearest subway station within 1.2 km, or absent when none is that close.",
+    )
+    subway_routes = models.TextField(
+        blank=True,
+        null=True,
+        help_text="The lines calling there, space separated, as the MTA publishes them.",
+    )
+    subway_metres = models.IntegerField(
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
+        help_text="Straight-line metres to that station, not walking distance.",
+    )
+    subway_step_free = models.TextField(
+        blank=True,
+        null=True,
+        help_text=(
+            "Step-free access at that station: 'full', 'none', or 'partial' for a "
+            "platform reachable going one way and not the other. The MTA's own three "
+            "states rather than a rounding of them."
+        ),
+    )
+
     free_public_wifi = models.BooleanField(
         default=False,
         help_text=(

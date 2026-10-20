@@ -228,6 +228,10 @@ class TestOneSpot:
             "operator",
             "free_public_wifi",
             "no_purchase_needed",
+            "subway_station",
+            "subway_routes",
+            "subway_metres",
+            "subway_step_free",
         }
 
     def test_an_unknown_identifier_is_a_404(self) -> None:

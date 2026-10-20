@@ -44,6 +44,12 @@ PUBLISHED_EXAMPLE = {
     "free_public_wifi": True,
     # A public library costs nothing to sit in.
     "no_purchase_needed": True,
+    # normalize() leaves these for combine(), which is the only point that sees
+    # every published spot including the curated ones.
+    "subway_station": None,
+    "subway_routes": None,
+    "subway_metres": None,
+    "subway_step_free": None,
 }
 
 #: The published vocabulary. `university_building` is a campus building a
@@ -520,6 +526,10 @@ class TestCuratedBuildings:
                         "operator": "New York University",
                         "free_public_wifi": False,
                         "no_purchase_needed": True,
+                        "subway_station": None,
+                        "subway_routes": None,
+                        "subway_metres": None,
+                        "subway_step_free": None,
                     }.items()
                 )
             )
@@ -847,3 +857,82 @@ class TestCoordinatesMustBeInTheCity:
     ) -> None:
         for spot in snapshot:
             assert ingest.in_new_york_city(spot["latitude"], spot["longitude"]), spot["id"]
+
+
+class TestNearestSubway:
+    """Derived in the importer, for the reason `no_purchase_needed` had to learn.
+
+    The result cards are rendered from the API and the detail pages from the
+    snapshot. Anything computed in one of those places is missing from the
+    other, so it is computed here, which is the only point both read from.
+    """
+
+    STATIONS = [
+        {
+            "name": "W 4 St-Wash Sq",
+            "routes": ["A", "B", "C", "D", "E", "F", "M"],
+            "latitude": 40.732338,
+            "longitude": -74.000495,
+            "step_free": "full",
+        },
+        {
+            "name": "Far Away",
+            "routes": ["7"],
+            "latitude": 40.75,
+            "longitude": -73.87,
+            "step_free": "none",
+        },
+    ]
+
+    def spot(self, latitude: float, longitude: float) -> dict[str, Any]:
+        return {**PUBLISHED_EXAMPLE, "latitude": latitude, "longitude": longitude}
+
+    def test_the_closest_station_wins(self) -> None:
+        spots = [self.spot(40.7295, -73.9973)]
+        ingest.assign_subway(spots, self.STATIONS)
+
+        assert spots[0]["subway_station"] == "W 4 St-Wash Sq"
+        assert spots[0]["subway_metres"] < 500
+
+    def test_the_lines_are_space_joined(self) -> None:
+        # The way the MTA publishes them and the way a sign reads.
+        spots = [self.spot(40.7295, -73.9973)]
+        ingest.assign_subway(spots, self.STATIONS)
+
+        assert spots[0]["subway_routes"] == "A B C D E F M"
+
+    def test_a_spot_with_nothing_near_publishes_null(self) -> None:
+        # Rather than a number nobody would act on: the furthest spot from any
+        # station is 7.7 km away, on Staten Island.
+        spots = [self.spot(40.55, -74.15)]
+        ingest.assign_subway(spots, self.STATIONS)
+
+        for field in ("subway_station", "subway_routes", "subway_metres", "subway_step_free"):
+            assert spots[0][field] is None
+
+    def test_accessibility_comes_through_unrounded(self) -> None:
+        spots = [self.spot(40.7295, -73.9973)]
+        ingest.assign_subway(spots, self.STATIONS)
+
+        assert spots[0]["subway_step_free"] == "full"
+
+    def test_no_stations_leaves_every_spot_null(self) -> None:
+        # `just ingest` without `just ingest-subway` warns rather than failing.
+        spots = [self.spot(40.7295, -73.9973)]
+        ingest.assign_subway(spots, [])
+
+        assert spots[0]["subway_station"] is None
+
+    def test_the_snapshot_is_consistent(self, snapshot: list[dict[str, Any]]) -> None:
+        # All four are set together or not at all.
+        for spot in snapshot:
+            present = [
+                spot[field] is not None
+                for field in (
+                    "subway_station",
+                    "subway_routes",
+                    "subway_metres",
+                    "subway_step_free",
+                )
+            ]
+            assert len(set(present)) == 1, spot["id"]

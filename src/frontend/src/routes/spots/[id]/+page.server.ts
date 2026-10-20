@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-import { allSpots, nearbySpots, nearestStation, spotById } from '$lib/server/snapshot';
+import { allSpots, nearbySpots, spotById } from '$lib/server/snapshot';
 import type { EntryGenerator, PageServerLoad } from './$types';
 
 // Every detail page is written as real HTML at build time. The identifiers come
@@ -18,5 +18,5 @@ export const load: PageServerLoad = ({ params }) => {
 		throw error(404, `No study spot has the identifier ${params.id}`);
 	}
 
-	return { spot, nearby: nearbySpots(spot), station: nearestStation(spot) };
+	return { spot, nearby: nearbySpots(spot) };
 };

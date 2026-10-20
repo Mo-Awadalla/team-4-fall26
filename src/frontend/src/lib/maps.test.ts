@@ -25,6 +25,10 @@ function spot(overrides: Partial<StudySpot> = {}): StudySpot {
 		operator: null,
 		free_public_wifi: false,
 		no_purchase_needed: false,
+		subway_station: null,
+		subway_routes: null,
+		subway_metres: null,
+		subway_step_free: null,
 		...overrides
 	};
 }
