@@ -237,6 +237,39 @@ class TestOneSpot:
         assert raised.value.code == 404
 
 
+class TestTheDetailPagesAreServed:
+    """Every spot has a prerendered page, written as real HTML at build time.
+
+    The identifier carries a colon -- "facdb:a1b2c3" -- which has to survive
+    being an S3 key, a CloudFront path, and the edge function that appends
+    .html to a segment without a dot. None of that is exercised by a unit test.
+    """
+
+    def page(self, path: str) -> tuple[int, str]:
+        request = urllib.request.Request(f"{BASE_URL}{path}")
+        try:
+            with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+                return response.status, response.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as error:
+            return error.code, ""
+
+    def test_a_spot_has_its_own_page(self, any_spot: dict[str, Any]) -> None:
+        status, body = self.page(f"/spots/{any_spot['id']}")
+
+        assert status == 200
+        # Prerendered, so the name is in the HTML rather than fetched after.
+        assert any_spot["name"].split(" (")[0][:20] in body
+
+    def test_the_identifier_keeps_its_colon(self, any_spot: dict[str, Any]) -> None:
+        assert ":" in any_spot["id"], "the fixture should use a prefixed identifier"
+        assert self.page(f"/spots/{any_spot['id']}")[0] == 200
+
+    def test_an_unknown_spot_has_no_page(self) -> None:
+        # No page was built for it, so S3 has no key and the 403 mapping turns
+        # that into the application's 404.
+        assert self.page("/spots/facdb:nothing")[0] == 404
+
+
 class TestTheBrowserAppIsServed:
     def test_the_site_responds(self) -> None:
         request = urllib.request.Request(BASE_URL + "/")

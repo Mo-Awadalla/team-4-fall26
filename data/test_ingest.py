@@ -42,6 +42,8 @@ PUBLISHED_EXAMPLE = {
     "operator": "New York Public Library",
     # The fixture puts a free hotspot on this branch; see fixtures/wifi.json.
     "free_public_wifi": True,
+    # A public library costs nothing to sit in.
+    "no_purchase_needed": True,
 }
 
 #: The published vocabulary. `university_building` is a campus building a
@@ -517,6 +519,7 @@ class TestCuratedBuildings:
                         "university": "New York University",
                         "operator": "New York University",
                         "free_public_wifi": False,
+                        "no_purchase_needed": True,
                     }.items()
                 )
             )
@@ -771,3 +774,34 @@ class TestOperator:
         assert "operator" in ingest.CONTRACT_FIELDS
         for spot in spots:
             assert tuple(spot) == ingest.CONTRACT_FIELDS
+
+
+class TestCostFollowsTheCategory:
+    """Derived at import time and stored, like every other derived field here.
+
+    It was briefly computed in the API serializer instead, on the argument that
+    a column could drift from the category beside it. Prerendering the detail
+    pages disproved that: those are built from this snapshot, where the field
+    did not exist, so every library's page said a purchase was expected.
+    `free_public_wifi` and `university` are derived and stored for the same
+    reason -- the snapshot is regenerated as a unit and cannot drift from
+    itself.
+    """
+
+    def test_a_library_costs_nothing(self, spots: list[dict[str, Any]]) -> None:
+        assert published(spots, "125th Street Library")["no_purchase_needed"] is True
+
+    def test_a_cafe_expects_a_purchase(self, cafe_spots: list[dict[str, Any]]) -> None:
+        assert all(spot["no_purchase_needed"] is False for spot in cafe_spots)
+
+    def test_it_matches_the_category_everywhere(self, snapshot: list[dict[str, Any]]) -> None:
+        for spot in snapshot:
+            expected = spot["category"] in ingest.NO_PURCHASE_CATEGORIES
+            assert spot["no_purchase_needed"] is expected, spot["id"]
+
+    def test_an_unmapped_category_is_not_claimed_free(
+        self, facilities: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        # The set is an allowlist, so a category added to the vocabulary has to
+        # be decided about rather than defaulting to free.
+        assert "coworking_space" not in ingest.NO_PURCHASE_CATEGORIES

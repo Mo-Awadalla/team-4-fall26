@@ -48,6 +48,7 @@ CONTRACT_FIELDS = {
     "university",
     "operator",
     "free_public_wifi",
+    "no_purchase_needed",
 }
 
 #: Written in batches so that a 2,000-row snapshot is a handful of statements
@@ -107,6 +108,7 @@ def to_spot(record: Any, index: int) -> StudySpot:
         university=record.get("university"),
         operator=record.get("operator"),
         free_public_wifi=record.get("free_public_wifi", False),
+        no_purchase_needed=record.get("no_purchase_needed", False),
     )
 
     try:
