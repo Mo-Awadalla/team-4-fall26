@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 
-	import Busyness from './Busyness.svelte';
 	import { mapsUrl } from './maps';
 	import { orderByTrunk, routeColour, routeTextColour, walkMinutes } from './subway';
 	import type { StudySpot } from './contract';
@@ -15,6 +14,26 @@
 	};
 
 	let { spots, total, hasMore, loadingMore = false, onShowMore }: Props = $props();
+
+	/**
+	 * How many other spots sit within a five-minute walk, said as a number.
+	 *
+	 * This replaced a Quiet/Moderate/Busy label. The underlying count is of
+	 * *places*, not people -- nothing in open data knows whether a cafe has a
+	 * free table -- so a word like "Busy" read as a claim about the venue that
+	 * the data could not support. The count says the same thing without the
+	 * inference, and a reader can check it.
+	 *
+	 * The walk is kept in the sentence because "nearby" alone gives no scale.
+	 */
+	function alternatives(nearby: number): string {
+		if (nearby === 0) {
+			return 'No alternatives within a 5-minute walk';
+		}
+
+		const noun = nearby === 1 ? 'alternative' : 'alternatives';
+		return `${nearby} ${noun} within a 5-minute walk`;
+	}
 
 	/**
 	 * The spot whose link was just copied, so one card can say so without the
@@ -176,7 +195,7 @@
 					</p>
 				{/if}
 
-				<Busyness nearby={spot.nearby_spots} />
+				<p class="alternatives">{alternatives(spot.nearby_spots)}</p>
 
 				<p class="actions">
 					<!--
@@ -307,7 +326,8 @@
 
 	.address,
 	.operator,
-	.campus {
+	.campus,
+	.alternatives {
 		margin: 10px 0 0;
 		color: var(--color-muted);
 		font-size: 13px;
