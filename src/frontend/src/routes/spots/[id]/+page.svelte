@@ -25,21 +25,6 @@
 		return metres < 100 ? `${Math.round(metres / 10) * 10} m` : `${Math.round(metres / 50) * 50} m`;
 	}
 
-	/**
-	 * Where the record came from, read off its identifier prefix.
-	 *
-	 * Worth saying on the page rather than only in the docs: a reader deciding
-	 * whether to trust "no purchase needed" should be able to see that it came
-	 * from a licence register rather than from somebody's opinion.
-	 */
-	const PROVENANCE: Record<string, string> = {
-		facdb: "The city's Facilities Database",
-		dining: 'Dining Out NYC, the outdoor-dining licence register',
-		nyu: 'A hand-checked list of NYU buildings'
-	};
-
-	const source = $derived(PROVENANCE[spot.id.split(':')[0]] ?? 'NYC Open Data');
-
 	// A plain geo link: it opens the viewer's own map application and needs no
 	// API key, no script from anyone else, and no request on page load.
 	const directions = $derived(
@@ -129,9 +114,6 @@
 						<span class="note">That is not the same as having no Wi-Fi.</span>
 					{/if}
 				</dd>
-
-				<dt>Where the record comes from</dt>
-				<dd>{source} <span class="note">— <code>{spot.id}</code></span></dd>
 			</dl>
 
 			<!--
@@ -288,10 +270,6 @@
 	.note {
 		color: var(--color-muted);
 		font-size: 13px;
-	}
-
-	code {
-		font-size: 12px;
 	}
 
 	.directions {
