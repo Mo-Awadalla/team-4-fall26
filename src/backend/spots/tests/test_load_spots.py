@@ -128,6 +128,7 @@ class TestEveryContractFieldIsWritten:
             "university": "Test University",
             "operator": "Test Operator",
             "free_public_wifi": True,
+            "no_purchase_needed": True,
         }
         assert set(record) == CONTRACT_FIELDS, "the fixture must cover the whole contract"
 

@@ -10,7 +10,8 @@
     "longitude": -73.9974,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:kimmel-center",
@@ -23,7 +24,8 @@
     "longitude": -73.9977,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:courant-institute",
@@ -36,7 +38,8 @@
     "longitude": -73.9956,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:stern-tisch-hall",
@@ -49,7 +52,8 @@
     "longitude": -73.9965,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:silver-center",
@@ -62,7 +66,8 @@
     "longitude": -73.9955,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:tandon-dibner-library",
@@ -75,7 +80,8 @@
     "longitude": -73.9865,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:tandon-rogers-hall",
@@ -88,7 +94,8 @@
     "longitude": -73.9855,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:global-center",
@@ -101,7 +108,8 @@
     "longitude": -73.9986,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:60-fifth-avenue",
@@ -114,7 +122,8 @@
     "longitude": -73.9944,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   },
   {
     "id": "nyu:paulson-center",
@@ -127,6 +136,7 @@
     "longitude": -73.9967,
     "university": "New York University",
     "operator": "New York University",
-    "free_public_wifi": false
+    "free_public_wifi": false,
+    "no_purchase_needed": true
   }
 ]

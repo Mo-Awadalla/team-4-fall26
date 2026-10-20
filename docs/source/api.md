@@ -51,7 +51,9 @@ The records represent public third places from NYC Open Data — today the libra
 
 `no_purchase_needed` is true where sitting down costs nothing — every library and every campus building, and no café. It answers the question a reader actually has, which no single category answers, and **it is about money rather than entry**: a campus building is free and still wants the university's credentials, and a special library may be open only by appointment.
 
-It is the one field the API publishes that `data/spots.json` does not store. It is a pure function of `category`, so a column would be a copy that can fall out of step with the value beside it, and computing it in the browser would put the same rule in two languages. `NO_PURCHASE_CATEGORIES` in `spots/models.py` is the single definition, and it is an allowlist so that a category added upstream is never silently published as free. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
+Derived by the importer from the category and stored, as `free_public_wifi` and `university` are. It was briefly computed in the serializer instead, on the argument that a column would be a copy able to drift from the category beside it; prerendering the detail pages disproved that, because those are built from `data/spots.json`, where the field did not exist, and every library's page said a purchase was expected. The snapshot is regenerated as a unit and cannot drift from itself.
+
+`NO_PURCHASE_CATEGORIES` in `data/ingest.py` is the single definition, beside the vocabulary it describes, and it is an allowlist so that a category added there is never silently published as free. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
 sits within 25 m, derived from `yjub-udmw`. False means none is recorded, which
 is not the same as there being no Wi-Fi: a campus building's network needs the
 university's credentials, and the city has no reason to know about it. The field

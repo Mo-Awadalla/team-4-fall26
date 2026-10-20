@@ -11,14 +11,7 @@ from typing import Any
 
 from rest_framework import serializers
 
-from .models import (
-    DEFAULT_LIMIT,
-    MAX_FILTER_LENGTH,
-    MAX_LIMIT,
-    NO_PURCHASE_CATEGORIES,
-    Borough,
-    StudySpot,
-)
+from .models import DEFAULT_LIMIT, MAX_FILTER_LENGTH, MAX_LIMIT, Borough, StudySpot
 
 
 class StudySpotSerializer(serializers.ModelSerializer):
@@ -28,22 +21,6 @@ class StudySpotSerializer(serializers.ModelSerializer):
     the shared contract, and a column added to the model should not silently
     become part of the public API.
     """
-
-    #: Derived here rather than stored, and rather than left to the browser.
-    #:
-    #: It is a pure function of ``category``, so a column would be a copy that
-    #: can fall out of step with the value beside it. Computing it in the
-    #: browser instead would put the same rule in two languages, which is the
-    #: drift this avoids: ``NO_PURCHASE_CATEGORIES`` stays the one definition
-    #: and every consumer reads the answer.
-    #:
-    #: This is why the API publishes one field more than ``data/spots.json``
-    #: stores. The snapshot holds what the city supplied; this is what the
-    #: contract says about it.
-    no_purchase_needed = serializers.SerializerMethodField()
-
-    def get_no_purchase_needed(self, spot: StudySpot) -> bool:
-        return spot.category in NO_PURCHASE_CATEGORIES
 
     class Meta:
         model = StudySpot
