@@ -27,6 +27,33 @@ const TRUNK_COLOURS: ReadonlyArray<readonly [readonly string[], string]> = [
 	[['SIR', 'SI'], '#0039a6']
 ];
 
+/**
+ * The lines a station serves, grouped so that same-coloured bullets sit
+ * together.
+ *
+ * The stored value keeps the MTA's own ordering, which is alphabetical and
+ * therefore interleaves trunks: W 4 St-Wash Sq publishes "A B C D E F M",
+ * which renders blue-orange-blue-orange-blue-orange-orange and is harder to
+ * read than it needs to be. Grouped, it is "A C E" then "B D F M" -- two
+ * blocks of colour, which is how the signage does it.
+ *
+ * Ordering is presentation, so it happens here rather than in the importer:
+ * the trunks are defined by the colour table above, and duplicating that
+ * knowledge in Python to sort the stored string would be two places to keep
+ * in step.
+ */
+export function orderByTrunk(routes: string[]): string[] {
+	const position = new Map<string, number>();
+	TRUNK_COLOURS.forEach(([lines], trunk) => {
+		lines.forEach((line, within) => position.set(line, trunk * 100 + within));
+	});
+
+	// A line the table does not know keeps its grey bullet and goes last,
+	// rather than landing in whichever group it sorts next to.
+	const rank = (route: string) => position.get(route.toUpperCase()) ?? Number.MAX_SAFE_INTEGER;
+	return [...routes].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}
+
 /** Lines whose colour is too light for white text. */
 const DARK_TEXT = new Set(['N', 'Q', 'R', 'W']);
 

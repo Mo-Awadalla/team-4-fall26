@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 
 	import { mapsUrl } from './maps';
-	import { routeColour, routeTextColour, walkMinutes } from './subway';
+	import { orderByTrunk, routeColour, routeTextColour, walkMinutes } from './subway';
 	import type { StudySpot } from './contract';
 
 	type Props = {
@@ -14,6 +14,48 @@
 	};
 
 	let { spots, total, hasMore, loadingMore = false, onShowMore }: Props = $props();
+
+	/**
+	 * The spot whose link was just copied, so one card can say so without the
+	 * others claiming it too.
+	 */
+	let copied = $state<string | null>(null);
+	let clearing: ReturnType<typeof setTimeout> | undefined;
+
+	// Nothing should fire after the list is gone.
+	$effect(() => () => clearTimeout(clearing));
+
+	/**
+	 * Share a spot: the system sheet where there is one, the clipboard where
+	 * there is not.
+	 *
+	 * The link is the detail page, which is prerendered, so whoever receives it
+	 * opens real HTML rather than a shell that has to fetch before it can show
+	 * anything.
+	 */
+	async function share(spot: StudySpot): Promise<void> {
+		const url = new URL(resolve(`/spots/${spot.id}` as '/'), location.href).href;
+		const payload = { title: spot.name, text: `${spot.name} — StudySpot`, url };
+
+		if (navigator.share && navigator.canShare?.(payload)) {
+			try {
+				await navigator.share(payload);
+			} catch {
+				// Dismissing the sheet rejects, which is not a failure.
+			}
+			return;
+		}
+
+		try {
+			await navigator.clipboard.writeText(url);
+			copied = spot.id;
+			clearTimeout(clearing);
+			clearing = setTimeout(() => (copied = null), 2000);
+		} catch {
+			// Blocked clipboard, or an insecure context. Saying nothing beats
+			// claiming a copy that did not happen.
+		}
+	}
 
 	/**
 	 * The importer's vocabulary is snake_case (`academic_library`), because the
@@ -81,7 +123,7 @@
 					-->
 					<p class="subway">
 						<span class="bullets">
-							{#each spot.subway_routes.split(' ') as route (route)}
+							{#each orderByTrunk(spot.subway_routes.split(' ')) as route (route)}
 								<span
 									class="bullet"
 									style:background={routeColour(route)}
@@ -147,6 +189,21 @@
 						</svg>
 						Maps
 					</a>
+
+					<button type="button" onclick={() => share(spot)}>
+						{#if copied === spot.id}
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<path d="m5 12.5 4.5 4.5L19 7.5" />
+							</svg>
+							Copied
+						{:else}
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" />
+								<path d="M4.5 14v4.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V14" />
+							</svg>
+							Share
+						{/if}
+					</button>
 				</p>
 			</li>
 		{/each}
@@ -301,6 +358,34 @@
 		font-size: 13px;
 		font-weight: 650;
 		transition: border-color 160ms ease;
+	}
+
+	.actions button {
+		display: inline-flex;
+		min-height: 34px;
+		align-items: center;
+		gap: 6px;
+		padding: 0 14px;
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+		background: white;
+		font-size: 13px;
+		font-weight: 650;
+		cursor: pointer;
+		transition: border-color 160ms ease;
+	}
+
+	.actions button:hover {
+		border-color: var(--color-text);
+	}
+
+	.actions button svg {
+		width: 15px;
+		fill: none;
+		stroke: currentColor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 2;
 	}
 
 	.maps:hover {
