@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { routeColour, routeTextColour, STEP_FREE, walkMinutes } from './subway';
+import { orderByTrunk, routeColour, routeTextColour, STEP_FREE, walkMinutes } from './subway';
 
 describe('line colours', () => {
 	it('groups by trunk line, as the system does', () => {
@@ -41,6 +41,49 @@ describe('line colours', () => {
 		for (const route of ['A', '1', 'L', 'G']) {
 			expect(routeTextColour(route)).toBe('#ffffff');
 		}
+	});
+});
+
+describe('grouping by trunk', () => {
+	it('keeps same-coloured lines together', () => {
+		// W 4 St-Wash Sq is published "A B C D E F M", which renders
+		// blue-orange-blue-orange-blue-orange-orange.
+		expect(orderByTrunk(['A', 'B', 'C', 'D', 'E', 'F', 'M'])).toEqual([
+			'A',
+			'C',
+			'E',
+			'B',
+			'D',
+			'F',
+			'M'
+		]);
+	});
+
+	it('leaves each group in one run of colour', () => {
+		const colours = orderByTrunk(['A', 'B', 'C', 'D', 'E', 'F', 'M']).map(routeColour);
+		const runs = colours.filter((colour, i) => colour !== colours[i - 1]);
+		// One run per distinct colour means no colour is split in two.
+		expect(runs.length).toBe(new Set(colours).size);
+	});
+
+	it('orders the groups as the system numbers them', () => {
+		expect(orderByTrunk(['N', '4', 'A'])).toEqual(['4', 'A', 'N']);
+	});
+
+	it('puts a line it does not know last', () => {
+		// Rather than landing in whichever group it sorts next to.
+		expect(orderByTrunk(['ZZ', '6'])).toEqual(['6', 'ZZ']);
+	});
+
+	it('does not drop or invent a line', () => {
+		const routes = ['L', 'N', 'Q', 'R', 'W', '4', '5', '6'];
+		expect(orderByTrunk(routes).sort()).toEqual([...routes].sort());
+	});
+
+	it('leaves the caller’s array alone', () => {
+		const routes = ['M', 'A'];
+		orderByTrunk(routes);
+		expect(routes).toEqual(['M', 'A']);
 	});
 });
 

@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import type { StudySpot } from '$lib/contract';
 	import { mapsUrl } from '$lib/maps';
-	import { routeColour, routeTextColour, STEP_FREE, walkMinutes } from '$lib/subway';
+	import { orderByTrunk, routeColour, routeTextColour, STEP_FREE, walkMinutes } from '$lib/subway';
 	import type { Nearby } from '$lib/server/snapshot';
 
 	let { data }: { data: { spot: StudySpot; nearby: Nearby[] } } = $props();
@@ -95,7 +95,7 @@
 					<dt>Nearest subway</dt>
 					<dd>
 						<span class="bullets">
-							{#each spot.subway_routes.split(' ') as route (route)}
+							{#each orderByTrunk(spot.subway_routes.split(' ')) as route (route)}
 								<span
 									class="bullet"
 									style:background={routeColour(route)}
