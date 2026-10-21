@@ -123,6 +123,29 @@
 		</span>
 	</label>
 
+	<label class="toggle">
+		<input
+			type="checkbox"
+			checked={filters.indoor_seating === true}
+			onchange={(event) => set({ indoor_seating: event.currentTarget.checked || undefined })}
+		/>
+		<!--
+			"Recorded" is doing real work in this label, and it is not hedging.
+			The other two checkboxes narrow on a field that has an answer for
+			every spot; this one narrows on a field that is unrecorded for most
+			of them, so ticking it hides the places nobody has mapped as well as
+			the places that have nowhere to sit. The count says how few that
+			leaves before you tick it, which is the honest version of a filter
+			that would otherwise look broken.
+		-->
+		<span>
+			Indoor seating recorded
+			{#if facets}
+				<span class="count">({facets.indoor_seating})</span>
+			{/if}
+		</span>
+	</label>
+
 	{#if active > 0}
 		<button type="button" onclick={() => onChange({})}>
 			Clear {active}
