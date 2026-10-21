@@ -4,7 +4,8 @@
 	type Props = {
 		facets: Facets | null;
 		filters: SpotFilters;
-		onChange: (filters: SpotFilters) => void;
+		/** `typing` when the change came keystroke by keystroke, not from a pick. */
+		onChange: (filters: SpotFilters, typing?: boolean) => void;
 	};
 
 	let { facets, filters, onChange }: Props = $props();
@@ -22,7 +23,7 @@
 		return words.charAt(0).toUpperCase() + words.slice(1);
 	}
 
-	function set(change: Partial<SpotFilters>): void {
+	function set(change: Partial<SpotFilters>, typing = false): void {
 		const next = { ...filters, ...change };
 
 		// An empty select or a cleared input means "no filter". Sent as an empty
@@ -31,7 +32,7 @@
 			if (next[key] === undefined || next[key] === '') delete next[key];
 		}
 
-		onChange(next);
+		onChange(next, typing);
 	}
 </script>
 
@@ -67,12 +68,19 @@
 		<!--
 			A list rather than a select: there are 126 campuses, which is a
 			scroll in a dropdown and a type-ahead in a datalist.
+
+			Both handlers, and they mean different things. `oninput` is a
+			keystroke, so it is debounced like the search box; `onchange` is a
+			pick from the list or a blur, which should land at once. A partial
+			value narrows now rather than returning nothing, so typing is worth
+			following.
 		-->
 		<input
 			list="campus-options"
 			value={filters.university ?? ''}
 			placeholder="Any"
 			autocomplete="off"
+			oninput={(event) => set({ university: event.currentTarget.value }, true)}
 			onchange={(event) => set({ university: event.currentTarget.value })}
 		/>
 		<datalist id="campus-options">
