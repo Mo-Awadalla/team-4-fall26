@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { StudySpot } from '$lib/contract';
+	import { showsCampus } from '$lib/campus';
 	import { mapsUrl } from '$lib/maps';
 	import { orderByTrunk, routeColour, routeTextColour, STEP_FREE, walkMinutes } from '$lib/subway';
 	import type { Nearby } from '$lib/server/snapshot';
@@ -95,7 +96,7 @@
 					<dd>{spot.operator}</dd>
 				{/if}
 
-				{#if spot.university}
+				{#if showsCampus(spot)}
 					<dt>Nearest campus</dt>
 					<!--
 						Proximity and never affiliation. Spelled out here rather than
