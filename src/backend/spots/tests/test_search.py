@@ -14,7 +14,7 @@ from typing import Any
 import pytest
 
 from spots.models import StudySpot
-from spots.search import INITIALISMS, THRESHOLD, expand, precise, search
+from spots.search import INITIALISMS, THRESHOLD, expand, is_plain, partial, precise, search
 
 pytestmark = pytest.mark.django_db
 
@@ -424,3 +424,60 @@ class TestTheOperatorIsSearchable:
     def test_a_branch_that_names_no_system_is_not_dragged_in(self, spots: list[StudySpot]) -> None:
         # Baychester has no operator in the fixture.
         assert "Baychester Library" not in names("nypl")
+
+
+class TestTypingAWordOut:
+    """Search as you type.
+
+    Postgres full text matches whole lexemes, so every keystroke before the
+    last one used to find nothing and fall through to trigrams. Typing towards
+    "Bobst" returned "The Cafe at Bob" -- confidently, and wrongly -- until the
+    final letter landed.
+    """
+
+    @pytest.mark.parametrize("fragment", ["bob", "bobs", "bobst"])
+    def test_a_fragment_reaches_the_name_it_starts(
+        self, spots: list[StudySpot], fragment: str
+    ) -> None:
+        names = [spot.name for spot in search(fragment)]
+        assert "Elmer Holmes Bobst Library" in names
+
+    def test_a_fragment_of_a_later_word_works_too(self, spots: list[StudySpot]) -> None:
+        # The distinctive word is third in the title, which is the case a
+        # `startswith` on the name alone would miss.
+        assert "Elmer Holmes Bobst Library" in [spot.name for spot in search("holm")]
+
+    def test_every_word_has_to_match_something(self, spots: list[StudySpot]) -> None:
+        # Prefixes are ANDed, exactly as whole words are, so a fragment that
+        # belongs to no row still narrows rather than widens. Asserted on the
+        # pass itself: `search` would go on to the trigram fallback, which is
+        # designed to rescue exactly this and would mask the question.
+        assert list(partial("bobst zzzz", StudySpot.objects.all())) == []
+
+    def test_nonsense_still_returns_nothing(self, spots: list[StudySpot]) -> None:
+        assert list(search("qqqq")) == []
+
+    def test_a_complete_word_still_finds_everything_it_did(self, spots: list[StudySpot]) -> None:
+        # The prefix form is a superset, so nothing that matched before stops
+        # matching. It is a superset and not an equal: "library" now also
+        # reaches a row whose word is "Libraries", which is the behaviour this
+        # pass exists for.
+        exact = {spot.name for spot in precise("library", StudySpot.objects.all())}
+        assert exact <= {spot.name for spot in search("library")}
+
+    def test_a_longer_word_is_reached_by_its_opening(self, spots: list[StudySpot]) -> None:
+        # The real snapshot has "New York University Libraries"; this fixture
+        # has none, so the same property is checked on a word it does have.
+        assert "Elmer Holmes Bobst Library" in [spot.name for spot in search("librar")]
+
+    @pytest.mark.parametrize("query", ['"Square Washington"', "washington -square", "a or b"])
+    def test_an_operator_turns_this_pass_off(self, spots: list[StudySpot], query: str) -> None:
+        # Quotes and `-` are intent, not noise. Prefixing their words would
+        # silently answer a different question -- a quoted phrase asks for an
+        # order, and ANDed prefixes have none.
+        assert not is_plain(query)
+
+    def test_punctuation_alone_matches_nothing(self, spots: list[StudySpot]) -> None:
+        # No words means no tsquery to build, and a raw one built from an empty
+        # string is a syntax error rather than an empty result.
+        assert list(partial("...", StudySpot.objects.all())) == []
