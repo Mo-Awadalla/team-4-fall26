@@ -11,7 +11,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:kimmel-center",
@@ -25,7 +30,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:courant-institute",
@@ -39,7 +49,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:stern-tisch-hall",
@@ -53,7 +68,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:silver-center",
@@ -67,7 +87,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:tandon-dibner-library",
@@ -81,7 +106,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:tandon-rogers-hall",
@@ -95,7 +125,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:global-center",
@@ -109,7 +144,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:60-fifth-avenue",
@@ -123,7 +163,12 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   },
   {
     "id": "nyu:paulson-center",
@@ -137,6 +182,11 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0
   }
 ]

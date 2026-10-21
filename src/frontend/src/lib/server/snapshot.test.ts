@@ -35,7 +35,11 @@ describe('reading the snapshot', () => {
 			'longitude',
 			'operator',
 			'free_public_wifi',
-			'no_purchase_needed'
+			'no_purchase_needed',
+			'subway_station',
+			'subway_routes',
+			'subway_metres',
+			'subway_step_free'
 		]) {
 			expect(spot, `${field} is missing from the snapshot`).toHaveProperty(field);
 		}

@@ -37,6 +37,11 @@ class StudySpotSerializer(serializers.ModelSerializer):
             "operator",
             "free_public_wifi",
             "no_purchase_needed",
+            "subway_station",
+            "subway_routes",
+            "subway_metres",
+            "subway_step_free",
+            "nearby_spots",
         ]
 
 
