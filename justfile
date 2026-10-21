@@ -84,6 +84,12 @@ test:
 ingest-subway:
     cd data && uv run --project ../src/backend python subway.py
 
+# Refresh the OpenStreetMap cafe list the importer merges over DOHMH. Rarely
+# needed: the output is committed. One Overpass request takes about 45 seconds
+# against a volunteer-run service, which is why it is not part of `just ingest`.
+ingest-osm:
+    cd data && uv run --project ../src/backend python osm.py
+
 # End-to-end tests against a running deployment. Needs STUDYSPOT_E2E_URL; see
 # tests/e2e/README.md. Deliberately outside `just test`, which must pass with
 # nothing running.
