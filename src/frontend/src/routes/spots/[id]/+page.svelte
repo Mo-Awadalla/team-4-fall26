@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { StudySpot } from '$lib/contract';
+	import NearbyMap from '$lib/NearbyMap.svelte';
 	import { showsCampus } from '$lib/campus';
 	import { mapsUrl } from '$lib/maps';
 	import { orderByTrunk, routeColour, routeTextColour, STEP_FREE, walkMinutes } from '$lib/subway';
@@ -162,6 +163,13 @@
 		{#if data.nearby.length > 0}
 			<section aria-labelledby="nearby-title">
 				<h2 id="nearby-title">Also within a short walk</h2>
+
+				<!--
+					The map is an enhancement over the list, never a replacement.
+					It loads only when scrolled to, and if it fails to load the
+					list below still answers the question.
+				-->
+				<NearbyMap {spot} nearby={data.nearby} />
 
 				<ul>
 					{#each data.nearby.slice(0, SHOWN) as entry (entry.spot.id)}
