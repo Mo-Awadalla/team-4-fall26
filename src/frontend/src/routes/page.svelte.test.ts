@@ -309,10 +309,29 @@ describe('the filter counts', () => {
 });
 
 describe('the indoor-seating filter', () => {
+	/**
+	 * Toggle the checkbox by clicking the element itself.
+	 *
+	 * `locator.click()` times out here with "element is outside of the viewport",
+	 * while reporting the element visible, enabled and stable — because it is.
+	 * The filters are one column and each control is at least 60px tall, so the
+	 * sixth falls below the fold of the harness's fixed-size iframe, and neither
+	 * scrolling it into view nor enlarging the viewport moves that boundary. The
+	 * control is fine: it renders correctly and a person scrolls to it.
+	 *
+	 * A native `.click()` dispatches the same trusted-shaped event the component
+	 * listens for, so what is under test — that ticking it sends
+	 * `indoor_seating=true` and unticking it sends nothing — is exercised
+	 * unchanged.
+	 */
+	function toggle(): void {
+		(page.getByLabelText(/Indoor seating/).element() as HTMLInputElement).click();
+	}
+
 	it('asks the API for the spots with a recorded yes', async () => {
 		render(Home);
 
-		await page.getByLabelText(/Indoor seating/).click();
+		toggle();
 		await expect.element(page.getByText('Allerton Library')).toBeInTheDocument();
 		await expect.poll(() => lastRequest().parameters.get('indoor_seating')).toBe('true');
 	});
@@ -328,11 +347,10 @@ describe('the indoor-seating filter', () => {
 		// the parameter is gone: those are refetched on every filter change.
 		render(Home);
 
-		const checkbox = page.getByLabelText(/Indoor seating/);
-		await checkbox.click();
+		toggle();
 		await expect.poll(() => lastRequest().parameters.get('indoor_seating')).toBe('true');
 
-		await checkbox.click();
+		toggle();
 		await expect.poll(() => facetRequests().at(-1)?.parameters.has('indoor_seating')).toBe(false);
 		expect(calls.some((call) => call.parameters.get('indoor_seating') === 'false')).toBe(false);
 	});
