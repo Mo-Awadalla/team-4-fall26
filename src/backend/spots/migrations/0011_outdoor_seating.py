@@ -12,6 +12,14 @@ Unlike 0006 and 0007 this is a plain AddField: the column is not part of
 and the vector is left alone. A boolean is not something anyone types into a
 search box.
 
+It was written as 0009 against ``0008_cost_is_stored``, before the subway and
+nearby-spots work landed on develop and took 0009 and 0010. Two migrations
+declaring one parent is not a merge conflict -- the filenames differ, so git
+merges both without a word -- and Django then refuses every ``migrate`` with
+"Conflicting migrations detected; multiple leaf nodes in the migration graph".
+Renumbering keeps the graph a single chain. The number is cosmetic; the
+``dependencies`` entry below is what actually decides the order.
+
 No index either, for the same reason as no filter: this is an attribute the API
 reports, not one it narrows on. ``free_public_wifi`` and ``no_purchase_needed``
 each have an index because each has a query parameter behind it. Adding one here
@@ -23,7 +31,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("spots", "0008_cost_is_stored"),
+        ("spots", "0010_nearby_spots"),
     ]
 
     operations = [

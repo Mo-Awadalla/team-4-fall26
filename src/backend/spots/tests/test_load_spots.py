@@ -129,6 +129,11 @@ class TestEveryContractFieldIsWritten:
             "operator": "Test Operator",
             "free_public_wifi": True,
             "no_purchase_needed": True,
+            "subway_station": "W 4 St-Wash Sq",
+            "subway_routes": "A B C D E F M",
+            "subway_metres": 409,
+            "subway_step_free": "full",
+            "nearby_spots": 41,
             "outdoor_seating": True,
         }
         assert set(record) == CONTRACT_FIELDS, "the fixture must cover the whole contract"

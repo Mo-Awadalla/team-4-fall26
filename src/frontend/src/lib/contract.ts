@@ -64,6 +64,27 @@ export type StudySpot = {
 	 */
 	no_purchase_needed: boolean;
 	/**
+	 * The nearest subway station within 1.2 km, derived by the importer.
+	 *
+	 * All four are null together — 182 of 2,422 spots have none that close,
+	 * mostly on Staten Island, where the railway is not the subway. `routes` is
+	 * space separated the way the MTA publishes it; `metres` is straight-line
+	 * rather than walking distance; `step_free` is `full`, `partial` (one
+	 * direction only) or `none`.
+	 */
+	subway_station: string | null;
+	subway_routes: string | null;
+	subway_metres: number | null;
+	subway_step_free: string | null;
+	/**
+	 * How many other study spots are within 400 m, about a five-minute walk.
+	 *
+	 * A count of places, not of people: a café on a dense stretch may be empty
+	 * and an isolated library may be packed. It says how lively the surrounding
+	 * block is, and whether there is anywhere else to go if this one is full.
+	 */
+	nearby_spots: number;
+	/**
 	 * Whether a current Dining Out NYC sidewalk licence matches this
 	 * establishment's name and address.
 	 *

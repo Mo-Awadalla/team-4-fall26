@@ -1,0 +1,4329 @@
+[
+  {
+    "name": "1 Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.730953,
+    "longitude": -73.981628,
+    "step_free": "full"
+  },
+  {
+    "name": "103 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.799446,
+    "longitude": -73.968379,
+    "step_free": "none"
+  },
+  {
+    "name": "103 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.7906,
+    "longitude": -73.947478,
+    "step_free": "none"
+  },
+  {
+    "name": "103 St",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.796092,
+    "longitude": -73.961454,
+    "step_free": "none"
+  },
+  {
+    "name": "103 St-Corona Plaza",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.749865,
+    "longitude": -73.8627,
+    "step_free": "none"
+  },
+  {
+    "name": "104 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.681711,
+    "longitude": -73.837683,
+    "step_free": "none"
+  },
+  {
+    "name": "104 St",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.695178,
+    "longitude": -73.84433,
+    "step_free": "none"
+  },
+  {
+    "name": "110 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.79502,
+    "longitude": -73.94425,
+    "step_free": "none"
+  },
+  {
+    "name": "110 St-Malcolm X Plaza",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.799075,
+    "longitude": -73.951822,
+    "step_free": "none"
+  },
+  {
+    "name": "111 St",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.75173,
+    "longitude": -73.855334,
+    "step_free": "none"
+  },
+  {
+    "name": "111 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.684331,
+    "longitude": -73.832163,
+    "step_free": "none"
+  },
+  {
+    "name": "111 St",
+    "routes": [
+      "J"
+    ],
+    "latitude": 40.697418,
+    "longitude": -73.836345,
+    "step_free": "none"
+  },
+  {
+    "name": "116 St",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.802098,
+    "longitude": -73.949625,
+    "step_free": "none"
+  },
+  {
+    "name": "116 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.798629,
+    "longitude": -73.941617,
+    "step_free": "none"
+  },
+  {
+    "name": "116 St",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.805085,
+    "longitude": -73.954882,
+    "step_free": "none"
+  },
+  {
+    "name": "116 St-Columbia University",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.807722,
+    "longitude": -73.96411,
+    "step_free": "none"
+  },
+  {
+    "name": "121 St",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.700492,
+    "longitude": -73.828294,
+    "step_free": "none"
+  },
+  {
+    "name": "125 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.815581,
+    "longitude": -73.958372,
+    "step_free": "none"
+  },
+  {
+    "name": "125 St",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.807754,
+    "longitude": -73.945495,
+    "step_free": "none"
+  },
+  {
+    "name": "125 St",
+    "routes": [
+      "4",
+      "5",
+      "6"
+    ],
+    "latitude": 40.804138,
+    "longitude": -73.937594,
+    "step_free": "full"
+  },
+  {
+    "name": "125 St",
+    "routes": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "latitude": 40.811109,
+    "longitude": -73.952343,
+    "step_free": "full"
+  },
+  {
+    "name": "135 St",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.814229,
+    "longitude": -73.94077,
+    "step_free": "full"
+  },
+  {
+    "name": "135 St",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.817894,
+    "longitude": -73.947649,
+    "step_free": "none"
+  },
+  {
+    "name": "137 St-City College",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.822008,
+    "longitude": -73.953676,
+    "step_free": "full"
+  },
+  {
+    "name": "138 St-Grand Concourse",
+    "routes": [
+      "4",
+      "5"
+    ],
+    "latitude": 40.813224,
+    "longitude": -73.929849,
+    "step_free": "none"
+  },
+  {
+    "name": "14 St",
+    "routes": [
+      "1",
+      "2",
+      "3",
+      "F",
+      "L",
+      "M"
+    ],
+    "latitude": 40.737796,
+    "longitude": -73.997732,
+    "step_free": "full"
+  },
+  {
+    "name": "14 St",
+    "routes": [
+      "A",
+      "C",
+      "E",
+      "L"
+    ],
+    "latitude": 40.740335,
+    "longitude": -74.002134,
+    "step_free": "full"
+  },
+  {
+    "name": "14 St-Union Sq",
+    "routes": [
+      "4",
+      "5",
+      "6",
+      "L",
+      "N",
+      "Q",
+      "R",
+      "W"
+    ],
+    "latitude": 40.735066,
+    "longitude": -73.990416,
+    "step_free": "full"
+  },
+  {
+    "name": "145 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.826551,
+    "longitude": -73.95036,
+    "step_free": "none"
+  },
+  {
+    "name": "145 St",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.820421,
+    "longitude": -73.936245,
+    "step_free": "none"
+  },
+  {
+    "name": "145 St",
+    "routes": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "latitude": 40.824783,
+    "longitude": -73.944216,
+    "step_free": "none"
+  },
+  {
+    "name": "149 St-Hostos",
+    "routes": [
+      "2",
+      "4",
+      "5"
+    ],
+    "latitude": 40.818393,
+    "longitude": -73.927034,
+    "step_free": "full"
+  },
+  {
+    "name": "15 St-Prospect Park",
+    "routes": [
+      "F",
+      "G"
+    ],
+    "latitude": 40.660365,
+    "longitude": -73.979493,
+    "step_free": "none"
+  },
+  {
+    "name": "155 St",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.830135,
+    "longitude": -73.938209,
+    "step_free": "none"
+  },
+  {
+    "name": "155 St",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.830518,
+    "longitude": -73.941514,
+    "step_free": "none"
+  },
+  {
+    "name": "157 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.834041,
+    "longitude": -73.94489,
+    "step_free": "none"
+  },
+  {
+    "name": "161 St-Yankee Stadium",
+    "routes": [
+      "4",
+      "B",
+      "D"
+    ],
+    "latitude": 40.82795,
+    "longitude": -73.925741,
+    "step_free": "full"
+  },
+  {
+    "name": "163 St-Amsterdam Av",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.836013,
+    "longitude": -73.939892,
+    "step_free": "none"
+  },
+  {
+    "name": "167 St",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.835537,
+    "longitude": -73.9214,
+    "step_free": "none"
+  },
+  {
+    "name": "167 St",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.833771,
+    "longitude": -73.91844,
+    "step_free": "none"
+  },
+  {
+    "name": "168 St",
+    "routes": [
+      "1",
+      "A",
+      "C"
+    ],
+    "latitude": 40.840637,
+    "longitude": -73.939847,
+    "step_free": "full"
+  },
+  {
+    "name": "169 St",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.71047,
+    "longitude": -73.793604,
+    "step_free": "none"
+  },
+  {
+    "name": "170 St",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.840075,
+    "longitude": -73.917791,
+    "step_free": "full"
+  },
+  {
+    "name": "170 St",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.839306,
+    "longitude": -73.9134,
+    "step_free": "none"
+  },
+  {
+    "name": "174 St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.837288,
+    "longitude": -73.887734,
+    "step_free": "none"
+  },
+  {
+    "name": "174-175 Sts",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.8459,
+    "longitude": -73.910136,
+    "step_free": "none"
+  },
+  {
+    "name": "175 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.847391,
+    "longitude": -73.939704,
+    "step_free": "full"
+  },
+  {
+    "name": "176 St",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.84848,
+    "longitude": -73.911794,
+    "step_free": "none"
+  },
+  {
+    "name": "18 Av",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.607954,
+    "longitude": -74.001736,
+    "step_free": "none"
+  },
+  {
+    "name": "18 Av",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.629755,
+    "longitude": -73.976971,
+    "step_free": "none"
+  },
+  {
+    "name": "18 Av",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.620671,
+    "longitude": -73.990414,
+    "step_free": "none"
+  },
+  {
+    "name": "18 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.74104,
+    "longitude": -73.997871,
+    "step_free": "none"
+  },
+  {
+    "name": "181 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.849505,
+    "longitude": -73.933596,
+    "step_free": "none"
+  },
+  {
+    "name": "181 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.851695,
+    "longitude": -73.937969,
+    "step_free": "full"
+  },
+  {
+    "name": "182-183 Sts",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.856093,
+    "longitude": -73.900741,
+    "step_free": "none"
+  },
+  {
+    "name": "183 St",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.858407,
+    "longitude": -73.903879,
+    "step_free": "none"
+  },
+  {
+    "name": "190 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.859022,
+    "longitude": -73.93418,
+    "step_free": "none"
+  },
+  {
+    "name": "191 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.855225,
+    "longitude": -73.929412,
+    "step_free": "none"
+  },
+  {
+    "name": "2 Av",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.723402,
+    "longitude": -73.989938,
+    "step_free": "none"
+  },
+  {
+    "name": "20 Av",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.604556,
+    "longitude": -73.998168,
+    "step_free": "none"
+  },
+  {
+    "name": "20 Av",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.61741,
+    "longitude": -73.985026,
+    "step_free": "none"
+  },
+  {
+    "name": "207 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.864621,
+    "longitude": -73.918822,
+    "step_free": "none"
+  },
+  {
+    "name": "21 St",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.744065,
+    "longitude": -73.949724,
+    "step_free": "none"
+  },
+  {
+    "name": "21 St-Queensbridge",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.754203,
+    "longitude": -73.942836,
+    "step_free": "full"
+  },
+  {
+    "name": "215 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.869444,
+    "longitude": -73.915279,
+    "step_free": "none"
+  },
+  {
+    "name": "219 St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.883895,
+    "longitude": -73.862633,
+    "step_free": "none"
+  },
+  {
+    "name": "225 St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.888022,
+    "longitude": -73.860341,
+    "step_free": "none"
+  },
+  {
+    "name": "23 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.744081,
+    "longitude": -73.995657,
+    "step_free": "none"
+  },
+  {
+    "name": "23 St",
+    "routes": [
+      "C",
+      "E"
+    ],
+    "latitude": 40.745906,
+    "longitude": -73.998041,
+    "step_free": "none"
+  },
+  {
+    "name": "23 St",
+    "routes": [
+      "F",
+      "M"
+    ],
+    "latitude": 40.742878,
+    "longitude": -73.992821,
+    "step_free": "none"
+  },
+  {
+    "name": "23 St",
+    "routes": [
+      "R",
+      "W"
+    ],
+    "latitude": 40.741303,
+    "longitude": -73.989344,
+    "step_free": "none"
+  },
+  {
+    "name": "23 St-Baruch College",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.739864,
+    "longitude": -73.986599,
+    "step_free": "full"
+  },
+  {
+    "name": "231 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.878856,
+    "longitude": -73.904834,
+    "step_free": "full"
+  },
+  {
+    "name": "233 St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.893193,
+    "longitude": -73.857473,
+    "step_free": "full"
+  },
+  {
+    "name": "238 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.884667,
+    "longitude": -73.90087,
+    "step_free": "none"
+  },
+  {
+    "name": "25 Av",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.597704,
+    "longitude": -73.986829,
+    "step_free": "none"
+  },
+  {
+    "name": "25 St",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.660397,
+    "longitude": -73.998091,
+    "step_free": "none"
+  },
+  {
+    "name": "28 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.747215,
+    "longitude": -73.993365,
+    "step_free": "none"
+  },
+  {
+    "name": "28 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.74307,
+    "longitude": -73.984264,
+    "step_free": "partial"
+  },
+  {
+    "name": "28 St",
+    "routes": [
+      "R",
+      "W"
+    ],
+    "latitude": 40.745494,
+    "longitude": -73.988691,
+    "step_free": "none"
+  },
+  {
+    "name": "3 Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.732849,
+    "longitude": -73.986122,
+    "step_free": "none"
+  },
+  {
+    "name": "3 Av-138 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.810476,
+    "longitude": -73.926138,
+    "step_free": "none"
+  },
+  {
+    "name": "3 Av-149 St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.816109,
+    "longitude": -73.917757,
+    "step_free": "full"
+  },
+  {
+    "name": "30 Av",
+    "routes": [
+      "N",
+      "W"
+    ],
+    "latitude": 40.766779,
+    "longitude": -73.921479,
+    "step_free": "none"
+  },
+  {
+    "name": "33 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.746081,
+    "longitude": -73.982076,
+    "step_free": "none"
+  },
+  {
+    "name": "33 St-Rawson St",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.744587,
+    "longitude": -73.930997,
+    "step_free": "none"
+  },
+  {
+    "name": "34 St-Herald Sq",
+    "routes": [
+      "B",
+      "D",
+      "F",
+      "M",
+      "N",
+      "Q",
+      "R",
+      "W"
+    ],
+    "latitude": 40.749643,
+    "longitude": -73.987887,
+    "step_free": "full"
+  },
+  {
+    "name": "34 St-Hudson Yards",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.755882,
+    "longitude": -74.00191,
+    "step_free": "full"
+  },
+  {
+    "name": "34 St-Penn Station",
+    "routes": [
+      "1",
+      "2",
+      "3"
+    ],
+    "latitude": 40.750373,
+    "longitude": -73.991057,
+    "step_free": "full"
+  },
+  {
+    "name": "34 St-Penn Station",
+    "routes": [
+      "A",
+      "C",
+      "E"
+    ],
+    "latitude": 40.752287,
+    "longitude": -73.993391,
+    "step_free": "full"
+  },
+  {
+    "name": "36 Av",
+    "routes": [
+      "N",
+      "W"
+    ],
+    "latitude": 40.756804,
+    "longitude": -73.929575,
+    "step_free": "none"
+  },
+  {
+    "name": "36 St",
+    "routes": [
+      "D",
+      "N",
+      "R"
+    ],
+    "latitude": 40.655144,
+    "longitude": -74.003549,
+    "step_free": "none"
+  },
+  {
+    "name": "36 St",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.752039,
+    "longitude": -73.928781,
+    "step_free": "none"
+  },
+  {
+    "name": "39 Av-Dutch Kills",
+    "routes": [
+      "N",
+      "W"
+    ],
+    "latitude": 40.752882,
+    "longitude": -73.932755,
+    "step_free": "none"
+  },
+  {
+    "name": "4 Av-9 St",
+    "routes": [
+      "F",
+      "G",
+      "R"
+    ],
+    "latitude": 40.670559,
+    "longitude": -73.989041,
+    "step_free": "none"
+  },
+  {
+    "name": "40 St-Lowery St",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.743781,
+    "longitude": -73.924016,
+    "step_free": "none"
+  },
+  {
+    "name": "42 St-Bryant Pk",
+    "routes": [
+      "7",
+      "B",
+      "D",
+      "F",
+      "M"
+    ],
+    "latitude": 40.754022,
+    "longitude": -73.983266,
+    "step_free": "none"
+  },
+  {
+    "name": "45 St",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.648939,
+    "longitude": -74.010006,
+    "step_free": "none"
+  },
+  {
+    "name": "46 St",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.756312,
+    "longitude": -73.913333,
+    "step_free": "none"
+  },
+  {
+    "name": "46 St-Bliss St",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.743132,
+    "longitude": -73.918435,
+    "step_free": "none"
+  },
+  {
+    "name": "47-50 Sts-Rockefeller Ctr",
+    "routes": [
+      "B",
+      "D",
+      "F",
+      "M"
+    ],
+    "latitude": 40.758663,
+    "longitude": -73.981329,
+    "step_free": "full"
+  },
+  {
+    "name": "49 St",
+    "routes": [
+      "N",
+      "R",
+      "W"
+    ],
+    "latitude": 40.759901,
+    "longitude": -73.984139,
+    "step_free": "partial"
+  },
+  {
+    "name": "5 Av/53 St",
+    "routes": [
+      "E",
+      "F"
+    ],
+    "latitude": 40.760167,
+    "longitude": -73.975224,
+    "step_free": "none"
+  },
+  {
+    "name": "5 Av/59 St",
+    "routes": [
+      "N",
+      "R",
+      "W"
+    ],
+    "latitude": 40.764811,
+    "longitude": -73.973347,
+    "step_free": "none"
+  },
+  {
+    "name": "50 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.761728,
+    "longitude": -73.983849,
+    "step_free": "none"
+  },
+  {
+    "name": "50 St",
+    "routes": [
+      "C",
+      "E"
+    ],
+    "latitude": 40.762456,
+    "longitude": -73.985984,
+    "step_free": "partial"
+  },
+  {
+    "name": "50 St",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.63626,
+    "longitude": -73.994791,
+    "step_free": "none"
+  },
+  {
+    "name": "52 St",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.744149,
+    "longitude": -73.912549,
+    "step_free": "none"
+  },
+  {
+    "name": "53 St",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.645069,
+    "longitude": -74.014034,
+    "step_free": "none"
+  },
+  {
+    "name": "55 St",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.631435,
+    "longitude": -73.995476,
+    "step_free": "none"
+  },
+  {
+    "name": "57 St",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.763972,
+    "longitude": -73.97745,
+    "step_free": "full"
+  },
+  {
+    "name": "57 St-7 Av",
+    "routes": [
+      "N",
+      "Q",
+      "R",
+      "W"
+    ],
+    "latitude": 40.764664,
+    "longitude": -73.980658,
+    "step_free": "full"
+  },
+  {
+    "name": "59 St",
+    "routes": [
+      "4",
+      "5",
+      "6",
+      "N",
+      "R",
+      "W"
+    ],
+    "latitude": 40.762593,
+    "longitude": -73.967613,
+    "step_free": "none"
+  },
+  {
+    "name": "59 St",
+    "routes": [
+      "N",
+      "R"
+    ],
+    "latitude": 40.641362,
+    "longitude": -74.017881,
+    "step_free": "full"
+  },
+  {
+    "name": "59 St-Columbus Circle",
+    "routes": [
+      "1",
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "latitude": 40.768271,
+    "longitude": -73.981832,
+    "step_free": "full"
+  },
+  {
+    "name": "61 St-Woodside",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.74563,
+    "longitude": -73.902984,
+    "step_free": "full"
+  },
+  {
+    "name": "62 St",
+    "routes": [
+      "D",
+      "N"
+    ],
+    "latitude": 40.625657,
+    "longitude": -73.996624,
+    "step_free": "full"
+  },
+  {
+    "name": "63 Dr-Rego Park",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.729846,
+    "longitude": -73.861604,
+    "step_free": "none"
+  },
+  {
+    "name": "65 St",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.749669,
+    "longitude": -73.898453,
+    "step_free": "none"
+  },
+  {
+    "name": "66 St-Lincoln Center",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.77344,
+    "longitude": -73.982209,
+    "step_free": "full"
+  },
+  {
+    "name": "67 Av",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.726523,
+    "longitude": -73.852719,
+    "step_free": "none"
+  },
+  {
+    "name": "68 St-Hunter College",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.768141,
+    "longitude": -73.96387,
+    "step_free": "full"
+  },
+  {
+    "name": "69 St",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.746325,
+    "longitude": -73.896403,
+    "step_free": "none"
+  },
+  {
+    "name": "7 Av",
+    "routes": [
+      "B",
+      "D",
+      "E"
+    ],
+    "latitude": 40.762862,
+    "longitude": -73.981637,
+    "step_free": "none"
+  },
+  {
+    "name": "7 Av",
+    "routes": [
+      "B",
+      "Q"
+    ],
+    "latitude": 40.67705,
+    "longitude": -73.972367,
+    "step_free": "none"
+  },
+  {
+    "name": "7 Av",
+    "routes": [
+      "F",
+      "G"
+    ],
+    "latitude": 40.666271,
+    "longitude": -73.980305,
+    "step_free": "full"
+  },
+  {
+    "name": "71 St",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.619589,
+    "longitude": -73.998864,
+    "step_free": "none"
+  },
+  {
+    "name": "72 St",
+    "routes": [
+      "1",
+      "2",
+      "3"
+    ],
+    "latitude": 40.778453,
+    "longitude": -73.98197,
+    "step_free": "full"
+  },
+  {
+    "name": "72 St",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.775594,
+    "longitude": -73.97641,
+    "step_free": "none"
+  },
+  {
+    "name": "72 St",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.768799,
+    "longitude": -73.958424,
+    "step_free": "full"
+  },
+  {
+    "name": "75 Av",
+    "routes": [
+      "E",
+      "F"
+    ],
+    "latitude": 40.718331,
+    "longitude": -73.837324,
+    "step_free": "none"
+  },
+  {
+    "name": "75 St-Elderts Ln",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.691324,
+    "longitude": -73.867139,
+    "step_free": "none"
+  },
+  {
+    "name": "77 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.77362,
+    "longitude": -73.959874,
+    "step_free": "none"
+  },
+  {
+    "name": "77 St",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.629742,
+    "longitude": -74.02551,
+    "step_free": "none"
+  },
+  {
+    "name": "79 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.783934,
+    "longitude": -73.979917,
+    "step_free": "none"
+  },
+  {
+    "name": "79 St",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.613501,
+    "longitude": -74.00061,
+    "step_free": "none"
+  },
+  {
+    "name": "8 Av",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.635064,
+    "longitude": -74.011719,
+    "step_free": "full"
+  },
+  {
+    "name": "8 St-NYU",
+    "routes": [
+      "R",
+      "W"
+    ],
+    "latitude": 40.730328,
+    "longitude": -73.992629,
+    "step_free": "none"
+  },
+  {
+    "name": "80 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.679371,
+    "longitude": -73.858992,
+    "step_free": "none"
+  },
+  {
+    "name": "81 St-Museum of Natural History",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.781433,
+    "longitude": -73.972143,
+    "step_free": "none"
+  },
+  {
+    "name": "82 St-Jackson Hts",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.747659,
+    "longitude": -73.883697,
+    "step_free": "none"
+  },
+  {
+    "name": "85 St-Forest Pkwy",
+    "routes": [
+      "J"
+    ],
+    "latitude": 40.692435,
+    "longitude": -73.86001,
+    "step_free": "none"
+  },
+  {
+    "name": "86 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.788644,
+    "longitude": -73.976218,
+    "step_free": "none"
+  },
+  {
+    "name": "86 St",
+    "routes": [
+      "4",
+      "5",
+      "6"
+    ],
+    "latitude": 40.779492,
+    "longitude": -73.955589,
+    "step_free": "partial"
+  },
+  {
+    "name": "86 St",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.785868,
+    "longitude": -73.968916,
+    "step_free": "none"
+  },
+  {
+    "name": "86 St",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.592721,
+    "longitude": -73.97823,
+    "step_free": "none"
+  },
+  {
+    "name": "86 St",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.777891,
+    "longitude": -73.951787,
+    "step_free": "full"
+  },
+  {
+    "name": "86 St",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.622687,
+    "longitude": -74.028398,
+    "step_free": "full"
+  },
+  {
+    "name": "88 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.679843,
+    "longitude": -73.85147,
+    "step_free": "none"
+  },
+  {
+    "name": "9 Av",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.646292,
+    "longitude": -73.994324,
+    "step_free": "none"
+  },
+  {
+    "name": "90 St-Elmhurst Av",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.748408,
+    "longitude": -73.876613,
+    "step_free": "none"
+  },
+  {
+    "name": "96 St",
+    "routes": [
+      "1",
+      "2",
+      "3"
+    ],
+    "latitude": 40.793919,
+    "longitude": -73.972323,
+    "step_free": "full"
+  },
+  {
+    "name": "96 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.785672,
+    "longitude": -73.95107,
+    "step_free": "none"
+  },
+  {
+    "name": "96 St",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.791642,
+    "longitude": -73.964696,
+    "step_free": "none"
+  },
+  {
+    "name": "96 St",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.784318,
+    "longitude": -73.947152,
+    "step_free": "full"
+  },
+  {
+    "name": "Alabama Av",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.676992,
+    "longitude": -73.898654,
+    "step_free": "none"
+  },
+  {
+    "name": "Allerton Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.865462,
+    "longitude": -73.867352,
+    "step_free": "none"
+  },
+  {
+    "name": "Annadale",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.54046,
+    "longitude": -74.178217,
+    "step_free": "none"
+  },
+  {
+    "name": "Aqueduct Racetrack",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.672097,
+    "longitude": -73.835919,
+    "step_free": "full"
+  },
+  {
+    "name": "Aqueduct-N Conduit Av",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.668234,
+    "longitude": -73.834058,
+    "step_free": "none"
+  },
+  {
+    "name": "Arthur Kill",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.516578,
+    "longitude": -74.242096,
+    "step_free": "full"
+  },
+  {
+    "name": "Astor Pl",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.730054,
+    "longitude": -73.99107,
+    "step_free": "none"
+  },
+  {
+    "name": "Astoria Blvd",
+    "routes": [
+      "N",
+      "W"
+    ],
+    "latitude": 40.770258,
+    "longitude": -73.917843,
+    "step_free": "full"
+  },
+  {
+    "name": "Astoria-Ditmars Blvd",
+    "routes": [
+      "N",
+      "W"
+    ],
+    "latitude": 40.775036,
+    "longitude": -73.912034,
+    "step_free": "none"
+  },
+  {
+    "name": "Atlantic Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.675345,
+    "longitude": -73.903097,
+    "step_free": "none"
+  },
+  {
+    "name": "Atlantic Av-Barclays Ctr",
+    "routes": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "B",
+      "D",
+      "N",
+      "Q",
+      "R"
+    ],
+    "latitude": 40.684162,
+    "longitude": -73.977789,
+    "step_free": "full"
+  },
+  {
+    "name": "Avenue H",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.62927,
+    "longitude": -73.961639,
+    "step_free": "full"
+  },
+  {
+    "name": "Avenue I",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.625322,
+    "longitude": -73.976127,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue J",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.625039,
+    "longitude": -73.960803,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue M",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.617618,
+    "longitude": -73.959399,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue N",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.61514,
+    "longitude": -73.974197,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue P",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.608944,
+    "longitude": -73.973022,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue U",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.596063,
+    "longitude": -73.973357,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue U",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.597473,
+    "longitude": -73.979137,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue U",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.5993,
+    "longitude": -73.955929,
+    "step_free": "none"
+  },
+  {
+    "name": "Avenue X",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.58962,
+    "longitude": -73.97425,
+    "step_free": "none"
+  },
+  {
+    "name": "Bay 50 St",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.588841,
+    "longitude": -73.983765,
+    "step_free": "none"
+  },
+  {
+    "name": "Bay Pkwy",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.601875,
+    "longitude": -73.993728,
+    "step_free": "full"
+  },
+  {
+    "name": "Bay Pkwy",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.620769,
+    "longitude": -73.975264,
+    "step_free": "none"
+  },
+  {
+    "name": "Bay Pkwy",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.611815,
+    "longitude": -73.981848,
+    "step_free": "none"
+  },
+  {
+    "name": "Bay Ridge Av",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.634967,
+    "longitude": -74.023377,
+    "step_free": "none"
+  },
+  {
+    "name": "Bay Ridge-95 St",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.616622,
+    "longitude": -74.030876,
+    "step_free": "full"
+  },
+  {
+    "name": "Bay Terrace",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.5564,
+    "longitude": -74.136907,
+    "step_free": "none"
+  },
+  {
+    "name": "Baychester Av",
+    "routes": [
+      "5"
+    ],
+    "latitude": 40.878663,
+    "longitude": -73.838591,
+    "step_free": "none"
+  },
+  {
+    "name": "Beach 105 St",
+    "routes": [
+      "A",
+      "S"
+    ],
+    "latitude": 40.583209,
+    "longitude": -73.827559,
+    "step_free": "none"
+  },
+  {
+    "name": "Beach 25 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.600066,
+    "longitude": -73.761353,
+    "step_free": "none"
+  },
+  {
+    "name": "Beach 36 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.595398,
+    "longitude": -73.768175,
+    "step_free": "none"
+  },
+  {
+    "name": "Beach 44 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.592943,
+    "longitude": -73.776013,
+    "step_free": "none"
+  },
+  {
+    "name": "Beach 60 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.592374,
+    "longitude": -73.788522,
+    "step_free": "none"
+  },
+  {
+    "name": "Beach 67 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.590927,
+    "longitude": -73.796924,
+    "step_free": "full"
+  },
+  {
+    "name": "Beach 90 St",
+    "routes": [
+      "A",
+      "S"
+    ],
+    "latitude": 40.588034,
+    "longitude": -73.813641,
+    "step_free": "none"
+  },
+  {
+    "name": "Beach 98 St",
+    "routes": [
+      "A",
+      "S"
+    ],
+    "latitude": 40.585307,
+    "longitude": -73.820558,
+    "step_free": "none"
+  },
+  {
+    "name": "Bedford Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.717304,
+    "longitude": -73.956872,
+    "step_free": "full"
+  },
+  {
+    "name": "Bedford Park Blvd",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.873244,
+    "longitude": -73.887138,
+    "step_free": "full"
+  },
+  {
+    "name": "Bedford Park Blvd-Lehman College",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.873412,
+    "longitude": -73.890064,
+    "step_free": "none"
+  },
+  {
+    "name": "Bedford-Nostrand Avs",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.689627,
+    "longitude": -73.953522,
+    "step_free": "none"
+  },
+  {
+    "name": "Bergen St",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.680829,
+    "longitude": -73.975098,
+    "step_free": "none"
+  },
+  {
+    "name": "Bergen St",
+    "routes": [
+      "F",
+      "G"
+    ],
+    "latitude": 40.686145,
+    "longitude": -73.990862,
+    "step_free": "none"
+  },
+  {
+    "name": "Beverley Rd",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.644031,
+    "longitude": -73.964492,
+    "step_free": "none"
+  },
+  {
+    "name": "Beverly Rd",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.645098,
+    "longitude": -73.948959,
+    "step_free": "none"
+  },
+  {
+    "name": "Borough Hall",
+    "routes": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "R"
+    ],
+    "latitude": 40.693241,
+    "longitude": -73.990642,
+    "step_free": "full"
+  },
+  {
+    "name": "Bowery",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.72028,
+    "longitude": -73.993915,
+    "step_free": "none"
+  },
+  {
+    "name": "Bowling Green",
+    "routes": [
+      "4",
+      "5"
+    ],
+    "latitude": 40.704817,
+    "longitude": -74.014065,
+    "step_free": "full"
+  },
+  {
+    "name": "Briarwood",
+    "routes": [
+      "E",
+      "F"
+    ],
+    "latitude": 40.709179,
+    "longitude": -73.820574,
+    "step_free": "none"
+  },
+  {
+    "name": "Brighton Beach",
+    "routes": [
+      "B",
+      "Q"
+    ],
+    "latitude": 40.577621,
+    "longitude": -73.961376,
+    "step_free": "none"
+  },
+  {
+    "name": "Broad Channel",
+    "routes": [
+      "A",
+      "S"
+    ],
+    "latitude": 40.608382,
+    "longitude": -73.815925,
+    "step_free": "none"
+  },
+  {
+    "name": "Broad St",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.706476,
+    "longitude": -74.011056,
+    "step_free": "none"
+  },
+  {
+    "name": "Broadway",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.706092,
+    "longitude": -73.950308,
+    "step_free": "none"
+  },
+  {
+    "name": "Broadway",
+    "routes": [
+      "N",
+      "W"
+    ],
+    "latitude": 40.76182,
+    "longitude": -73.925508,
+    "step_free": "none"
+  },
+  {
+    "name": "Broadway Junction",
+    "routes": [
+      "A",
+      "C",
+      "J",
+      "L",
+      "Z"
+    ],
+    "latitude": 40.678896,
+    "longitude": -73.904356,
+    "step_free": "none"
+  },
+  {
+    "name": "Broadway-Lafayette St",
+    "routes": [
+      "6",
+      "B",
+      "D",
+      "F",
+      "M"
+    ],
+    "latitude": 40.725606,
+    "longitude": -73.995431,
+    "step_free": "full"
+  },
+  {
+    "name": "Bronx Park East",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.848828,
+    "longitude": -73.868457,
+    "step_free": "none"
+  },
+  {
+    "name": "Brook Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.807566,
+    "longitude": -73.91924,
+    "step_free": "none"
+  },
+  {
+    "name": "Brooklyn Bridge-City Hall",
+    "routes": [
+      "4",
+      "5",
+      "6",
+      "J",
+      "Z"
+    ],
+    "latitude": 40.713154,
+    "longitude": -74.003766,
+    "step_free": "full"
+  },
+  {
+    "name": "Buhre Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.84681,
+    "longitude": -73.832569,
+    "step_free": "none"
+  },
+  {
+    "name": "Burke Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.871356,
+    "longitude": -73.867164,
+    "step_free": "none"
+  },
+  {
+    "name": "Burnside Av",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.853453,
+    "longitude": -73.907684,
+    "step_free": "none"
+  },
+  {
+    "name": "Bushwick Av-Aberdeen St",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.682829,
+    "longitude": -73.905249,
+    "step_free": "none"
+  },
+  {
+    "name": "Canal St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.722854,
+    "longitude": -74.006277,
+    "step_free": "none"
+  },
+  {
+    "name": "Canal St",
+    "routes": [
+      "6",
+      "J",
+      "N",
+      "Q",
+      "R",
+      "W",
+      "Z"
+    ],
+    "latitude": 40.718701,
+    "longitude": -74.00058,
+    "step_free": "full"
+  },
+  {
+    "name": "Canal St",
+    "routes": [
+      "A",
+      "C",
+      "E"
+    ],
+    "latitude": 40.720824,
+    "longitude": -74.005229,
+    "step_free": "none"
+  },
+  {
+    "name": "Canarsie-Rockaway Pkwy",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.646654,
+    "longitude": -73.90185,
+    "step_free": "full"
+  },
+  {
+    "name": "Carroll St",
+    "routes": [
+      "F",
+      "G"
+    ],
+    "latitude": 40.680303,
+    "longitude": -73.995048,
+    "step_free": "none"
+  },
+  {
+    "name": "Castle Hill Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.834255,
+    "longitude": -73.851222,
+    "step_free": "none"
+  },
+  {
+    "name": "Cathedral Pkwy (110 St)",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.803967,
+    "longitude": -73.966847,
+    "step_free": "none"
+  },
+  {
+    "name": "Cathedral Pkwy (110 St)",
+    "routes": [
+      "B",
+      "C"
+    ],
+    "latitude": 40.800603,
+    "longitude": -73.958161,
+    "step_free": "none"
+  },
+  {
+    "name": "Central Av",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.697857,
+    "longitude": -73.927397,
+    "step_free": "none"
+  },
+  {
+    "name": "Chambers St",
+    "routes": [
+      "1",
+      "2",
+      "3"
+    ],
+    "latitude": 40.715478,
+    "longitude": -74.009266,
+    "step_free": "full"
+  },
+  {
+    "name": "Chauncey St",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.682893,
+    "longitude": -73.910456,
+    "step_free": "none"
+  },
+  {
+    "name": "Christopher St-Stonewall",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.733422,
+    "longitude": -74.002906,
+    "step_free": "none"
+  },
+  {
+    "name": "Church Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.650843,
+    "longitude": -73.949575,
+    "step_free": "full"
+  },
+  {
+    "name": "Church Av",
+    "routes": [
+      "B",
+      "Q"
+    ],
+    "latitude": 40.650527,
+    "longitude": -73.962982,
+    "step_free": "full"
+  },
+  {
+    "name": "Church Av",
+    "routes": [
+      "F",
+      "G"
+    ],
+    "latitude": 40.644041,
+    "longitude": -73.979678,
+    "step_free": "full"
+  },
+  {
+    "name": "City Hall",
+    "routes": [
+      "R",
+      "W"
+    ],
+    "latitude": 40.713282,
+    "longitude": -74.006978,
+    "step_free": "none"
+  },
+  {
+    "name": "Clark St",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.697466,
+    "longitude": -73.993086,
+    "step_free": "none"
+  },
+  {
+    "name": "Classon Av",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.688873,
+    "longitude": -73.96007,
+    "step_free": "none"
+  },
+  {
+    "name": "Cleveland St",
+    "routes": [
+      "J"
+    ],
+    "latitude": 40.679947,
+    "longitude": -73.884639,
+    "step_free": "none"
+  },
+  {
+    "name": "Clifton",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.621319,
+    "longitude": -74.071402,
+    "step_free": "none"
+  },
+  {
+    "name": "Clinton-Washington Avs",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.683263,
+    "longitude": -73.965838,
+    "step_free": "none"
+  },
+  {
+    "name": "Clinton-Washington Avs",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.688089,
+    "longitude": -73.966839,
+    "step_free": "none"
+  },
+  {
+    "name": "Coney Island-Stillwell Av",
+    "routes": [
+      "D",
+      "F",
+      "N",
+      "Q"
+    ],
+    "latitude": 40.577422,
+    "longitude": -73.981233,
+    "step_free": "full"
+  },
+  {
+    "name": "Cortelyou Rd",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.640927,
+    "longitude": -73.963891,
+    "step_free": "none"
+  },
+  {
+    "name": "Court Sq-23 St",
+    "routes": [
+      "7",
+      "E",
+      "F",
+      "G"
+    ],
+    "latitude": 40.747141,
+    "longitude": -73.945032,
+    "step_free": "full"
+  },
+  {
+    "name": "Crescent St",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.683194,
+    "longitude": -73.873785,
+    "step_free": "none"
+  },
+  {
+    "name": "Crown Hts-Utica Av",
+    "routes": [
+      "3",
+      "4"
+    ],
+    "latitude": 40.668897,
+    "longitude": -73.932942,
+    "step_free": "full"
+  },
+  {
+    "name": "Cypress Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.805368,
+    "longitude": -73.914042,
+    "step_free": "none"
+  },
+  {
+    "name": "Cypress Hills",
+    "routes": [
+      "J"
+    ],
+    "latitude": 40.689941,
+    "longitude": -73.87255,
+    "step_free": "none"
+  },
+  {
+    "name": "DeKalb Av",
+    "routes": [
+      "B",
+      "Q",
+      "R"
+    ],
+    "latitude": 40.690635,
+    "longitude": -73.981824,
+    "step_free": "full"
+  },
+  {
+    "name": "DeKalb Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.703811,
+    "longitude": -73.918425,
+    "step_free": "none"
+  },
+  {
+    "name": "Delancey St-Essex St",
+    "routes": [
+      "F",
+      "J",
+      "M",
+      "Z"
+    ],
+    "latitude": 40.718463,
+    "longitude": -73.987775,
+    "step_free": "none"
+  },
+  {
+    "name": "Ditmas Av",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.636119,
+    "longitude": -73.978172,
+    "step_free": "none"
+  },
+  {
+    "name": "Dongan Hills",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.588849,
+    "longitude": -74.09609,
+    "step_free": "full"
+  },
+  {
+    "name": "Dyckman St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.860531,
+    "longitude": -73.925536,
+    "step_free": "full"
+  },
+  {
+    "name": "Dyckman St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.865491,
+    "longitude": -73.927271,
+    "step_free": "none"
+  },
+  {
+    "name": "E 143 St-St Mary's St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.808719,
+    "longitude": -73.907657,
+    "step_free": "none"
+  },
+  {
+    "name": "E 149 St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.812118,
+    "longitude": -73.904098,
+    "step_free": "full"
+  },
+  {
+    "name": "E 180 St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.841894,
+    "longitude": -73.873488,
+    "step_free": "full"
+  },
+  {
+    "name": "East 105 St",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.650573,
+    "longitude": -73.899485,
+    "step_free": "none"
+  },
+  {
+    "name": "East Broadway",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.713715,
+    "longitude": -73.990173,
+    "step_free": "none"
+  },
+  {
+    "name": "Eastchester-Dyre Av",
+    "routes": [
+      "5"
+    ],
+    "latitude": 40.8883,
+    "longitude": -73.830834,
+    "step_free": "none"
+  },
+  {
+    "name": "Eastern Pkwy-Brooklyn Museum",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.671987,
+    "longitude": -73.964375,
+    "step_free": "full"
+  },
+  {
+    "name": "Elder Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.828584,
+    "longitude": -73.879159,
+    "step_free": "none"
+  },
+  {
+    "name": "Elmhurst Av",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.742454,
+    "longitude": -73.882017,
+    "step_free": "none"
+  },
+  {
+    "name": "Eltingville",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.544601,
+    "longitude": -74.16457,
+    "step_free": "none"
+  },
+  {
+    "name": "Euclid Av",
+    "routes": [
+      "A",
+      "C"
+    ],
+    "latitude": 40.675377,
+    "longitude": -73.872106,
+    "step_free": "full"
+  },
+  {
+    "name": "Far Rockaway-Mott Av",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.603995,
+    "longitude": -73.755405,
+    "step_free": "full"
+  },
+  {
+    "name": "Flatbush Av-Brooklyn College",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.632836,
+    "longitude": -73.947642,
+    "step_free": "full"
+  },
+  {
+    "name": "Flushing Av",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.700377,
+    "longitude": -73.950234,
+    "step_free": "none"
+  },
+  {
+    "name": "Flushing Av",
+    "routes": [
+      "J",
+      "M"
+    ],
+    "latitude": 40.70026,
+    "longitude": -73.941126,
+    "step_free": "full"
+  },
+  {
+    "name": "Flushing-Main St",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.7596,
+    "longitude": -73.83003,
+    "step_free": "full"
+  },
+  {
+    "name": "Fordham Rd",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.862803,
+    "longitude": -73.901034,
+    "step_free": "full"
+  },
+  {
+    "name": "Fordham Rd",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.861296,
+    "longitude": -73.897749,
+    "step_free": "none"
+  },
+  {
+    "name": "Forest Av",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.704423,
+    "longitude": -73.903077,
+    "step_free": "none"
+  },
+  {
+    "name": "Forest Hills-71 Av",
+    "routes": [
+      "E",
+      "F",
+      "M",
+      "R"
+    ],
+    "latitude": 40.721691,
+    "longitude": -73.844521,
+    "step_free": "full"
+  },
+  {
+    "name": "Fort Hamilton Pkwy",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.640914,
+    "longitude": -73.994304,
+    "step_free": "none"
+  },
+  {
+    "name": "Fort Hamilton Pkwy",
+    "routes": [
+      "F",
+      "G"
+    ],
+    "latitude": 40.650782,
+    "longitude": -73.975776,
+    "step_free": "none"
+  },
+  {
+    "name": "Fort Hamilton Pkwy",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.631386,
+    "longitude": -74.005351,
+    "step_free": "none"
+  },
+  {
+    "name": "Franklin Av",
+    "routes": [
+      "C",
+      "S"
+    ],
+    "latitude": 40.680988,
+    "longitude": -73.956337,
+    "step_free": "full"
+  },
+  {
+    "name": "Franklin Av-Medgar Evers College",
+    "routes": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "S"
+    ],
+    "latitude": 40.670513,
+    "longitude": -73.958688,
+    "step_free": "none"
+  },
+  {
+    "name": "Franklin St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.719318,
+    "longitude": -74.006886,
+    "step_free": "none"
+  },
+  {
+    "name": "Freeman St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.829993,
+    "longitude": -73.891865,
+    "step_free": "none"
+  },
+  {
+    "name": "Fresh Pond Rd",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.706186,
+    "longitude": -73.895877,
+    "step_free": "none"
+  },
+  {
+    "name": "Fulton St",
+    "routes": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "A",
+      "C",
+      "J",
+      "Z"
+    ],
+    "latitude": 40.710089,
+    "longitude": -74.007838,
+    "step_free": "full"
+  },
+  {
+    "name": "Fulton St",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.687119,
+    "longitude": -73.975375,
+    "step_free": "none"
+  },
+  {
+    "name": "Gates Av",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.68963,
+    "longitude": -73.92227,
+    "step_free": "none"
+  },
+  {
+    "name": "Graham Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.714565,
+    "longitude": -73.944053,
+    "step_free": "none"
+  },
+  {
+    "name": "Grand Army Plaza",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.675235,
+    "longitude": -73.971046,
+    "step_free": "none"
+  },
+  {
+    "name": "Grand Av-Newtown",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.737015,
+    "longitude": -73.877223,
+    "step_free": "none"
+  },
+  {
+    "name": "Grand Central-42 St",
+    "routes": [
+      "4",
+      "5",
+      "6",
+      "7",
+      "S"
+    ],
+    "latitude": 40.751992,
+    "longitude": -73.977359,
+    "step_free": "full"
+  },
+  {
+    "name": "Grand St",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.718267,
+    "longitude": -73.993753,
+    "step_free": "none"
+  },
+  {
+    "name": "Grand St",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.711926,
+    "longitude": -73.94067,
+    "step_free": "full"
+  },
+  {
+    "name": "Grant Av",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.677044,
+    "longitude": -73.86505,
+    "step_free": "none"
+  },
+  {
+    "name": "Grant City",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.578965,
+    "longitude": -74.109704,
+    "step_free": "none"
+  },
+  {
+    "name": "Grasmere",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.603117,
+    "longitude": -74.084087,
+    "step_free": "none"
+  },
+  {
+    "name": "Great Kills",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.551231,
+    "longitude": -74.151399,
+    "step_free": "full"
+  },
+  {
+    "name": "Greenpoint Av",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.731352,
+    "longitude": -73.954449,
+    "step_free": "full"
+  },
+  {
+    "name": "Gun Hill Rd",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.87785,
+    "longitude": -73.866256,
+    "step_free": "full"
+  },
+  {
+    "name": "Gun Hill Rd",
+    "routes": [
+      "5"
+    ],
+    "latitude": 40.869526,
+    "longitude": -73.846384,
+    "step_free": "full"
+  },
+  {
+    "name": "Halsey St",
+    "routes": [
+      "J"
+    ],
+    "latitude": 40.68637,
+    "longitude": -73.916559,
+    "step_free": "none"
+  },
+  {
+    "name": "Halsey St",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.695602,
+    "longitude": -73.904084,
+    "step_free": "none"
+  },
+  {
+    "name": "Harlem-148 St",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.82388,
+    "longitude": -73.93647,
+    "step_free": "full"
+  },
+  {
+    "name": "Hewes St",
+    "routes": [
+      "J",
+      "M"
+    ],
+    "latitude": 40.70687,
+    "longitude": -73.953431,
+    "step_free": "none"
+  },
+  {
+    "name": "High St",
+    "routes": [
+      "A",
+      "C"
+    ],
+    "latitude": 40.699337,
+    "longitude": -73.990531,
+    "step_free": "none"
+  },
+  {
+    "name": "Houston St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.728251,
+    "longitude": -74.005367,
+    "step_free": "none"
+  },
+  {
+    "name": "Howard Beach-JFK Airport",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.660476,
+    "longitude": -73.830301,
+    "step_free": "full"
+  },
+  {
+    "name": "Hoyt St",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.690545,
+    "longitude": -73.985065,
+    "step_free": "partial"
+  },
+  {
+    "name": "Hoyt-Schermerhorn Sts",
+    "routes": [
+      "A",
+      "C",
+      "G"
+    ],
+    "latitude": 40.688484,
+    "longitude": -73.985001,
+    "step_free": "none"
+  },
+  {
+    "name": "Huguenot",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.533674,
+    "longitude": -74.191794,
+    "step_free": "none"
+  },
+  {
+    "name": "Hunters Point Av",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.742216,
+    "longitude": -73.948916,
+    "step_free": "none"
+  },
+  {
+    "name": "Hunts Point Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.820948,
+    "longitude": -73.890549,
+    "step_free": "full"
+  },
+  {
+    "name": "Intervale Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.822181,
+    "longitude": -73.896736,
+    "step_free": "none"
+  },
+  {
+    "name": "Inwood-207 St",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.868072,
+    "longitude": -73.919899,
+    "step_free": "full"
+  },
+  {
+    "name": "Jackson Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.81649,
+    "longitude": -73.907807,
+    "step_free": "none"
+  },
+  {
+    "name": "Jackson Hts-Roosevelt Av",
+    "routes": [
+      "7",
+      "E",
+      "F",
+      "M",
+      "R"
+    ],
+    "latitude": 40.746746,
+    "longitude": -73.891366,
+    "step_free": "full"
+  },
+  {
+    "name": "Jamaica Center-Parsons/Archer",
+    "routes": [
+      "E",
+      "J",
+      "Z"
+    ],
+    "latitude": 40.702147,
+    "longitude": -73.801109,
+    "step_free": "full"
+  },
+  {
+    "name": "Jamaica-179 St",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.712646,
+    "longitude": -73.783817,
+    "step_free": "full"
+  },
+  {
+    "name": "Jamaica-Van Wyck",
+    "routes": [
+      "E"
+    ],
+    "latitude": 40.702566,
+    "longitude": -73.816859,
+    "step_free": "full"
+  },
+  {
+    "name": "Jay St-MetroTech",
+    "routes": [
+      "A",
+      "C",
+      "F",
+      "R"
+    ],
+    "latitude": 40.692259,
+    "longitude": -73.986642,
+    "step_free": "full"
+  },
+  {
+    "name": "Jefferson Av",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.583591,
+    "longitude": -74.103338,
+    "step_free": "none"
+  },
+  {
+    "name": "Jefferson St",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.706607,
+    "longitude": -73.922913,
+    "step_free": "none"
+  },
+  {
+    "name": "Junction Blvd",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.749145,
+    "longitude": -73.869527,
+    "step_free": "full"
+  },
+  {
+    "name": "Junius St",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.663515,
+    "longitude": -73.902447,
+    "step_free": "none"
+  },
+  {
+    "name": "Kew Gardens-Union Tpke",
+    "routes": [
+      "E",
+      "F"
+    ],
+    "latitude": 40.714441,
+    "longitude": -73.831008,
+    "step_free": "full"
+  },
+  {
+    "name": "Kings Hwy",
+    "routes": [
+      "B",
+      "Q"
+    ],
+    "latitude": 40.60867,
+    "longitude": -73.957734,
+    "step_free": "full"
+  },
+  {
+    "name": "Kings Hwy",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.603217,
+    "longitude": -73.972361,
+    "step_free": "full"
+  },
+  {
+    "name": "Kings Hwy",
+    "routes": [
+      "N"
+    ],
+    "latitude": 40.603923,
+    "longitude": -73.980353,
+    "step_free": "none"
+  },
+  {
+    "name": "Kingsbridge Rd",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.86776,
+    "longitude": -73.897174,
+    "step_free": "none"
+  },
+  {
+    "name": "Kingsbridge Rd",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.866978,
+    "longitude": -73.893509,
+    "step_free": "full"
+  },
+  {
+    "name": "Kingston Av",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.669399,
+    "longitude": -73.942161,
+    "step_free": "none"
+  },
+  {
+    "name": "Kingston-Throop Avs",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.679921,
+    "longitude": -73.940858,
+    "step_free": "none"
+  },
+  {
+    "name": "Knickerbocker Av",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.698664,
+    "longitude": -73.919711,
+    "step_free": "none"
+  },
+  {
+    "name": "Kosciuszko St",
+    "routes": [
+      "J"
+    ],
+    "latitude": 40.693342,
+    "longitude": -73.928814,
+    "step_free": "none"
+  },
+  {
+    "name": "Lafayette Av",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.686113,
+    "longitude": -73.973946,
+    "step_free": "none"
+  },
+  {
+    "name": "Lexington Av/53 St",
+    "routes": [
+      "6",
+      "E",
+      "F"
+    ],
+    "latitude": 40.757329,
+    "longitude": -73.970487,
+    "step_free": "full"
+  },
+  {
+    "name": "Lexington Av/63 St",
+    "routes": [
+      "M",
+      "Q"
+    ],
+    "latitude": 40.764629,
+    "longitude": -73.966113,
+    "step_free": "full"
+  },
+  {
+    "name": "Liberty Av",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.674542,
+    "longitude": -73.896548,
+    "step_free": "none"
+  },
+  {
+    "name": "Livonia Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.664038,
+    "longitude": -73.900571,
+    "step_free": "full"
+  },
+  {
+    "name": "Longwood Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.816104,
+    "longitude": -73.896435,
+    "step_free": "none"
+  },
+  {
+    "name": "Lorimer St",
+    "routes": [
+      "G",
+      "L"
+    ],
+    "latitude": 40.713428,
+    "longitude": -73.950847,
+    "step_free": "full"
+  },
+  {
+    "name": "Lorimer St",
+    "routes": [
+      "J",
+      "M"
+    ],
+    "latitude": 40.703869,
+    "longitude": -73.947408,
+    "step_free": "none"
+  },
+  {
+    "name": "Marble Hill-225 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.874561,
+    "longitude": -73.909831,
+    "step_free": "none"
+  },
+  {
+    "name": "Marcy Av",
+    "routes": [
+      "J",
+      "M",
+      "Z"
+    ],
+    "latitude": 40.708359,
+    "longitude": -73.957757,
+    "step_free": "full"
+  },
+  {
+    "name": "Mets-Willets Point",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.754622,
+    "longitude": -73.845625,
+    "step_free": "none"
+  },
+  {
+    "name": "Middle Village-Metropolitan Av",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.711396,
+    "longitude": -73.889601,
+    "step_free": "full"
+  },
+  {
+    "name": "Middletown Rd",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.843863,
+    "longitude": -73.836322,
+    "step_free": "none"
+  },
+  {
+    "name": "Montrose Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.707739,
+    "longitude": -73.93985,
+    "step_free": "none"
+  },
+  {
+    "name": "Morgan Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.706152,
+    "longitude": -73.933147,
+    "step_free": "none"
+  },
+  {
+    "name": "Morris Park",
+    "routes": [
+      "5"
+    ],
+    "latitude": 40.854364,
+    "longitude": -73.860495,
+    "step_free": "none"
+  },
+  {
+    "name": "Morrison Av-Soundview",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.829521,
+    "longitude": -73.874516,
+    "step_free": "none"
+  },
+  {
+    "name": "Mosholu Pkwy",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.87975,
+    "longitude": -73.884655,
+    "step_free": "full"
+  },
+  {
+    "name": "Mt Eden Av",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.844434,
+    "longitude": -73.914685,
+    "step_free": "none"
+  },
+  {
+    "name": "Myrtle Av",
+    "routes": [
+      "J",
+      "M",
+      "Z"
+    ],
+    "latitude": 40.697207,
+    "longitude": -73.935657,
+    "step_free": "none"
+  },
+  {
+    "name": "Myrtle-Willoughby Avs",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.694568,
+    "longitude": -73.949046,
+    "step_free": "none"
+  },
+  {
+    "name": "Myrtle-Wyckoff Avs",
+    "routes": [
+      "L",
+      "M"
+    ],
+    "latitude": 40.699622,
+    "longitude": -73.911986,
+    "step_free": "full"
+  },
+  {
+    "name": "Nassau Av",
+    "routes": [
+      "G"
+    ],
+    "latitude": 40.724635,
+    "longitude": -73.951277,
+    "step_free": "none"
+  },
+  {
+    "name": "Neck Rd",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.595246,
+    "longitude": -73.955161,
+    "step_free": "none"
+  },
+  {
+    "name": "Neptune Av",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.581011,
+    "longitude": -73.974574,
+    "step_free": "none"
+  },
+  {
+    "name": "Nereid Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.898379,
+    "longitude": -73.854376,
+    "step_free": "none"
+  },
+  {
+    "name": "Nevins St",
+    "routes": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "latitude": 40.688246,
+    "longitude": -73.980492,
+    "step_free": "none"
+  },
+  {
+    "name": "New Dorp",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.57348,
+    "longitude": -74.11721,
+    "step_free": "full"
+  },
+  {
+    "name": "New Lots Av",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.666235,
+    "longitude": -73.884079,
+    "step_free": "none"
+  },
+  {
+    "name": "New Lots Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.658733,
+    "longitude": -73.899232,
+    "step_free": "none"
+  },
+  {
+    "name": "Newkirk Av-Little Haiti",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.639967,
+    "longitude": -73.948411,
+    "step_free": "none"
+  },
+  {
+    "name": "Newkirk Plaza",
+    "routes": [
+      "B",
+      "Q"
+    ],
+    "latitude": 40.635082,
+    "longitude": -73.962793,
+    "step_free": "none"
+  },
+  {
+    "name": "Northern Blvd",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.752885,
+    "longitude": -73.906006,
+    "step_free": "full"
+  },
+  {
+    "name": "Norwood Av",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.68141,
+    "longitude": -73.880039,
+    "step_free": "none"
+  },
+  {
+    "name": "Norwood-205 St",
+    "routes": [
+      "D"
+    ],
+    "latitude": 40.874811,
+    "longitude": -73.878855,
+    "step_free": "none"
+  },
+  {
+    "name": "Nostrand Av",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.669847,
+    "longitude": -73.950466,
+    "step_free": "none"
+  },
+  {
+    "name": "Nostrand Av",
+    "routes": [
+      "A",
+      "C"
+    ],
+    "latitude": 40.680438,
+    "longitude": -73.950426,
+    "step_free": "none"
+  },
+  {
+    "name": "Oakwood Heights",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.56511,
+    "longitude": -74.12632,
+    "step_free": "none"
+  },
+  {
+    "name": "Ocean Pkwy",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.576312,
+    "longitude": -73.968501,
+    "step_free": "none"
+  },
+  {
+    "name": "Old Town",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.596612,
+    "longitude": -74.087368,
+    "step_free": "none"
+  },
+  {
+    "name": "Ozone Park-Lefferts Blvd",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.685951,
+    "longitude": -73.825798,
+    "step_free": "full"
+  },
+  {
+    "name": "Park Pl",
+    "routes": [
+      "S"
+    ],
+    "latitude": 40.674772,
+    "longitude": -73.957624,
+    "step_free": "full"
+  },
+  {
+    "name": "Park Place",
+    "routes": [
+      "2",
+      "3",
+      "A",
+      "C",
+      "E",
+      "R",
+      "W"
+    ],
+    "latitude": 40.712603,
+    "longitude": -74.009552,
+    "step_free": "full"
+  },
+  {
+    "name": "Parkchester",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.833226,
+    "longitude": -73.860816,
+    "step_free": "full"
+  },
+  {
+    "name": "Parkside Av",
+    "routes": [
+      "Q"
+    ],
+    "latitude": 40.655292,
+    "longitude": -73.961495,
+    "step_free": "none"
+  },
+  {
+    "name": "Parsons Blvd",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.707564,
+    "longitude": -73.803326,
+    "step_free": "none"
+  },
+  {
+    "name": "Pelham Bay Park",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.852462,
+    "longitude": -73.828121,
+    "step_free": "full"
+  },
+  {
+    "name": "Pelham Pkwy",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.857192,
+    "longitude": -73.867615,
+    "step_free": "full"
+  },
+  {
+    "name": "Pelham Pkwy",
+    "routes": [
+      "5"
+    ],
+    "latitude": 40.858985,
+    "longitude": -73.855359,
+    "step_free": "none"
+  },
+  {
+    "name": "Pennsylvania Av",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.664635,
+    "longitude": -73.894895,
+    "step_free": "none"
+  },
+  {
+    "name": "Pleasant Plains",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.52241,
+    "longitude": -74.217847,
+    "step_free": "none"
+  },
+  {
+    "name": "President St-Medgar Evers College",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.667883,
+    "longitude": -73.950683,
+    "step_free": "none"
+  },
+  {
+    "name": "Prince St",
+    "routes": [
+      "R",
+      "W"
+    ],
+    "latitude": 40.724329,
+    "longitude": -73.997702,
+    "step_free": "none"
+  },
+  {
+    "name": "Prince's Bay",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.525507,
+    "longitude": -74.200064,
+    "step_free": "none"
+  },
+  {
+    "name": "Prospect Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.819585,
+    "longitude": -73.90177,
+    "step_free": "none"
+  },
+  {
+    "name": "Prospect Av",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.665414,
+    "longitude": -73.992872,
+    "step_free": "none"
+  },
+  {
+    "name": "Prospect Park",
+    "routes": [
+      "B",
+      "Q",
+      "S"
+    ],
+    "latitude": 40.661614,
+    "longitude": -73.962246,
+    "step_free": "full"
+  },
+  {
+    "name": "Queens Plaza",
+    "routes": [
+      "E",
+      "F",
+      "R"
+    ],
+    "latitude": 40.748973,
+    "longitude": -73.937243,
+    "step_free": "full"
+  },
+  {
+    "name": "Queensboro Plaza",
+    "routes": [
+      "7",
+      "N",
+      "W"
+    ],
+    "latitude": 40.750582,
+    "longitude": -73.940202,
+    "step_free": "full"
+  },
+  {
+    "name": "Ralph Av",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.678822,
+    "longitude": -73.920786,
+    "step_free": "none"
+  },
+  {
+    "name": "Rector St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.707513,
+    "longitude": -74.013783,
+    "step_free": "none"
+  },
+  {
+    "name": "Rector St",
+    "routes": [
+      "R",
+      "W"
+    ],
+    "latitude": 40.70722,
+    "longitude": -74.013342,
+    "step_free": "none"
+  },
+  {
+    "name": "Richmond Valley",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.519631,
+    "longitude": -74.229141,
+    "step_free": "none"
+  },
+  {
+    "name": "Rockaway Av",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.662549,
+    "longitude": -73.908946,
+    "step_free": "none"
+  },
+  {
+    "name": "Rockaway Av",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.67834,
+    "longitude": -73.911946,
+    "step_free": "none"
+  },
+  {
+    "name": "Rockaway Blvd",
+    "routes": [
+      "A"
+    ],
+    "latitude": 40.680429,
+    "longitude": -73.843853,
+    "step_free": "full"
+  },
+  {
+    "name": "Rockaway Park-Beach 116 St",
+    "routes": [
+      "A",
+      "S"
+    ],
+    "latitude": 40.580903,
+    "longitude": -73.835592,
+    "step_free": "full"
+  },
+  {
+    "name": "Roosevelt Island",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.759145,
+    "longitude": -73.95326,
+    "step_free": "full"
+  },
+  {
+    "name": "Saratoga Av",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.661453,
+    "longitude": -73.916327,
+    "step_free": "none"
+  },
+  {
+    "name": "Seneca Av",
+    "routes": [
+      "M"
+    ],
+    "latitude": 40.702762,
+    "longitude": -73.90774,
+    "step_free": "none"
+  },
+  {
+    "name": "Sheepshead Bay",
+    "routes": [
+      "B",
+      "Q"
+    ],
+    "latitude": 40.586896,
+    "longitude": -73.954155,
+    "step_free": "full"
+  },
+  {
+    "name": "Shepherd Av",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.67413,
+    "longitude": -73.88075,
+    "step_free": "none"
+  },
+  {
+    "name": "Simpson St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.824073,
+    "longitude": -73.893064,
+    "step_free": "full"
+  },
+  {
+    "name": "Smith-9 Sts",
+    "routes": [
+      "F",
+      "G"
+    ],
+    "latitude": 40.67358,
+    "longitude": -73.995959,
+    "step_free": "none"
+  },
+  {
+    "name": "Spring St",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.722301,
+    "longitude": -73.997141,
+    "step_free": "none"
+  },
+  {
+    "name": "Spring St",
+    "routes": [
+      "C",
+      "E"
+    ],
+    "latitude": 40.726227,
+    "longitude": -74.003739,
+    "step_free": "partial"
+  },
+  {
+    "name": "St George",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.643748,
+    "longitude": -74.073643,
+    "step_free": "full"
+  },
+  {
+    "name": "St Lawrence Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.831509,
+    "longitude": -73.867618,
+    "step_free": "none"
+  },
+  {
+    "name": "Stapleton",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.627915,
+    "longitude": -74.075162,
+    "step_free": "none"
+  },
+  {
+    "name": "Steinway St",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.756879,
+    "longitude": -73.92074,
+    "step_free": "none"
+  },
+  {
+    "name": "Sterling St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.662742,
+    "longitude": -73.95085,
+    "step_free": "none"
+  },
+  {
+    "name": "Sutphin Blvd",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.70546,
+    "longitude": -73.810708,
+    "step_free": "none"
+  },
+  {
+    "name": "Sutphin Blvd-Archer Av-JFK Airport",
+    "routes": [
+      "E",
+      "J",
+      "Z"
+    ],
+    "latitude": 40.700486,
+    "longitude": -73.807969,
+    "step_free": "full"
+  },
+  {
+    "name": "Sutter Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.669367,
+    "longitude": -73.901975,
+    "step_free": "none"
+  },
+  {
+    "name": "Sutter Av-Rutland Rd",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.664717,
+    "longitude": -73.92261,
+    "step_free": "none"
+  },
+  {
+    "name": "Times Sq-42 St",
+    "routes": [
+      "1",
+      "2",
+      "3",
+      "7",
+      "A",
+      "C",
+      "E",
+      "N",
+      "Q",
+      "R",
+      "S",
+      "W"
+    ],
+    "latitude": 40.755746,
+    "longitude": -73.987581,
+    "step_free": "full"
+  },
+  {
+    "name": "Tompkinsville",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.636949,
+    "longitude": -74.074835,
+    "step_free": "none"
+  },
+  {
+    "name": "Tottenville",
+    "routes": [
+      "SIR"
+    ],
+    "latitude": 40.512764,
+    "longitude": -74.251961,
+    "step_free": "full"
+  },
+  {
+    "name": "Tremont Av",
+    "routes": [
+      "B",
+      "D"
+    ],
+    "latitude": 40.85041,
+    "longitude": -73.905227,
+    "step_free": "full"
+  },
+  {
+    "name": "Union St",
+    "routes": [
+      "R"
+    ],
+    "latitude": 40.677316,
+    "longitude": -73.98311,
+    "step_free": "none"
+  },
+  {
+    "name": "Utica Av",
+    "routes": [
+      "A",
+      "C"
+    ],
+    "latitude": 40.679364,
+    "longitude": -73.930729,
+    "step_free": "full"
+  },
+  {
+    "name": "Van Cortlandt Park-242 St",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.889248,
+    "longitude": -73.898583,
+    "step_free": "none"
+  },
+  {
+    "name": "Van Siclen Av",
+    "routes": [
+      "3"
+    ],
+    "latitude": 40.665449,
+    "longitude": -73.889395,
+    "step_free": "none"
+  },
+  {
+    "name": "Van Siclen Av",
+    "routes": [
+      "C"
+    ],
+    "latitude": 40.67271,
+    "longitude": -73.890358,
+    "step_free": "none"
+  },
+  {
+    "name": "Van Siclen Av",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.678024,
+    "longitude": -73.891688,
+    "step_free": "none"
+  },
+  {
+    "name": "Vernon Blvd-Jackson Av",
+    "routes": [
+      "7"
+    ],
+    "latitude": 40.742626,
+    "longitude": -73.953581,
+    "step_free": "none"
+  },
+  {
+    "name": "W 4 St-Wash Sq",
+    "routes": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "M"
+    ],
+    "latitude": 40.732338,
+    "longitude": -74.000495,
+    "step_free": "full"
+  },
+  {
+    "name": "W 8 St-NY Aquarium",
+    "routes": [
+      "F",
+      "Q"
+    ],
+    "latitude": 40.576127,
+    "longitude": -73.975939,
+    "step_free": "none"
+  },
+  {
+    "name": "WTC Cortlandt",
+    "routes": [
+      "1"
+    ],
+    "latitude": 40.711835,
+    "longitude": -74.012188,
+    "step_free": "full"
+  },
+  {
+    "name": "Wakefield-241 St",
+    "routes": [
+      "2"
+    ],
+    "latitude": 40.903125,
+    "longitude": -73.85062,
+    "step_free": "none"
+  },
+  {
+    "name": "Wall St",
+    "routes": [
+      "2",
+      "3"
+    ],
+    "latitude": 40.706821,
+    "longitude": -74.0091,
+    "step_free": "none"
+  },
+  {
+    "name": "Wall St",
+    "routes": [
+      "4",
+      "5"
+    ],
+    "latitude": 40.707557,
+    "longitude": -74.011862,
+    "step_free": "none"
+  },
+  {
+    "name": "West Farms Sq-E Tremont Av",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.840295,
+    "longitude": -73.880049,
+    "step_free": "none"
+  },
+  {
+    "name": "Westchester Sq-E Tremont Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.839892,
+    "longitude": -73.842952,
+    "step_free": "full"
+  },
+  {
+    "name": "Whitehall St-South Ferry",
+    "routes": [
+      "1",
+      "R",
+      "W"
+    ],
+    "latitude": 40.702577,
+    "longitude": -74.013329,
+    "step_free": "full"
+  },
+  {
+    "name": "Whitlock Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.826525,
+    "longitude": -73.886283,
+    "step_free": "none"
+  },
+  {
+    "name": "Wilson Av",
+    "routes": [
+      "L"
+    ],
+    "latitude": 40.688764,
+    "longitude": -73.904046,
+    "step_free": "partial"
+  },
+  {
+    "name": "Winthrop St",
+    "routes": [
+      "2",
+      "5"
+    ],
+    "latitude": 40.656652,
+    "longitude": -73.9502,
+    "step_free": "none"
+  },
+  {
+    "name": "Woodhaven Blvd",
+    "routes": [
+      "J",
+      "Z"
+    ],
+    "latitude": 40.693879,
+    "longitude": -73.851576,
+    "step_free": "full"
+  },
+  {
+    "name": "Woodhaven Blvd",
+    "routes": [
+      "M",
+      "R"
+    ],
+    "latitude": 40.733106,
+    "longitude": -73.869229,
+    "step_free": "none"
+  },
+  {
+    "name": "Woodlawn",
+    "routes": [
+      "4"
+    ],
+    "latitude": 40.886037,
+    "longitude": -73.878751,
+    "step_free": "none"
+  },
+  {
+    "name": "York St",
+    "routes": [
+      "F"
+    ],
+    "latitude": 40.701397,
+    "longitude": -73.986751,
+    "step_free": "none"
+  },
+  {
+    "name": "Zerega Av",
+    "routes": [
+      "6"
+    ],
+    "latitude": 40.836488,
+    "longitude": -73.847036,
+    "step_free": "none"
+  }
+]

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { StudySpot } from '$lib/contract';
+	import { mapsUrl } from '$lib/maps';
+	import { orderByTrunk, routeColour, routeTextColour, STEP_FREE, walkMinutes } from '$lib/subway';
 	import type { Nearby } from '$lib/server/snapshot';
 
 	let { data }: { data: { spot: StudySpot; nearby: Nearby[] } } = $props();
@@ -25,11 +27,9 @@
 		return metres < 100 ? `${Math.round(metres / 10) * 10} m` : `${Math.round(metres / 50) * 50} m`;
 	}
 
-	// A plain geo link: it opens the viewer's own map application and needs no
-	// API key, no script from anyone else, and no request on page load.
-	const directions = $derived(
-		`https://www.openstreetmap.org/?mlat=${spot.latitude}&mlon=${spot.longitude}#map=18/${spot.latitude}/${spot.longitude}`
-	);
+	// The same target the result cards use: a hyperlink that opens the viewer's
+	// own maps app, where walking and subway directions are one tap away.
+	const directions = $derived(mapsUrl(spot));
 </script>
 
 <svelte:head>
@@ -91,6 +91,39 @@
 					<dd>{spot.university} <span class="note">— nearby, not affiliated</span></dd>
 				{/if}
 
+				{#if spot.subway_station && spot.subway_routes && spot.subway_metres !== null}
+					<dt>Nearest subway</dt>
+					<dd>
+						<span class="bullets">
+							{#each orderByTrunk(spot.subway_routes.split(' ')) as route (route)}
+								<span
+									class="bullet"
+									style:background={routeColour(route)}
+									style:color={routeTextColour(route)}>{route}</span
+								>
+							{/each}
+						</span>
+						{walkMinutes(spot.subway_metres)} min walk · {spot.subway_station}
+						<span class="note">— {STEP_FREE[spot.subway_step_free ?? 'none']}</span>
+					</dd>
+				{/if}
+
+				<dt>Options nearby</dt>
+				<dd>
+					{#if spot.nearby_spots === 0}
+						Nothing else within a five-minute walk.
+						<span class="note">If it is full, the next place is a longer trip.</span>
+					{:else}
+						{spot.nearby_spots}
+						other study {spot.nearby_spots === 1 ? 'spot' : 'spots'} within a five-minute walk.
+						<!--
+							Places, not people. The card's Quiet/Moderate/Busy reads off
+							this same number; here it is the number itself, because a
+							detail page is where someone decides whether to make the trip.
+						-->
+					{/if}
+				</dd>
+
 				<dt>Cost</dt>
 				<dd>
 					{#if spot.no_purchase_needed}
@@ -117,13 +150,13 @@
 			</dl>
 
 			<!--
-				An absolute URL to openstreetmap.org, which opens the viewer's own map
-				application. resolve() is for this application's own routes, and the
-				rule cannot tell that a derived string is external.
+				An absolute URL to Google Maps. resolve() is for this application's
+				own routes, and the rule cannot tell that a derived string is
+				external.
 			-->
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a class="directions" href={directions} rel="noreferrer noopener" target="_blank">
-				Open in a map ↗
+				Open in Maps ↗
 			</a>
 		</article>
 
@@ -265,6 +298,24 @@
 		margin: 6px 0 0;
 		font-size: 15px;
 		line-height: 1.55;
+	}
+
+	.bullets {
+		display: inline-flex;
+		gap: 3px;
+		vertical-align: -3px;
+	}
+
+	.bullet {
+		display: inline-flex;
+		width: 18px;
+		height: 18px;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 1;
 	}
 
 	.note {
