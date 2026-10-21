@@ -8,7 +8,7 @@ OpenStreetMap  --- data/ingest.py -> data/spots.json -> Postgres -> API
                                                      \-> search index
 ```
 
-The snapshot holds 3,774 third places across the five boroughs: 3,510 cafés, 227 public library branches, 21 special libraries, 8 academic libraries and 8 NYU campus buildings. The city's 126 campus records are read but not published: an institution's administrative point is not a room, and access to a campus is restricted. They anchor the "near which campus" label instead. These are candidate locations, not guarantees of Wi-Fi, outlets, seating, quietness, or availability.
+The snapshot holds 3,772 third places across the five boroughs: 3,509 cafés, 227 public library branches, 21 special libraries, 7 academic libraries and 8 NYU campus buildings. The city's 126 campus records are read but not published: an institution's administrative point is not a room, and access to a campus is restricted. They anchor the "near which campus" label instead. These are candidate locations, not guarantees of Wi-Fi, outlets, seating, quietness, or availability.
 
 The directory intentionally stays small:
 
@@ -46,5 +46,14 @@ Dropping 600 records costs recall, which is what this source was added for, so i
 Neither register publishes a 2020 NTA code for a café — DOHMH's `nta` column is the 2010 vintage, four characters where a 2020 code is six — so a café's neighborhood and borough come from locating its coordinates inside the NTA boundary polygons, while a facility's neighborhood is still a lookup on the code FacDB publishes. One field derived two ways is not ideal; joining 2010 codes to 2010 names would have put two neighborhood vocabularies in one snapshot and made the `neighborhood` filter depend on which source a spot came from. Regenerate the snapshot with `just ingest` and load it with `just load-data`.
 
 Every spot contains `id`, `name`, `category`, `address`, `neighborhood`, `borough`, `latitude`, and `longitude`, plus `university`, which names the closest campus from the curated campus list within 500 metres and is null for every spot with no campus that close. Source-specific fields must be normalized before reaching the API, and the loader rejects a snapshot carrying any field outside that contract rather than dropping it silently. The importer applies the same check to its own output first, because its errors name the offending record while the loader's arrive at deployment time.
+
+Where a curated building and an open-data record describe the same place, the curated record wins
+and the other is dropped. FacDB registers "New York University Libraries" at Bobst's coordinates,
+12 m from `nyu:bobst-library`, with the building name where a street address belongs and Long
+Island University as its campus, so "bobst" matched two records. The rule needs three conditions
+together — same category, within 50 m, and no house number in the address — because nine cafés sit
+within 60 m of a curated building and "NYU Tamiment Library" is a distinct collection 17 m from
+Bobst with its own street address. See [`data/README.md`](https://github.com/gcivil-nyu-org/team-4-fall26/blob/develop/data/README.md)
+for the measurements.
 
 Database code belongs to the backend's `spots` app rather than to this source-data directory: the model, the migrations, and the `load_spots` command live there, and nothing in `data/` talks to a database. The serving table and any separate search index remain rebuildable projections of `spots.json` until the product accepts non-reproducible writes — see [Postgres database](database.md).

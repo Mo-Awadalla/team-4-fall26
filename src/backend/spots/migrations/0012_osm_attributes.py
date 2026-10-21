@@ -35,12 +35,12 @@ oversight. A filter over a three-state column has to decide what ``false``
 means about the unrecorded majority, and only ``indoor_seating`` has an answer
 worth offering: "recorded as having nowhere to sit inside" is a real, if small,
 thing to ask for. ``?venue_wifi=false`` would be asking a question whose honest
-answer is 42 rows out of 3,774, and whose tempting wrong answer is 3,478.
+answer is 42 rows out of 3,772, and whose tempting wrong answer is 3,478.
 """
 
 from django.db import migrations, models
 
-#: Plain rather than partial. The column is null on 3,649 of 3,774 rows, so a
+#: Plain rather than partial. The column is null on 3,647 of 3,772 rows, so a
 #: `condition=Q(indoor_seating__isnull=False)` index would be a fraction of the
 #: size -- but Django requires the condition spelled identically on the model
 #: and here, and the table is small enough that the difference is theoretical.

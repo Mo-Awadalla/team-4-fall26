@@ -124,7 +124,7 @@ def indoor_seating_field() -> serializers.BooleanField:
     above. ``?free_public_wifi=false`` is "places with no city hotspot nearby",
     which is most of the snapshot. ``?indoor_seating=false`` is "places somebody
     has recorded as having nowhere to sit inside", which is 13 spots -- not
-    "places not known to have indoor seating", which would be 3,649 and would
+    "places not known to have indoor seating", which would be 3,647 and would
     be claiming something about every one of them.
 
     Both values therefore exclude the unrecorded majority. That is the only

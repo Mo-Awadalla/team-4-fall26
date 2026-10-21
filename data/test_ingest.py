@@ -1605,14 +1605,23 @@ class TestTheOsmCafeFile:
         assert osm_spots
         assert all(spot["category"] == ingest.CAFE_CATEGORY for spot in osm_spots)
 
-    def test_the_committed_snapshot_still_has_every_dohmh_cafe(
+    def test_the_committed_snapshot_still_has_its_dohmh_cafes(
         self, snapshot: list[dict[str, Any]]
     ) -> None:
-        # Additive. The cafe source was swapped once already and it cost real
-        # records; this one may only add.
+        """Additive: the OSM merge may not cost a DOHMH establishment.
+
+        A floor rather than an exact count, deliberately. DOHMH is an
+        inspection log that moves daily -- two runs an hour apart gave 16 and
+        17 closures -- so pinning the published figure would make this fail
+        because a coffee shop in Queens shut, which is not what it is testing.
+
+        The exact property, before against after on one run, is asserted by
+        `TestOpenStreetMapIsAdditive`, where both sides come from the same
+        upstream snapshot and the number cannot drift between them.
+        """
         dohmh = [spot for spot in snapshot if spot["id"].startswith(f"{ingest.CAFE_PREFIX}:")]
 
-        assert len(dohmh) == 2158
+        assert len(dohmh) > 2000
 
 
 class TestAPartialAddressIsNotAnAddress:
@@ -1667,3 +1676,203 @@ class TestAPartialAddressIsNotAnAddress:
 
         assert added == []
         assert merge.ambiguous == 1
+
+
+class TestCuratedBuildingsWinDuplicates:
+    """A curated building beats the open-data row describing the same building.
+
+    FacDB registers "New York University Libraries" as an academic library at
+    Bobst's coordinates, 12 m from `nyu:bobst-library`, with the *building
+    name* where a street address belongs and "LIU-New York University Campus"
+    -- Long Island University -- as its campus. A search for "bobst" returned
+    both, because the search vector includes the address.
+
+    Every test below is about the two conditions that keep the rule from
+    deleting records that are not duplicates.
+    """
+
+    #: A curated building, as `nyu_buildings.json` supplies it.
+    BUILDING = {
+        **TestOpenStreetMapMatching.CAFE,
+        "id": "nyu:bobst-library",
+        "name": "Elmer Holmes Bobst Library",
+        "category": "academic_library",
+        "address": "70 Washington Square South, New York, NY 10012",
+        "no_purchase_needed": True,
+        "operator": "New York University",
+        "university": "New York University",
+        "latitude": 40.7295,
+        "longitude": -73.9974,
+    }
+
+    def near(self, **overrides: Any) -> dict[str, Any]:
+        """An open-data record 12 m from the curated building."""
+        return {
+            **TestOpenStreetMapMatching.CAFE,
+            "id": "facdb:generic",
+            "name": "New York University Libraries",
+            "category": "academic_library",
+            "address": "Elmer H Bobst Library, New York, NY 10012",
+            "latitude": 40.72949,
+            "longitude": -73.99726,
+            **overrides,
+        }
+
+    def test_the_building_recorded_twice_is_published_once(self) -> None:
+        kept, dropped = ingest.drop_curated_duplicates([self.BUILDING, self.near()])
+
+        assert [spot["id"] for spot in kept] == ["nyu:bobst-library"]
+        assert dropped == [("New York University Libraries", "Elmer Holmes Bobst Library")]
+
+    def test_a_cafe_in_the_same_building_is_not_a_duplicate(self) -> None:
+        """The condition that protects nine real records.
+
+        Nine non-curated records sit within 60 m of a curated building in the
+        live data and every one is a cafe: Peet's Coffee @ NYU is 10 m from the
+        Kimmel Center, Blank Street Coffee 26 m from Rogers Hall, The Uncommons
+        24 m from the Global Center. They are cafes inside or beside the
+        building, and they are separate study spots. A rule that went on
+        distance alone would delete all nine to fix one duplicate.
+        """
+        cafe = self.near(id="dohmh:peets", name="Peet's Coffee @ NYU", category="cafe")
+
+        kept, dropped = ingest.drop_curated_duplicates([self.BUILDING, cafe])
+
+        assert dropped == []
+        assert {spot["id"] for spot in kept} == {"nyu:bobst-library", "dohmh:peets"}
+
+    def test_a_library_with_its_own_street_address_is_not_a_duplicate(self) -> None:
+        """The condition that is easy to leave out, and costs a real record.
+
+        *Two* academic libraries sit within 50 m of Bobst. The second is "NYU
+        Tamiment Library" at 17 m -- the Tamiment Library and Robert F. Wagner
+        Labor Archives, a named special collection on Bobst's tenth floor,
+        publishing its own street address. It is a library someone might search
+        for by name and it is not a duplicate of anything. Same category and
+        well inside the radius, so only the address tells it apart.
+        """
+        tamiment = self.near(
+            id="facdb:tamiment",
+            name="NYU Tamiment Library",
+            address="70 Washington Square South, New York, NY 10012",
+            latitude=40.729437,
+            longitude=-73.997217,
+        )
+
+        kept, dropped = ingest.drop_curated_duplicates([self.BUILDING, tamiment])
+
+        assert dropped == []
+        assert "facdb:tamiment" in {spot["id"] for spot in kept}
+
+    def test_the_street_may_be_the_curated_records_own(self) -> None:
+        # Tamiment is at Bobst's address, because it is on Bobst's tenth floor.
+        # The test is whether the record claims an address, not whether the
+        # address differs.
+        assert self.BUILDING["address"] == "70 Washington Square South, New York, NY 10012"
+
+    def test_a_record_with_no_address_at_all_is_dropped(self) -> None:
+        # Same reasoning as the building name: a row that cannot say what
+        # street it is on, sitting on a curated building of the same kind, has
+        # recorded that building.
+        kept, dropped = ingest.drop_curated_duplicates([self.BUILDING, self.near(address=None)])
+
+        assert [spot["id"] for spot in kept] == ["nyu:bobst-library"]
+        assert len(dropped) == 1
+
+    def test_the_same_record_across_the_street_is_kept(self) -> None:
+        # Two records of one category 200 m apart are two places.
+        far = self.near(latitude=40.7313, longitude=-73.9974)
+
+        kept, dropped = ingest.drop_curated_duplicates([self.BUILDING, far])
+
+        assert dropped == []
+        assert len(kept) == 2
+
+    def test_a_curated_record_is_never_dropped_for_another_curated_record(self) -> None:
+        # Two curated buildings can legitimately be metres apart, and neither
+        # was written by the open-data importer.
+        second = {**self.BUILDING, "id": "nyu:kimmel", "name": "Kimmel Center", "address": None}
+
+        kept, dropped = ingest.drop_curated_duplicates([self.BUILDING, second])
+
+        assert dropped == []
+        assert len(kept) == 2
+
+    def test_nothing_happens_without_a_curated_list(self) -> None:
+        # `--fixtures` runs and most of the test suite map facilities alone.
+        spots = [self.near()]
+
+        kept, dropped = ingest.drop_curated_duplicates(spots)
+
+        assert kept == spots
+        assert dropped == []
+
+    def test_combine_applies_it(self) -> None:
+        spots = ingest.combine([self.near()], [self.BUILDING])
+
+        assert [spot["id"] for spot in spots] == ["nyu:bobst-library"]
+
+    def test_it_runs_before_the_neighbour_count(self) -> None:
+        # A record about to be dropped must not be counted as somebody else's
+        # neighbour, or the curated building reports a neighbour that is itself.
+        spots = ingest.combine([self.near()], [self.BUILDING])
+
+        assert spots[0]["nearby_spots"] == 0
+
+
+class TestTheCommittedSnapshotHasNoCuratedDuplicates:
+    def test_bobst_matches_exactly_one_record(self, snapshot: list[dict[str, Any]]) -> None:
+        # Name *and* address, because the search vector weights both and the
+        # duplicate carried "Bobst" in its address rather than its name.
+        matching = [
+            spot
+            for spot in snapshot
+            if "bobst" in f"{spot['name']} {spot['address'] or ''}".lower()
+        ]
+
+        assert [spot["id"] for spot in matching] == ["nyu:bobst-library"]
+
+    def test_every_curated_building_survives(self, snapshot: list[dict[str, Any]]) -> None:
+        curated = [spot for spot in snapshot if spot["id"].startswith(f"{ingest.CURATED_PREFIX}:")]
+
+        assert len(curated) == len(ingest.curated_spots())
+
+    def test_the_cafes_beside_the_curated_buildings_survive(
+        self, snapshot: list[dict[str, Any]]
+    ) -> None:
+        # The nine the rule is written around. Named rather than counted, so a
+        # future loosening of the rule names which one it deleted.
+        names = {spot["name"] for spot in snapshot}
+
+        for cafe in (
+            "Peet's Coffee @ NYU",
+            "Blank Street Coffee",
+            "The Uncommons",
+            "Think Coffee",
+            "Tartinery",
+            "Irving Farm New York",
+            "Ariston Flowers & Cafe",
+            "Colomba Bakery",
+        ):
+            assert cafe in names, cafe
+
+    def test_nothing_non_curated_shares_a_category_and_a_doorstep(
+        self, snapshot: list[dict[str, Any]]
+    ) -> None:
+        curated = [spot for spot in snapshot if spot["id"].startswith(f"{ingest.CURATED_PREFIX}:")]
+
+        for building in curated:
+            for spot in snapshot:
+                if spot["id"].startswith(f"{ingest.CURATED_PREFIX}:"):
+                    continue
+                if spot["category"] != building["category"]:
+                    continue
+                metres = ingest.haversine_metres(
+                    building["latitude"],
+                    building["longitude"],
+                    spot["latitude"],
+                    spot["longitude"],
+                )
+                if metres <= ingest.CURATED_DUPLICATE_METRES:
+                    # Survives only by claiming a street address of its own.
+                    assert ingest.HOUSE_NUMBER.match(spot["address"] or ""), spot["id"]

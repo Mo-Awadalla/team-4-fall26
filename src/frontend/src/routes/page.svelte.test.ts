@@ -298,7 +298,7 @@ describe('the filter counts', () => {
 	});
 
 	it('put the indoor-seating count on its checkbox, small as it is', async () => {
-		// 3 against 34 and 56 in this fixture, and around 112 of 3,774 in the
+		// 3 against 34 and 56 in this fixture, and around 112 of 3,772 in the
 		// real snapshot. The count is doing more work on this checkbox than on
 		// the other two: it is what stops a filter that hides almost everything
 		// from looking broken.
