@@ -1,0 +1,69 @@
+[
+  {
+    "business_legal_name": "SUMMER THOMPSON LLC",
+    "assumed_name_s": "LEON'S BAGELS",
+    "street": "169 THOMPSON STREET",
+    "city": "NEW YORK",
+    "borough": "Manhattan",
+    "postcode": "10012",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "license_issue_date": "2026-09-11T10:31:28.000",
+    "license_expiration_date": "2030-09-11T23:59:59.000",
+    "latitude": "40.727648512373",
+    "longitude": "-74.000335540378",
+    "council_district": "2",
+    "community_board": "102",
+    "bin": "1077793",
+    "bbl": "1005250024",
+    "ct2020": "65",
+    "nta2020": "MN0202",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        -74.000335540378,
+        40.727648512373
+      ]
+    }
+  },
+  {
+    "business_legal_name": "JAGR HICKS ST LLC",
+    "assumed_name_s": "JOE COFFEE COMPANY",
+    "street": "102 HICKS STREET",
+    "city": "BROOKLYN",
+    "borough": "Brooklyn",
+    "postcode": "11201",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "license_issue_date": "2026-07-21T12:54:57.000",
+    "license_expiration_date": "2030-07-21T23:59:59.000",
+    "latitude": "40.698627926789",
+    "longitude": "-73.994255029531",
+    "council_district": "33",
+    "community_board": "302",
+    "bin": "3001680",
+    "bbl": "3002250020",
+    "ct2020": "1",
+    "nta2020": "BK0201",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        -73.994255029531,
+        40.698627926789
+      ]
+    }
+  },
+  {
+    "business_legal_name": "SOMEONE ELSE RESTAURANT CORP",
+    "assumed_name_s": "SOMEONE ELSE RESTAURANT",
+    "street": "26 PELL STREET",
+    "city": "NEW YORK",
+    "borough": "Manhattan",
+    "postcode": "10013",
+    "license_type": "Sidewalk",
+    "license_status": "Issued",
+    "latitude": "40.714860627928",
+    "longitude": "-73.998199974185",
+    "nta2020": "MN0301"
+  }
+]

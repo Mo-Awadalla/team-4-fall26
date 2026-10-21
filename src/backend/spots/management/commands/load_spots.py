@@ -54,6 +54,7 @@ CONTRACT_FIELDS = {
     "subway_metres",
     "subway_step_free",
     "nearby_spots",
+    "outdoor_seating",
 }
 
 #: Written in batches so that a 2,000-row snapshot is a handful of statements
@@ -119,6 +120,7 @@ def to_spot(record: Any, index: int) -> StudySpot:
         subway_metres=record.get("subway_metres"),
         subway_step_free=record.get("subway_step_free"),
         nearby_spots=record.get("nearby_spots", 0),
+        outdoor_seating=record.get("outdoor_seating", False),
     )
 
     try:

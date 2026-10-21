@@ -49,7 +49,7 @@ class TestLoading:
         load(write_snapshot(tmp_path, RECORDS))
         load(write_snapshot(tmp_path, RECORDS[:2]))
         assert StudySpot.objects.count() == 2
-        assert not StudySpot.objects.filter(pk="dining:grumpy").exists()
+        assert not StudySpot.objects.filter(pk="dohmh:grumpy").exists()
 
     def test_an_empty_snapshot_empties_the_table(self, tmp_path: Path) -> None:
         load(write_snapshot(tmp_path, RECORDS))
@@ -134,6 +134,7 @@ class TestEveryContractFieldIsWritten:
             "subway_metres": 409,
             "subway_step_free": "full",
             "nearby_spots": 41,
+            "outdoor_seating": True,
         }
         assert set(record) == CONTRACT_FIELDS, "the fixture must cover the whole contract"
 

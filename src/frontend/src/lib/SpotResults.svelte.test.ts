@@ -35,7 +35,8 @@ const SPOT: StudySpot = {
 	subway_routes: 'A C E',
 	subway_metres: 409,
 	subway_step_free: 'full',
-	nearby_spots: 41
+	nearby_spots: 41,
+	outdoor_seating: false
 };
 
 describe('a result card', () => {

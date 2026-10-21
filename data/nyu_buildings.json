@@ -16,7 +16,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:kimmel-center",
@@ -35,7 +36,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:courant-institute",
@@ -54,7 +56,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:stern-tisch-hall",
@@ -73,7 +76,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:silver-center",
@@ -92,7 +96,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:tandon-dibner-library",
@@ -111,7 +116,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:tandon-rogers-hall",
@@ -130,7 +136,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:global-center",
@@ -149,7 +156,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:60-fifth-avenue",
@@ -168,7 +176,8 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:paulson-center",
@@ -187,6 +196,7 @@
     "subway_routes": null,
     "subway_metres": null,
     "subway_step_free": null,
-    "nearby_spots": 0
+    "nearby_spots": 0,
+    "outdoor_seating": false
   }
 ]
