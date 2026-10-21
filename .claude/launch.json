@@ -1,0 +1,14 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "studyspot",
+			"runtimeExecutable": "bash",
+			"runtimeArgs": [
+				"-lc",
+				"cd src/frontend && API_PROXY_TARGET=\"$(terraform -chdir=../../infra/terraform output -raw api_endpoint)\" npm run dev -- --port 5173 --strictPort"
+			],
+			"port": 5173
+		}
+	]
+}
