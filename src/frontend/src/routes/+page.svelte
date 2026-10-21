@@ -78,9 +78,11 @@
 	 * How long to wait after a keystroke before searching.
 	 *
 	 * Long enough that an ordinary word is one request rather than five, short
-	 * enough to feel like the results are following the typing. The ranking
-	 * itself needs no help: `search.py` already scores a prefix at 0.95, so
-	 * `bob` finds Bobst Library without anything being submitted.
+	 * enough to feel like the results are following the typing.
+	 *
+	 * The matching is what makes a half-typed word worth sending at all:
+	 * `search.py` treats the last word as a prefix, so `bob` reaches Bobst
+	 * Library. Before that it reached "The Cafe at Bob" and nothing else.
 	 */
 	const TYPING_DELAY_MS = 250;
 
@@ -178,9 +180,14 @@
 		runNow();
 	}
 
-	function handleFilters(next: SpotFilters): void {
+	function handleFilters(next: SpotFilters, typing = false): void {
 		filters = next;
-		runNow();
+
+		// A select or a checkbox is a decision and lands at once. The campus
+		// box is typed, so it waits the same beat the search box does --
+		// otherwise every letter of "New York University" is a request.
+		if (typing) runSoon();
+		else runNow();
 	}
 
 	async function handleShowMore(): Promise<void> {
@@ -232,20 +239,33 @@
 			</svg>
 			<span>StudySpot</span>
 		</a>
+		<nav aria-label="Main navigation">
+			<a class="nav-link" href={resolve('/')}>Explore</a>
+			<!-- svelte-ignore a11y_invalid_attribute -->
+			<a class="nav-link" href="#">Map</a>
+			<!-- svelte-ignore a11y_invalid_attribute -->
+			<a class="nav-link" href="#">Saved</a>
+			<!-- svelte-ignore a11y_invalid_attribute -->
+			<a class="nav-link" href="#">Suggest a spot</a>
+			<!-- svelte-ignore a11y_invalid_attribute -->
+			<a class="sign-in" href="#">Sign in</a>
+		</nav>
 	</header>
 
 	<main>
 		<section class="hero" class:compact={searched} aria-labelledby="hero-title">
 			<div class="copy">
-				<p class="eyebrow">NYC third places</p>
+				<p class="eyebrow">New York City</p>
 				<h1 id="hero-title">Find a place to study together.</h1>
-				<p class="description">Explore cafés and public gathering places from NYC Open Data.</p>
+				<p class="description">A great study session starts with the right spot.</p>
 			</div>
 
-			<SearchBar value={query} onInput={handleQueryInput} onSearch={handleSearch} />
+			<div class="search-card">
+				<SearchBar value={query} onInput={handleQueryInput} onSearch={handleSearch} />
+				<div class="search-divider" aria-hidden="true"></div>
+				<SpotFiltersBar {facets} {filters} onChange={handleFilters} />
+			</div>
 		</section>
-
-		<SpotFiltersBar {facets} {filters} onChange={handleFilters} />
 
 		<!-- aria-live so a screen reader hears the outcome without moving focus. -->
 		<div aria-live="polite">
@@ -284,6 +304,7 @@
 	header {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		height: 76px;
 	}
 
@@ -291,7 +312,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 9px;
-		color: var(--color-brand);
+		color: var(--color-brand-hover);
 		font-size: 20px;
 		font-weight: 750;
 		letter-spacing: -0.04em;
@@ -307,14 +328,58 @@
 		stroke-width: 2;
 	}
 
+	nav {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.nav-link,
+	.sign-in {
+		display: inline-flex;
+		min-height: 44px;
+		align-items: center;
+		justify-content: center;
+		padding: 0 14px;
+		border: 1px solid #eee9e4;
+		border-radius: 999px;
+		font-size: 14px;
+		font-weight: 650;
+		line-height: 1.2;
+		background: #fff;
+		transition: background-color 150ms ease;
+	}
+
+	.nav-link:hover {
+		background: #f7f1eb;
+	}
+
+	.sign-in {
+		min-width: 88px;
+		margin-left: 4px;
+		border-color: #222;
+		color: #fff;
+		background: #222;
+	}
+
+	.sign-in:hover {
+		background: #3a3a3a;
+	}
+
+	.nav-link:focus-visible,
+	.sign-in:focus-visible {
+		outline: 3px solid var(--color-brand-hover);
+		outline-offset: 3px;
+	}
+
 	.hero {
 		display: flex;
-		min-height: calc(100vh - 100px);
+		min-height: min(700px, calc(100vh - 100px));
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 48px;
-		padding: 72px 48px 128px;
+		gap: 36px;
+		padding: 72px 48px 88px;
 		border-radius: 28px;
 		background: #f7f1eb;
 		text-align: center;
@@ -340,6 +405,44 @@
 
 	.copy {
 		max-width: 760px;
+	}
+
+	.search-card {
+		width: min(800px, 100%);
+		padding: 10px;
+		border: 1px solid var(--color-border);
+		border-radius: 24px;
+		background: #fff;
+		box-shadow: 0 16px 44px rgb(34 34 34 / 9%);
+		text-align: left;
+	}
+
+	.search-divider {
+		height: 1px;
+		margin: 0 8px;
+		background: #eee9e4;
+	}
+
+	:global(.search-card form[role='search']) {
+		width: 100%;
+		border: 0;
+		border-radius: 18px;
+		background: transparent;
+		box-shadow: none;
+	}
+
+	:global(.search-card form[role='search'] button) {
+		background: var(--color-brand-hover);
+	}
+
+	:global(.search-card form[role='search'] button:hover) {
+		background: #b50935;
+	}
+
+	:global(.search-card .filters) {
+		width: 100%;
+		margin: 0;
+		padding: 12px 0 0;
 	}
 
 	.eyebrow {
@@ -369,9 +472,13 @@
 	}
 
 	.status {
-		margin: 0;
-		padding: 40px 0;
+		width: min(800px, 100%);
+		margin: 28px auto 0;
+		padding: 24px;
+		border: 1px solid var(--color-border);
+		border-radius: 20px;
 		color: var(--color-muted);
+		background: #fff;
 		font-size: 15px;
 		text-align: center;
 	}
@@ -387,19 +494,54 @@
 
 	@media (max-width: 560px) {
 		.page {
-			padding: 0 15px 15px;
+			padding: 0 12px 15px;
+		}
+
+		header {
+			height: auto;
+			min-height: 68px;
+			flex-wrap: wrap;
+			gap: 6px;
+			padding: 10px 0;
+		}
+
+		nav {
+			width: 100%;
+			flex-wrap: wrap;
+			gap: 2px;
+		}
+
+		.nav-link,
+		.sign-in {
+			min-height: 40px;
+			padding: 0 10px;
+			font-size: 12px;
 		}
 
 		.hero {
-			min-height: calc(100vh - 91px);
+			min-height: calc(100vh - 112px);
 			gap: 36px;
-			padding: 56px 16px;
-			border-radius: 20px;
+			padding: 48px 14px;
+			border-radius: 24px;
 		}
 
 		.hero.compact {
 			min-height: 0;
 			padding: 36px 16px 40px;
+		}
+
+		h1 {
+			font-size: clamp(2.5rem, 12vw, 3.5rem);
+		}
+
+		.description {
+			margin-top: 18px;
+			font-size: 15px;
+		}
+
+		.search-card {
+			padding: 6px;
+			border-radius: 20px;
 		}
 	}
 </style>
