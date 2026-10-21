@@ -38,7 +38,12 @@ The shared study-spot summary contract is intentionally small:
   "university": "Touro University - Harlem",
   "operator": "New York Public Library",
   "free_public_wifi": true,
-  "no_purchase_needed": true
+  "no_purchase_needed": true,
+  "subway_station": "125 St",
+  "subway_routes": "4 5 6",
+  "subway_metres": 180,
+  "subway_step_free": "full",
+  "nearby_spots": 23
 }
 ```
 

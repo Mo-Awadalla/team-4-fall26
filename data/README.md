@@ -65,6 +65,22 @@ to put tables on the sidewalk, which is good evidence the place exists and has s
 nothing about hours, Wi-Fi, power, noise, or whether anyone may sit with a laptop and one coffee
 for three hours. The contract has no field for any of that and the application promises none.
 
+## Subway stations
+
+`subway_stations.json` is a second committed snapshot, written by `subway.py` from the MTA's
+[Subway Stations][subway] (`39hk-dx4f`) on the *state* portal. It is not a study-spot source:
+nothing in it reaches the `spots` table or the API. The frontend build measures each detail page's
+nearest station against it, the same way it measures distance between spots.
+
+Rows are merged on the MTA's `complex_id`, turning 496 into 445. Without that a station appears
+once per line and a page shows half its trains — W 4 St-Wash Sq is published twice, as `A C E` and
+as `B D F M`, at identical coordinates.
+
+Accessibility keeps the MTA's three states rather than rounding to yes or no: `full`, `none`, and
+`partial` for a platform reachable going one way and not the other. A merged complex reports its
+best, because one step-free platform is what a person needs to know and which line they want is
+not ours to guess.
+
 ## `operator` is who runs it
 
 FacDB's `opname`. For the 226 public branches it is the system — 91 New York Public Library, 68
@@ -151,5 +167,6 @@ hundred and sixty-nine metres is what the data says about "125th Street Library"
 University - Harlem", and it says nothing more than that.
 
 [dining]: https://data.cityofnewyork.us/resource/fpeh-f7ci
+[subway]: https://data.ny.gov/resource/39hk-dx4f
 [facdb]: https://data.cityofnewyork.us/City-Government/Facilities-Database/ji82-xba5
 [nta]: https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd

@@ -63,8 +63,10 @@ export function spotById(id: string): StudySpot | undefined {
 	return allSpots().find((spot) => spot.id === id);
 }
 
+type Point = { latitude: number; longitude: number };
+
 /** Metres between two points on the earth, by the haversine formula. */
-function metresBetween(a: StudySpot, b: StudySpot): number {
+function metresBetween(a: Point, b: Point): number {
 	const EARTH_RADIUS_METRES = 6_371_000;
 	const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 
