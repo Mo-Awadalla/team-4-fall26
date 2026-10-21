@@ -146,6 +146,19 @@ class StudySpot(models.Model):
         ),
     )
 
+    outdoor_seating = models.BooleanField(
+        default=False,
+        help_text=(
+            "Whether a current Dining Out NYC sidewalk licence matches this "
+            "establishment's name and address. False means no licence matched, not "
+            "that there is nowhere to sit outside: the join requires both the name "
+            "and the address to agree, because matching on address alone credits a "
+            "cafe with the licence of whichever other business shares its building. "
+            "Only cafes can carry it -- nothing licenses a library to put tables on "
+            "the pavement."
+        ),
+    )
+
     #: What free-text search matches against, maintained by Postgres rather
     #: than by application code: a generated column cannot fall out of step with
     #: the row the way a column the loader has to remember to update can.

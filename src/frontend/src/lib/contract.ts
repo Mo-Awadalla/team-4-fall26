@@ -63,6 +63,19 @@ export type StudySpot = {
 	 * university's credentials.
 	 */
 	no_purchase_needed: boolean;
+	/**
+	 * Whether a current Dining Out NYC sidewalk licence matches this
+	 * establishment's name and address.
+	 *
+	 * False means no licence matched, not that there is nowhere to sit outside:
+	 * the join requires both the name and the address to agree, because matching
+	 * on address alone credits a cafe with the licence of whichever other
+	 * business shares its building.
+	 *
+	 * Only cafés can carry it — nothing licenses a library to put tables on the
+	 * pavement.
+	 */
+	outdoor_seating: boolean;
 };
 
 /** One value a filter can take, with how many spots carry it. */

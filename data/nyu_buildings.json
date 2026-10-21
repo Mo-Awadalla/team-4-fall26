@@ -11,7 +11,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:kimmel-center",
@@ -25,7 +26,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:courant-institute",
@@ -39,7 +41,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:stern-tisch-hall",
@@ -53,7 +56,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:silver-center",
@@ -67,7 +71,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:tandon-dibner-library",
@@ -81,7 +86,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:tandon-rogers-hall",
@@ -95,7 +101,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:global-center",
@@ -109,7 +116,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:60-fifth-avenue",
@@ -123,7 +131,8 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   },
   {
     "id": "nyu:paulson-center",
@@ -137,6 +146,7 @@
     "university": "New York University",
     "operator": "New York University",
     "free_public_wifi": false,
-    "no_purchase_needed": true
+    "no_purchase_needed": true,
+    "outdoor_seating": false
   }
 ]

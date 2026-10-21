@@ -7,7 +7,7 @@
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data.
 
 > [!IMPORTANT]
-> StudySpot is deployed and working. `data/spots.json` holds 1,916 real places — 1,652 cafés with a sidewalk licence, 227 public library branches, 21 special libraries, and 16 academic libraries and NYU campus buildings — 465 of them with a free public Wi-Fi hotspot nearby. Every one is somewhere a person can go: the city's 126 campus records anchor the "near which campus" label but are not published as spots, because an institution's administrative point is not a room. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
+> StudySpot is deployed and working. `data/spots.json` holds 2,421 real places — 2,157 cafés, 227 public library branches, 21 special libraries, and 16 academic libraries and NYU campus buildings — 429 of them with a free public Wi-Fi hotspot nearby, and 108 cafés with a sidewalk-dining licence. Every one is somewhere a person can go: the city's 126 campus records anchor the "near which campus" label but are not published as spots, because an institution's administrative point is not a room. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
 
 ## How will it work?
 
@@ -38,11 +38,12 @@ The shared study-spot summary contract is intentionally small:
   "university": "Touro University - Harlem",
   "operator": "New York Public Library",
   "free_public_wifi": true,
-  "no_purchase_needed": true
+  "no_purchase_needed": true,
+  "outdoor_seating": false
 }
 ```
 
-`university` is proximity and never affiliation or a claim of access. `free_public_wifi` means the city publishes a free hotspot within 25 m; `false` means none is recorded rather than that there is no Wi-Fi, which is why a campus building with credentialled Wi-Fi reads as `false`. `operator` is who runs the place — for a branch, its library system, which nothing else in the record says. `no_purchase_needed` is true where sitting down costs nothing — every library and campus building, no café — and is about money rather than entry.
+`university` is proximity and never affiliation or a claim of access. `free_public_wifi` means the city publishes a free hotspot within 25 m; `false` means none is recorded rather than that there is no Wi-Fi, which is why a campus building with credentialled Wi-Fi reads as `false`. `operator` is who runs the place — for a branch, its library system, which nothing else in the record says. `no_purchase_needed` is true where sitting down costs nothing — every library and campus building, no café — and is about money rather than entry. `outdoor_seating` is true when a Dining Out NYC sidewalk licence matches the establishment's name *and* address; `false` means no licence matched rather than that there is nowhere to sit outside, and only cafés can carry it.
 
 Four routes are available alongside `GET /health/live`, none of them with a trailing slash:
 
@@ -55,7 +56,7 @@ Four routes are available alongside `GET /health/live`, none of them with a trai
 
 See the [HTTP API guide](docs/source/api.md).
 
-Every spot also has its own page at `/spots/{id}`. All 1,916 are prerendered at build time from the committed snapshot, so each is real HTML in S3 rather than a route the browser assembles: the link works in a fresh tab, in a shared message, and to a crawler, with no request on load. The nearby-spots list on each page is computed at build time from the same coordinates the importer uses.
+Every spot also has its own page at `/spots/{id}`. All 2,421 are prerendered at build time from the committed snapshot, so each is real HTML in S3 rather than a route the browser assembles: the link works in a fresh tab, in a shared message, and to a crawler, with no request on load. The nearby-spots list on each page is computed at build time from the same coordinates the importer uses.
 
 ## Development
 

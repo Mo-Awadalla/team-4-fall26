@@ -35,11 +35,12 @@ No route has a trailing slash, and the application does not redirect one onto th
   "university": "Touro University - Harlem",
   "operator": "New York Public Library",
   "free_public_wifi": true,
-  "no_purchase_needed": true
+  "no_purchase_needed": true,
+  "outdoor_seating": false
 }
 ```
 
-The records represent public third places from NYC Open Data — today the libraries and campuses of the city's facilities database. They are candidate gathering and study locations; the API must not imply that unverified amenities are available. This response shape belongs to the shared contract. Changes require review from frontend, API, data, and search owners.
+The records represent public third places from NYC Open Data — today the libraries of the city's facilities database, the coffee shops of the health department's inspection register, and a curated list of NYU campus buildings. They are candidate gathering and study locations; the API must not imply that unverified amenities are available. This response shape belongs to the shared contract. Changes require review from frontend, API, data, and search owners.
 
 `category` currently takes one of `cafe`, `public_library`, `special_library`, `academic_library` and `university_building`.
 
@@ -47,13 +48,15 @@ The records represent public third places from NYC Open Data — today the libra
 
 `university_building` is a campus building a student can work in. The city's facilities database registers institutions and administrative points rather than buildings, so these come from the curated list in `data/nyu_buildings.json` and all carry the `nyu:` identifier prefix. The institution records themselves are *not* published: an administrative point is not a room, and campus access is restricted. They are read only to anchor the `university` label.
 
-`cafe` comes from the outdoor-dining licence register: see [Data and search](data-and-search.md). The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration.
+`cafe` comes from the health department's own `Coffee/Tea` cuisine classification: see [Data and search](data-and-search.md). It used to come from the outdoor-dining licence register, which published any business holding a sidewalk licence as a café — bars, pizzerias and restaurants among them — and missed every indoor-only coffee shop. The API does not constrain the value: the vocabulary belongs to the importer, and pinning it in the serving schema would put every category change through a migration.
 
 `no_purchase_needed` is true where sitting down costs nothing — every library and every campus building, and no café. It answers the question a reader actually has, which no single category answers, and **it is about money rather than entry**: a campus building is free and still wants the university's credentials, and a special library may be open only by appointment.
 
 Derived by the importer from the category and stored, as `free_public_wifi` and `university` are. It was briefly computed in the serializer instead, on the argument that a column would be a copy able to drift from the category beside it; prerendering the detail pages disproved that, because those are built from `data/spots.json`, where the field did not exist, and every library's page said a purchase was expected. The snapshot is regenerated as a unit and cannot drift from itself.
 
-`NO_PURCHASE_CATEGORIES` in `data/ingest.py` is the single definition, beside the vocabulary it describes, and it is an allowlist so that a category added there is never silently published as free. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
+`NO_PURCHASE_CATEGORIES` in `data/ingest.py` is the single definition, beside the vocabulary it describes, and it is an allowlist so that a category added there is never silently published as free.
+
+`outdoor_seating` is true when a current Dining Out NYC sidewalk licence matches the establishment's name *and* street address. **False means no licence matched, not that there is nowhere to sit outside.** The join is strict on purpose: matching on address alone would credit a café with the licence of whichever other business shares its building, and in the live data 28 cafés share a street address with a licence held under a different name — "787 Coffee" at 100 Lexington Ave with "Bhatti Indian Grill", "Joe Coffee" at 405 W 23 St with "Henry & The Lions". A café missing its licence reads as a false; a café credited with someone else's would be a false statement about a real business. Only cafés can carry it, because nothing licenses a library to put tables on the pavement. There is no filter on it — it is an attribute the API reports rather than one it narrows on, which is also why it has no index. `free_public_wifi` is true when a free public Wi-Fi hotspot the city publishes
 sits within 25 m, derived from `yjub-udmw`. False means none is recorded, which
 is not the same as there being no Wi-Fi: a campus building's network needs the
 university's credentials, and the city has no reason to know about it. The field

@@ -56,7 +56,7 @@ RECORDS: list[dict[str, Any]] = [
         "university": None,
     },
     {
-        "id": "dining:grumpy",
+        "id": "dohmh:grumpy",
         "name": "Café Grumpy",
         "category": "cafe",
         "no_purchase_needed": False,
@@ -68,7 +68,7 @@ RECORDS: list[dict[str, Any]] = [
         "university": None,
     },
     {
-        "id": "dining:hundred",
+        "id": "dohmh:hundred",
         "name": "100% Coffee",
         "category": "cafe",
         "no_purchase_needed": False,
@@ -98,6 +98,7 @@ CONTRACT_FIELDS = {
     "operator",
     "free_public_wifi",
     "no_purchase_needed",
+    "outdoor_seating",
 }
 
 
@@ -185,7 +186,7 @@ class TestFilters:
         self, client: Any, spots: list[StudySpot]
     ) -> None:
         body = client.get("/spots?name=café").json()
-        assert [spot["id"] for spot in body["items"]] == ["dining:grumpy"]
+        assert [spot["id"] for spot in body["items"]] == ["dohmh:grumpy"]
 
     @pytest.mark.parametrize("query", ["%", "_", "100%"])
     def test_like_wildcards_are_matched_literally(
@@ -199,7 +200,7 @@ class TestFilters:
 
     def test_filters_by_neighborhood(self, client: Any, spots: list[StudySpot]) -> None:
         body = client.get("/spots?neighborhood=greenpoint").json()
-        assert [spot["id"] for spot in body["items"]] == ["dining:hundred"]
+        assert [spot["id"] for spot in body["items"]] == ["dohmh:hundred"]
 
     def test_filters_by_borough(self, client: Any, spots: list[StudySpot]) -> None:
         assert client.get("/spots?borough=Bronx").json()["pagination"]["total"] == 1
@@ -209,7 +210,7 @@ class TestFilters:
         self, client: Any, spots: list[StudySpot], borough: str
     ) -> None:
         body = client.get("/spots", {"borough": borough}).json()
-        assert [spot["id"] for spot in body["items"]] == ["dining:hundred"]
+        assert [spot["id"] for spot in body["items"]] == ["dohmh:hundred"]
 
     def test_filters_by_university(self, client: Any, spots: list[StudySpot]) -> None:
         body = client.get("/spots?university=new york university").json()
@@ -260,7 +261,7 @@ class TestDetail:
         self, client: Any, spots: list[StudySpot]
     ) -> None:
         # The colon in "facdb:bobst" has to survive URL routing.
-        assert client.get("/spots/dining:grumpy").json()["id"] == "dining:grumpy"
+        assert client.get("/spots/dohmh:grumpy").json()["id"] == "dohmh:grumpy"
 
     def test_an_unknown_identifier_is_404(self, client: Any, spots: list[StudySpot]) -> None:
         response = client.get("/spots/facdb:nothing")
