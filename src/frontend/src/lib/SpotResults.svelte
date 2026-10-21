@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 
+	import { showsCampus } from './campus';
 	import { mapsUrl } from './maps';
 	import { orderByTrunk, routeColour, routeTextColour, walkMinutes } from './subway';
 	import type { StudySpot } from './contract';
@@ -135,7 +136,7 @@
 					</p>
 				{/if}
 
-				{#if spot.university}
+				{#if showsCampus(spot)}
 					<!-- Proximity, never affiliation: see the contract. -->
 					<p class="campus">Near {spot.university}</p>
 				{/if}
