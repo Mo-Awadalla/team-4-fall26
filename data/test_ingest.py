@@ -1,15 +1,28 @@
 """Tests for the NYC Open Data importer.
 
-These run against ``fixtures/``, a trimmed copy of what the two Socrata
-datasets actually return, so the suite never depends on NYC Open Data being up
-and CI needs no network. The fixture keeps the awkward records the backend's own
+These run against ``fixtures/``, a trimmed copy of what the Socrata datasets
+actually return, so the suite never depends on NYC Open Data being up and CI
+needs no network. The fixture keeps the awkward records the backend's own
 fixtures warn about -- an accented name, a name carrying SQL ``LIKE`` wildcards,
 a branch with no address, an older extract with no 2020 NTA column, a facility
 type the importer excludes on purpose -- because those are the records a mapping
 quietly gets wrong.
 
+``fixtures/cafes.json`` is eleven inspection rows describing eight
+establishments, which is the shape of ``43nn-pn8j`` in miniature. Six of the
+eight are real records, chosen because each is a case that has to be handled:
+one closed at its most recent inspection, one closed years ago and clean since,
+one with no geocode, two that hold a sidewalk licence and one that shares its
+street address with somebody else's. The remaining two are written by hand for
+cases the live data cannot supply -- an establishment whose ``boro`` is ``"0"``
+*and* which is geocoded, and one geocoded into open water.
+
+``fixtures/neighborhoods.json`` carries every NTA's code and name, and the
+boundary geometry for only the five the fixture cafes fall in. The real response
+is 4.5 MB of coastline and none of the rest of it is exercised.
+
 What matters here is that the snapshot the importer writes is one the loader
-accepts and the API can serve: nine fields, five boroughs, nulls rather than
+accepts and the API can serve: thirteen fields, five boroughs, nulls rather than
 blanks, and identifiers that do not move when upstream edits a name.
 """
 
@@ -51,11 +64,15 @@ PUBLISHED_EXAMPLE = {
     "subway_metres": None,
     "subway_step_free": None,
     "nearby_spots": 0,
+    # Nothing licenses a library to put tables on the pavement, so no facility
+    # can match the seating join.
+    "outdoor_seating": False,
 }
 
 #: The published vocabulary. `university_building` is a campus building a
 #: student can work in, which FacDB has no equivalent for and only the curated
-#: list supplies; `cafe` has no source at all yet.
+#: list supplies; `cafe` comes from the health department's `Coffee/Tea`
+#: classification.
 CATEGORIES = {
     "public_library",
     "special_library",
@@ -87,6 +104,22 @@ def cafes() -> list[dict[str, Any]]:
 
 
 @pytest.fixture(scope="module")
+def outdoor_dining() -> list[dict[str, Any]]:
+    return ingest.fixture_rows(FIXTURES, "outdoor_dining")
+
+
+@pytest.fixture(scope="module")
+def areas() -> list[ingest.NtaArea]:
+    """The boundary polygons, which is how a cafe gets placed.
+
+    DOHMH publishes no 2020 NTA code, so unlike a facility a cafe cannot be
+    located by a dictionary lookup. Only the five NTAs the fixture cafes fall in
+    carry geometry.
+    """
+    return ingest.nta_areas(ingest.fixture_rows(FIXTURES, "neighborhoods"))
+
+
+@pytest.fixture(scope="module")
 def spots(
     facilities: list[dict[str, Any]],
     names: dict[str, str],
@@ -100,10 +133,14 @@ def spots(
 def cafe_spots(
     cafes: list[dict[str, Any]],
     names: dict[str, str],
+    areas: list[ingest.NtaArea],
+    outdoor_dining: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     return [
         spot
-        for spot in ingest.normalize([], cafes, names, [])
+        for spot in ingest.normalize(
+            [], cafes, names, [], areas=areas, outdoor_dining=outdoor_dining
+        )
         if spot["category"] == ingest.CAFE_CATEGORY
     ]
 
@@ -413,11 +450,12 @@ class TestCommandLine:
 
         written = json.loads(output.read_text("utf-8"))
         # Nine published facility records -- eleven mapped, less the two
-        # campuses, which anchor the proximity label without being spots --
-        # and four cafes from six licences, one without a borough and one a
-        # repeat of a storefront already seen. Plus the curated buildings,
-        # which are read from the repository rather than from the network.
-        assert len(written) == 9 + 4 + len(ingest.curated_spots())
+        # campuses, which anchor the proximity label without being spots -- and
+        # five cafes from eleven inspection rows: eight establishments, less one
+        # closed at its most recent inspection, one with no geocode and one
+        # geocoded into open water. Plus the curated buildings, which are read
+        # from the repository rather than from the network.
+        assert len(written) == 9 + 5 + len(ingest.curated_spots())
 
     def test_a_missing_fixture_directory_is_reported_not_raised(self, tmp_path: Path) -> None:
         assert ingest.main(["--fixtures", str(tmp_path / "absent")]) == 1
@@ -532,6 +570,7 @@ class TestCuratedBuildings:
                         "subway_metres": None,
                         "subway_step_free": None,
                         "nearby_spots": 0,
+                        "outdoor_seating": False,
                     }.items()
                 )
             )
@@ -629,88 +668,227 @@ class TestFreePublicWifi:
 
 
 class TestCafes:
-    """Dining Out NYC, the source for the published ``cafe`` category.
+    """DOHMH Restaurant Inspection Results, the source for the ``cafe`` category.
 
     FacDB is a register of city facilities, so it holds libraries and campuses
-    and not one cafe. Cafes are licensed rather than operated by the city, which
-    is why they are in a licence register instead and why the category had no
-    source until this one.
+    and not one cafe. The city does not operate cafes, but it does inspect them,
+    and the inspector records what each one serves -- which is the question the
+    category asks.
     """
 
     def by_name(self, spots: list[dict[str, Any]], name: str) -> dict[str, Any]:
         return next(spot for spot in spots if spot["name"] == name)
 
-    def test_a_licence_becomes_a_cafe(self, cafe_spots: list[dict[str, Any]]) -> None:
-        spot = self.by_name(cafe_spots, "Jean's")
+    def test_an_establishment_becomes_a_cafe(self, cafe_spots: list[dict[str, Any]]) -> None:
+        spot = self.by_name(cafe_spots, "Leon's Bagels")
 
         assert spot["category"] == "cafe"
         assert spot["borough"] == "Manhattan"
-        assert spot["address"] == "415 Lafayette Street, New York, NY 10003"
+        # `building` and `street` are separate columns upstream, joined here.
+        assert spot["address"] == "169 Thompson Street, NY 10012"
 
     def test_the_identifier_names_the_source(self, cafe_spots: list[dict[str, Any]]) -> None:
-        assert all(spot["id"].startswith("dining:") for spot in cafe_spots)
+        assert all(spot["id"].startswith("dohmh:") for spot in cafe_spots)
 
-    def test_the_identifier_is_stable_across_runs(
-        self, cafes: list[dict[str, Any]], names: dict[str, str]
+    def test_the_identifier_is_the_upstream_permit_number(
+        self, cafe_spots: list[dict[str, Any]]
     ) -> None:
-        # Dining Out publishes no row identifier that survives a re-licensing,
-        # so it is derived from name and address. If it moved between runs the
-        # snapshot would churn and every spot's URL would change.
-        first = ingest.normalize([], cafes, names, [])
-        again = ingest.normalize([], cafes, names, [])
-        assert [spot["id"] for spot in first] == [spot["id"] for spot in again]
+        # `camis` is DOHMH's own key for an establishment and survives a
+        # renaming, a re-geocode and every later inspection. The previous
+        # source had no such key, so the identifier was a hash of name and
+        # address: renaming a cafe deleted it and created a stranger.
+        assert self.by_name(cafe_spots, "Leon's Bagels")["id"] == "dohmh:50037080"
 
-    def test_the_trading_name_is_preferred(self, cafe_spots: list[dict[str, Any]]) -> None:
-        # "JEAN'S" is over the door; "CGM-LLNR LLC" holds the licence, and
-        # nobody searches for that.
-        assert self.by_name(cafe_spots, "Jean's")["name"] == "Jean's"
+    def test_the_identifier_survives_an_upstream_edit_to_the_record(
+        self,
+        cafes: list[dict[str, Any]],
+        names: dict[str, str],
+        areas: list[ingest.NtaArea],
+    ) -> None:
+        edited = [
+            {**row, "dba": "RENAMED OVERNIGHT"} if row["camis"] == "50037080" else row
+            for row in cafes
+        ]
+        spots = ingest.normalize([], edited, names, [], areas=areas)
 
-    def test_the_legal_name_is_the_fallback(self, cafe_spots: list[dict[str, Any]]) -> None:
-        # One row in the fixture has no trading name at all.
-        assert self.by_name(cafe_spots, "No Trading Name Corp") is not None
+        assert self.by_name(spots, "Renamed Overnight")["id"] == "dohmh:50037080"
 
     def test_shouted_names_are_title_cased(self, cafe_spots: list[dict[str, Any]]) -> None:
-        # The register stores them upper case, as FacDB does.
-        assert self.by_name(cafe_spots, "The Butcher's Daughter")["name"] == (
-            "The Butcher's Daughter"
+        # DOHMH stores them upper case, as FacDB does.
+        assert self.by_name(cafe_spots, "Mee Sum Cafe")["name"] == "Mee Sum Cafe"
+
+    def test_the_log_is_folded_to_one_record_per_establishment(
+        self, cafes: list[dict[str, Any]], cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # The dataset is one row per inspection: the fixture's eleven rows
+        # describe eight establishments, of which five can be published.
+        assert len(cafes) == 11
+        assert len(ingest.establishments(cafes)) == 8
+        assert len(cafe_spots) == 5
+        assert len({spot["id"] for spot in cafe_spots}) == 5
+
+    def test_the_most_recent_inspection_is_the_one_published(
+        self, cafes: list[dict[str, Any]]
+    ) -> None:
+        rows = [row for row in cafes if row["camis"] == "50037080"]
+        assert len(rows) > 1, "the fixture must hold more than one inspection of this one"
+
+        latest = ingest.establishments(cafes)["50037080"]
+        assert latest["inspection_date"] == max(row["inspection_date"] for row in rows)
+
+    def test_a_cafe_closed_at_its_most_recent_inspection_is_dropped(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # Publishing it would send a student to a locked door.
+        assert not [spot for spot in cafe_spots if spot["name"] == "Momo Ashi"]
+
+    def test_a_cafe_closed_years_ago_and_clean_since_is_published(
+        self, cafes: list[dict[str, Any]], cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # The closure test reads the most recent inspection only. A place shut
+        # for a week in 2023 and inspected cleanly since is open.
+        history = [row for row in cafes if row["camis"] == "50114980"]
+        assert any(ingest.CLOSURE_ACTION.search(row["action"]) for row in history)
+
+        assert self.by_name(cafe_spots, "787 Coffee")["category"] == "cafe"
+
+    def test_a_reopening_is_not_read_as_a_closure(self) -> None:
+        # "Establishment re-opened by DOHMH" is the record of a place opening
+        # again. A substring test for "closed" that is not anchored on the word
+        # would be fine here, but a `LIKE '%Closed%'` is not: the dataset also
+        # carries "re-closed", with a lower-case c.
+        assert ingest.CLOSURE_ACTION.search("Establishment Closed by DOHMH.")
+        assert ingest.CLOSURE_ACTION.search("Establishment re-closed by DOHMH.")
+        assert not ingest.CLOSURE_ACTION.search("Establishment re-opened by DOHMH.")
+        assert not ingest.CLOSURE_ACTION.search("Violations were cited in the following area(s).")
+
+    def test_an_establishment_without_a_geocode_is_dropped(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # Not an error: the register is maintained for inspections rather than
+        # for mapping, and a row that cannot be placed is simply not a spot.
+        assert not [spot for spot in cafe_spots if spot["name"] == "Cafe Grumpy"]
+
+    def test_a_geocode_outside_every_neighborhood_is_dropped(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # Inside the bounding box and out in the harbour. Nothing places it,
+        # and the contract requires a borough.
+        assert not [spot for spot in cafe_spots if spot["name"] == "Out in the Harbour"]
+
+    def test_the_neighborhood_comes_from_the_boundary_polygon(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # DOHMH publishes an `nta` column, but it is the 2010 vintage -- four
+        # characters where a 2020 code is six -- so it cannot be joined to the
+        # 2020 names the rest of the snapshot uses. The coordinates can.
+        assert self.by_name(cafe_spots, "Leon's Bagels")["neighborhood"] == "Greenwich Village"
+        assert self.by_name(cafe_spots, "Joe Coffee Company")["neighborhood"] == (
+            "Brooklyn Heights"
         )
 
-    def test_one_storefront_with_two_licences_is_one_spot(
+    def test_the_borough_comes_from_the_polygon_and_not_from_boro(
         self, cafe_spots: list[dict[str, Any]]
     ) -> None:
-        # The fixture holds the same address under two licence holders, which
-        # is what a re-licensing looks like upstream.
-        matching = [spot for spot in cafe_spots if spot["name"] == "The Butcher's Daughter"]
-        assert len(matching) == 1
-
-    def test_a_licence_with_no_borough_is_dropped(self, cafe_spots: list[dict[str, Any]]) -> None:
-        # Not an error: the register is maintained for licensing rather than
-        # for mapping, and a row that cannot be placed is simply not a spot.
-        assert not [spot for spot in cafe_spots if spot["name"] == "Nowhere In Particular"]
-
-    def test_a_cafe_gets_its_neighborhood_from_the_same_join(
-        self, cafe_spots: list[dict[str, Any]]
-    ) -> None:
-        # Dining Out carries nta2020 just as FacDB does, which is the whole
-        # reason cafes could join without a point-in-polygon test.
-        assert self.by_name(cafe_spots, "Jean's")["neighborhood"] is not None
-
-    def test_an_nta_code_with_no_name_leaves_the_neighborhood_null(
-        self, cafe_spots: list[dict[str, Any]]
-    ) -> None:
-        spot = self.by_name(cafe_spots, "Code Ahead of the Boundary File")
-        assert spot["neighborhood"] is None
+        # DOHMH's `boro` is "0" for a handful of establishments. The polygon
+        # answers the same question and is never blank, so it is what the
+        # record carries.
+        spot = self.by_name(cafe_spots, "Borough Says Zero")
+        assert spot["borough"] == "Manhattan"
+        assert spot["neighborhood"] == "Chinatown-Two Bridges"
 
     def test_every_cafe_matches_the_contract(self, cafe_spots: list[dict[str, Any]]) -> None:
         for spot in cafe_spots:
             assert tuple(spot) == ingest.CONTRACT_FIELDS
 
+    def test_the_category_is_the_health_department_s_own(self) -> None:
+        # The whole of the category test. Reading the name instead is guessing,
+        # and guessing is what published 1,652 bars and pizzerias as cafes.
+        assert ingest.CAFES_WHERE == "cuisine_description = 'Coffee/Tea'"
+
+    def test_mapping_cafes_without_the_boundaries_is_an_error(
+        self, cafes: list[dict[str, Any]], names: dict[str, str]
+    ) -> None:
+        # The alternative default is dropping every cafe for want of a borough,
+        # which looks exactly like upstream having no coffee shops today.
+        with pytest.raises(ingest.IngestError, match="NTA boundaries"):
+            ingest.normalize([], cafes, names, [])
+
+
+class TestOutdoorSeating:
+    """Dining Out NYC, demoted from a category to an attribute.
+
+    A sidewalk licence says a business puts tables on the pavement. It says
+    nothing about what the business sells, which is why treating it as the
+    definition of a cafe published "Good Bar" and "Koronet Pizza" as places to
+    study. It is a perfectly good source for one boolean.
+    """
+
+    def by_name(self, spots: list[dict[str, Any]], name: str) -> dict[str, Any]:
+        return next(spot for spot in spots if spot["name"] == name)
+
+    def test_a_matching_licence_sets_the_attribute(self, cafe_spots: list[dict[str, Any]]) -> None:
+        assert self.by_name(cafe_spots, "Leon's Bagels")["outdoor_seating"] is True
+        assert self.by_name(cafe_spots, "Joe Coffee Company")["outdoor_seating"] is True
+
+    def test_a_licence_at_the_same_address_under_another_name_does_not(
+        self, cafe_spots: list[dict[str, Any]]
+    ) -> None:
+        # The case the strictness is for. The fixture puts a licence at Mee Sum
+        # Cafe's address held by "Someone Else Restaurant", which is what 28 of
+        # these look like in the live data: a different business in the same
+        # building. Crediting the cafe with it would be a false statement about
+        # a real place.
+        assert self.by_name(cafe_spots, "Mee Sum Cafe")["outdoor_seating"] is False
+
+    def test_no_match_is_false_rather_than_missing(self, cafe_spots: list[dict[str, Any]]) -> None:
+        # False means no licence matched, not that there is nowhere to sit. The
+        # model's help_text says so; the contract has no third state.
+        assert all(isinstance(spot["outdoor_seating"], bool) for spot in cafe_spots)
+        assert self.by_name(cafe_spots, "787 Coffee")["outdoor_seating"] is False
+
+    def test_a_facility_never_carries_it(self, spots: list[dict[str, Any]]) -> None:
+        # Nothing licenses a library to put tables on the pavement.
+        assert all(spot["outdoor_seating"] is False for spot in spots)
+
+    def test_the_whole_snapshot_agrees(self, snapshot: list[dict[str, Any]]) -> None:
+        # Only cafes can carry it, so a true on anything else means the join
+        # has started matching on something it should not.
+        for spot in snapshot:
+            if spot["outdoor_seating"]:
+                assert spot["category"] == "cafe", spot["id"]
+
     def test_only_issued_sidewalk_licences_are_requested(self) -> None:
-        # A licence that was applied for and never granted describes a cafe
-        # that does not exist; a roadway licence is a structure in a parking
-        # lane rather than somewhere to sit with a laptop.
-        assert "license_status = 'Issued'" in ingest.CAFES_WHERE
-        assert "license_type = 'Sidewalk'" in ingest.CAFES_WHERE
+        # A licence applied for and never granted is not seating, and a roadway
+        # licence is a structure in a parking lane rather than somewhere to sit
+        # with a laptop.
+        assert "license_status = 'Issued'" in ingest.OUTDOOR_DINING_WHERE
+        assert "license_type = 'Sidewalk'" in ingest.OUTDOOR_DINING_WHERE
+
+    def test_the_two_registers_spell_an_address_differently(self) -> None:
+        # DOHMH stores "169" + "THOMPSON STREET"; Dining Out stores "169
+        # THOMPSON STREET". Neither is wrong and they must still match.
+        assert ingest.match_key("169 THOMPSON STREET") == ingest.match_key("169 Thompson St")
+        assert ingest.match_key("355 5 AVENUE") == ingest.match_key("355 5th Ave")
+        assert ingest.match_key("30 WEST 25 ST") == ingest.match_key("30 W 25th Street")
+        # Punctuation is noise in a match key and kept in a published name.
+        assert ingest.match_key("TETE-A-TETE") == ingest.match_key("Tete A Tete")
+
+    def test_a_distant_licence_is_rejected(
+        self, cafes: list[dict[str, Any]], names: dict[str, str], areas: list[ingest.NtaArea]
+    ) -> None:
+        # The backstop. It fires on nothing in the live data, and is here so
+        # that a re-geocode cannot quietly move a licence across town and have
+        # it still match on name and address.
+        moved = [
+            {**row, "latitude": "40.55", "longitude": "-74.05"}
+            if row.get("assumed_name_s") == "LEON'S BAGELS"
+            else row
+            for row in ingest.fixture_rows(FIXTURES, "outdoor_dining")
+        ]
+        spots = ingest.normalize([], cafes, names, [], areas=areas, outdoor_dining=moved)
+
+        assert self.by_name(spots, "Leon's Bagels")["outdoor_seating"] is False
 
 
 class TestCafesAreNotAttachedToCampuses:
@@ -724,11 +902,11 @@ class TestCafesAreNotAttachedToCampuses:
     """
 
     def test_a_cafe_beside_a_campus_has_no_university(
-        self, cafes: list[dict[str, Any]], names: dict[str, str]
+        self, cafes: list[dict[str, Any]], names: dict[str, str], areas: list[ingest.NtaArea]
     ) -> None:
         # A campus placed on top of the first fixture cafe, so proximity cannot
         # be the reason the field is empty.
-        first = ingest.normalize([], cafes, names, [])[0]
+        first = ingest.normalize([], cafes, names, [], areas=areas)[0]
         campus = {
             "uid": "campus-on-the-doorstep",
             "facname": "RIGHT NEXT DOOR UNIVERSITY",
@@ -739,7 +917,7 @@ class TestCafesAreNotAttachedToCampuses:
             "longitude": str(first["longitude"]),
         }
 
-        spots = ingest.normalize([campus], cafes, names, [])
+        spots = ingest.normalize([campus], cafes, names, [], areas=areas)
         for spot in spots:
             if spot["category"] == ingest.CAFE_CATEGORY:
                 assert spot["university"] is None
@@ -840,10 +1018,19 @@ class TestCoordinatesMustBeInTheCity:
         assert ingest.normalize([record], [], names, []) == []
 
     def test_a_cafe_outside_the_city_is_dropped(
-        self, cafes: list[dict[str, Any]], names: dict[str, str]
+        self,
+        cafes: list[dict[str, Any]],
+        areas: list[ingest.NtaArea],
+        outdoor_dining: list[dict[str, Any]],
     ) -> None:
+        # Massachusetts Bay. The DOHMH geocodes that miss the box are 0,0 and
+        # out-of-state zips rather than this, but the check is the same one and
+        # a cafe must not survive it either.
         record = {**cafes[0], "latitude": "42.126441", "longitude": "-70.848088"}
-        assert ingest.cafe_spot(record, names) is None
+        index = ingest.outdoor_dining_index(outdoor_dining)
+
+        assert ingest.cafe_coordinates(record) is None
+        assert ingest.cafe_spot(record["camis"], record, areas, index) is None
 
     def test_a_spot_inside_it_is_kept(
         self, facilities: list[dict[str, Any]], names: dict[str, str]

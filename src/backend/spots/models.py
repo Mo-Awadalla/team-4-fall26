@@ -142,7 +142,7 @@ class StudySpot(models.Model):
     #: and the rest of this model is flat. ``subway_routes`` is space-joined the
     #: way the MTA publishes it and the way a sign reads.
     #:
-    #: All four are null together: 88 of 1,915 spots have no station that close,
+    #: All four are null together: 182 of 2,422 spots have no station that close,
     #: mostly on Staten Island where the railway is not the subway.
     subway_station = models.TextField(
         blank=True,
@@ -189,6 +189,19 @@ class StudySpot(models.Model):
             "False means none is recorded, not that there is no Wi-Fi: a campus "
             "building's Wi-Fi needs the university's credentials and the city has no "
             "reason to know about it."
+        ),
+    )
+
+    outdoor_seating = models.BooleanField(
+        default=False,
+        help_text=(
+            "Whether a current Dining Out NYC sidewalk licence matches this "
+            "establishment's name and address. False means no licence matched, not "
+            "that there is nowhere to sit outside: the join requires both the name "
+            "and the address to agree, because matching on address alone credits a "
+            "cafe with the licence of whichever other business shares its building. "
+            "Only cafes can carry it -- nothing licenses a library to put tables on "
+            "the pavement."
         ),
     )
 

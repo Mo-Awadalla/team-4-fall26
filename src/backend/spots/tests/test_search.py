@@ -86,7 +86,7 @@ RECORDS: list[dict[str, Any]] = [
         "university": "CUNY Bernard M. Baruch College",
     },
     {
-        "id": "dining:grumpy",
+        "id": "dohmh:grumpy",
         "name": "Café Grumpy",
         "category": "cafe",
         "no_purchase_needed": False,

@@ -66,7 +66,7 @@ export type StudySpot = {
 	/**
 	 * The nearest subway station within 1.2 km, derived by the importer.
 	 *
-	 * All four are null together — 88 of 1,915 spots have none that close,
+	 * All four are null together — 182 of 2,422 spots have none that close,
 	 * mostly on Staten Island, where the railway is not the subway. `routes` is
 	 * space separated the way the MTA publishes it; `metres` is straight-line
 	 * rather than walking distance; `step_free` is `full`, `partial` (one
@@ -84,6 +84,19 @@ export type StudySpot = {
 	 * block is, and whether there is anywhere else to go if this one is full.
 	 */
 	nearby_spots: number;
+	/**
+	 * Whether a current Dining Out NYC sidewalk licence matches this
+	 * establishment's name and address.
+	 *
+	 * False means no licence matched, not that there is nowhere to sit outside:
+	 * the join requires both the name and the address to agree, because matching
+	 * on address alone credits a cafe with the licence of whichever other
+	 * business shares its building.
+	 *
+	 * Only cafés can carry it — nothing licenses a library to put tables on the
+	 * pavement.
+	 */
+	outdoor_seating: boolean;
 };
 
 /** One value a filter can take, with how many spots carry it. */

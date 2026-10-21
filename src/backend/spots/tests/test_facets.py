@@ -83,7 +83,7 @@ RECORDS: list[dict[str, Any]] = [
         "free_public_wifi": True,
     },
     {
-        "id": "dining:hundred",
+        "id": "dohmh:hundred",
         "name": "100% Coffee",
         "category": "cafe",
         "no_purchase_needed": False,

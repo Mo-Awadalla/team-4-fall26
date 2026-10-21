@@ -22,7 +22,8 @@ function page(total: number, count = total, offset = 0): SpotPage {
 			subway_routes: 'L',
 			subway_metres: 180,
 			subway_step_free: 'none',
-			nearby_spots: 12
+			nearby_spots: 12,
+			outdoor_seating: false
 		})),
 		pagination: {
 			limit: 20,
