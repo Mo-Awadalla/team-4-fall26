@@ -37,6 +37,7 @@ class StudySpotSerializer(serializers.ModelSerializer):
             "operator",
             "free_public_wifi",
             "no_purchase_needed",
+            "outdoor_seating",
         ]
 
 

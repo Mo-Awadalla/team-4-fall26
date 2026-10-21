@@ -17,7 +17,8 @@ function page(total: number, count = total, offset = 0): SpotPage {
 			university: null,
 			operator: 'Brooklyn Public Library',
 			free_public_wifi: false,
-			no_purchase_needed: true
+			no_purchase_needed: true,
+			outdoor_seating: false
 		})),
 		pagination: {
 			limit: 20,

@@ -17,20 +17,24 @@ changes; nothing writes to ``spots.json`` at runtime.
 Where the records come from
 ---------------------------
 
-Four sources. The first is the city's Facilities Database (FacDB, Socrata ``ji82-xba5``),
-which is what the ``facdb:`` identifier prefix refers to. Two subsets of it are
-places a student might read in -- the ``LIBRARIES`` facility group and the
-``COLLEGES OR UNIVERSITIES`` subgroup.
+Five sources. The first is the city's Facilities Database (FacDB, Socrata
+``ji82-xba5``), which is what the ``facdb:`` identifier prefix refers to. Two
+subsets of it are places a student might read in -- the ``LIBRARIES`` facility
+group and the ``COLLEGES OR UNIVERSITIES`` subgroup.
 
-The second is Dining Out NYC (``fpeh-f7ci``), the register of outdoor-dining
-licences, which the ``dining:`` prefix refers to and which is where the cafes
-come from. FacDB holds none and never will: it registers what the city
-*operates*, and a cafe is something the city *licenses*.
+The second is DOHMH Restaurant Inspection Results (``43nn-pn8j``), filtered to
+``cuisine_description = 'Coffee/Tea'``, which the ``dohmh:`` prefix refers to and
+which is where the cafes come from. FacDB holds none and never will: it
+registers what the city *operates*, and a cafe is something the city
+*inspects*. See "What a cafe is" below, because the obvious alternative is
+wrong in a way that took a while to notice.
 
-Neighborhood names come from the 2020 Neighborhood Tabulation Areas
-(``9nt8-h7nd``), because both registers publish the NTA code and not its name.
+The third is Dining Out NYC (``fpeh-f7ci``), the register of outdoor-dining
+licences. It is not a source of records -- it contributes no spot of its own --
+only of one attribute: whether a cafe has sidewalk seating. See "Outdoor
+seating is a join and not a category".
 
-The second is ``nyu_buildings.json``, a hand-maintained list of NYU buildings
+The fourth is ``nyu_buildings.json``, a hand-maintained list of NYU buildings
 merged over the open-data records by :func:`combine`. FacDB registers NYU as an
 institution and its schools as administrative points, but not the buildings
 students study in, so without this list the snapshot has no campus study space
@@ -38,12 +42,23 @@ at all. Those records carry the ``nyu:`` identifier prefix and name the
 institution whose building it is rather than a campus that happens to be within
 500 m.
 
-The third is the city's public Wi-Fi hotspot locations (``yjub-udmw``), used
+The fifth is the city's public Wi-Fi hotspot locations (``yjub-udmw``), used
 only to answer one question: is there free public Wi-Fi at this spot. A hotspot
 within 25 m sets ``free_public_wifi``. That radius is tight on purpose -- the
 matches at 25 m are overwhelmingly hotspots the libraries themselves run, while
 widening it to 100 m starts counting LinkNYC kiosks on the street, which is not
 Wi-Fi anyone can use sitting down.
+
+Neighborhood names and borough come from the 2020 Neighborhood Tabulation Areas
+(``9nt8-h7nd``), which is read two different ways. FacDB publishes the NTA code
+but not its name, so a facility's neighborhood is a dictionary lookup on
+``nta2020``. DOHMH publishes no 2020 code at all -- its ``nta`` column is the
+2010 vintage, four characters where 2020 codes are six -- so a cafe's
+neighborhood is found by locating its coordinates inside the boundary polygons.
+Two paths for one field is not ideal, and the alternative was worse: joining
+2010 codes to 2010 names would put two different neighborhood vocabularies in
+one snapshot, and the ``neighborhood`` filter would then depend on which source
+a spot came from.
 
 ``free_public_wifi`` is false for every curated NYU building, and that is
 correct rather than missing: those buildings have Wi-Fi that needs NYU
@@ -55,11 +70,52 @@ neither of which is a schedule, so "open now" is not derivable. No source lists
 access conditions either, and the contract has no field for one: several
 curated buildings require a university ID to enter.
 
-FacDB does not list cafés, so no record maps to the published ``cafe`` category
-yet. The obvious candidate, the health department's restaurant inspection
-results, is an inspection log rather than a directory of open businesses: it
-keeps establishments that closed years ago and carries no 2020 NTA, so
-publishing it as study spots would assert more than the data supports.
+What a cafe is
+--------------
+
+A cafe is an establishment the health department records as serving coffee or
+tea. It is **not** a place that holds an outdoor-dining licence, which is what
+this importer published as ``cafe`` until this was fixed.
+
+Dining Out NYC is a register of outdoor-dining licences, and every row of it
+was assigned ``category = "cafe"`` on the strength of holding one. A sidewalk
+licence says a business puts tables on the pavement; it says nothing whatever
+about what the business sells. Of the 1,652 records that reached the snapshot
+that way, about 261 read as bars, pubs, pizzerias or restaurants -- "Good Bar",
+"P.Mcdaid's Irish Pub", "Mchale's Bar & Grill", "Koronet Pizza" -- against about
+179 whose name reads like a coffee shop. The application was telling students
+an Irish pub was a cafe. It also missed every indoor-only coffee shop in the
+city, because a cafe with no pavement tables has no licence and so had no row.
+
+DOHMH's ``cuisine_description`` is the health department's own classification of
+what an establishment serves, which is the question the category is supposed to
+answer. Filtering it to ``Coffee/Tea`` yields 2,225 establishments where the
+licence register yielded 1,652 mislabelled ones.
+
+What this source does *not* support, and what the old comment here was right
+about: it is an inspection log rather than a directory of open businesses. The
+mitigations are specific and limited, and are spelled out at
+:data:`CLOSURE_ACTION` and :func:`establishments`. In particular, a place that
+quietly shut without a final inspection is still in here, and nothing in the
+data says so.
+
+Outdoor seating is a join and not a category
+--------------------------------------------
+
+Dining Out NYC is still read, but for one boolean rather than for the records
+themselves. A licence whose name *and* street address match a DOHMH
+establishment's sets ``outdoor_seating`` on that cafe.
+
+The match is deliberately strict -- see :func:`outdoor_dining_index` -- because
+the failure modes are not symmetric. A cafe whose licence was not found reads
+as ``outdoor_seating = false``, which is what the field is documented to mean:
+no matching licence, rather than no tables. A cafe credited with *someone
+else's* licence is a false statement about a real business. Matching on street
+address alone would do exactly that: 28 DOHMH cafes share a street address with
+a sidewalk licence held under a different name, and inspecting them shows
+almost all are a different business in the same building -- "787 Coffee" at 100
+Lexington Ave shares its address with "Bhatti Indian Grill", "Joe Coffee" at
+405 W 23 St with "Henry & The Lions". Those 28 are left unmatched on purpose.
 
 Why the identifiers look like that
 ----------------------------------
@@ -113,7 +169,6 @@ may walk in: 169 metres is what the data says about "125th Street Library" and
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import os
@@ -153,31 +208,50 @@ NEIGHBORHOODS_DATASET = "9nt8-h7nd"
 WIFI_DATASET = "yjub-udmw"
 WIFI_WHERE = "type = 'Free'"
 
-#: Dining Out NYC, the city's register of outdoor-dining licences and the
-#: successor to the retired DCA sidewalk-cafe dataset. The ``dining:``
-#: identifier prefix names this dataset.
+#: DOHMH Restaurant Inspection Results, the health department's register of
+#: inspected food-service establishments. The ``dohmh:`` identifier prefix names
+#: this dataset.
 #:
 #: FacDB is a register of *city facilities*, which is why it holds libraries and
-#: campuses and not a single cafe. Cafes are licensed rather than operated by
-#: the city, so they live in a licence register instead. The published ``cafe``
-#: category had no source until this was found.
-CAFES_DATASET = "fpeh-f7ci"
+#: campuses and not a single cafe. The city does not operate cafes, but it does
+#: inspect them, and the inspector records what each one serves.
+CAFES_DATASET = "43nn-pn8j"
+
+#: Coffee shops, as the health department classifies them.
+#:
+#: ``cuisine_description`` is one value per establishment, chosen by DOHMH from a
+#: fixed list, and ``Coffee/Tea`` is its entry for a coffee shop. This is the
+#: whole of the category test: the importer does not read names, because
+#: deciding what a business is from the words in its name is guessing, and the
+#: previous version of this file guessed wrong 1,652 times.
+CAFES_WHERE = "cuisine_description = 'Coffee/Tea'"
+
+#: One row per inspection, so paging must be ordered on a column of the dataset
+#: and the rows must then be folded down to one per establishment.
+CAFES_ORDER = "camis"
+
+#: Dining Out NYC, the city's register of outdoor-dining licences and the
+#: successor to the retired DCA sidewalk-cafe dataset.
+#:
+#: Read for the ``outdoor_seating`` attribute only. It published no spot of its
+#: own after the ``cafe`` category stopped meaning "holds a sidewalk licence";
+#: see the module docstring.
+OUTDOOR_DINING_DATASET = "fpeh-f7ci"
 
 #: Issued sidewalk licences only.
 #:
-#: ``license_status`` also carries applications that were never granted, and a
-#: cafe that does not exist is worse than one the snapshot omits. ``Sidewalk``
-#: rather than ``Roadway`` because a roadway licence is a dining structure in a
-#: parking lane, which is seasonal, frequently removed, and not somewhere to sit
-#: with a laptop.
-CAFES_WHERE = "license_status = 'Issued' AND license_type = 'Sidewalk'"
+#: ``license_status`` also carries applications that were never granted, and
+#: crediting a cafe with seating on the strength of an ungranted application
+#: would be a false statement about a real business. ``Sidewalk`` rather than
+#: ``Roadway`` because a roadway licence is a dining structure in a parking
+#: lane, which is seasonal, frequently removed, and not somewhere to sit with a
+#: laptop.
+OUTDOOR_DINING_WHERE = "license_status = 'Issued' AND license_type = 'Sidewalk'"
 
 SOURCE_PREFIX = "facdb"
-CAFE_PREFIX = "dining"
+CAFE_PREFIX = "dohmh"
 
-#: The category every Dining Out record takes. The licence says the place
-#: serves food outdoors, not what kind of place it is, so there is nothing
-#: finer to map.
+#: The category every DOHMH ``Coffee/Tea`` establishment takes.
 CAFE_CATEGORY = "cafe"
 
 #: A hand-maintained list of NYU buildings, kept as data rather than code so it
@@ -218,6 +292,7 @@ CONTRACT_FIELDS = (
     "operator",
     "free_public_wifi",
     "no_purchase_needed",
+    "outdoor_seating",
 )
 
 #: Categories where sitting down costs nothing.
@@ -303,6 +378,45 @@ BOROUGH_BY_FACILITY_BOROUGH = {
 #: About a tenth of a metre, and what the published example record shows.
 COORDINATE_DIGITS = 6
 
+#: A loose box around the five boroughs, used to reject a geocode rather than to
+#: locate one.
+#:
+#: Needed because DOHMH's geocoding is uneven in a way FacDB's is not. The rows
+#: that fail this are not near-misses: they are ``0, 0``, and addresses carrying
+#: an out-of-state zip code -- a "Columbus Ave" with Mount Vernon's 10550, a
+#: "Central Ave" with Jersey City's 07307. Those rows also have no coordinates
+#: at all, so the box and the null check catch the same 42 establishments
+#: between them.
+#:
+#: Deliberately generous. The precise test for "is this in New York" is the
+#: point-in-polygon pass in :func:`locate_nta`, which runs afterwards against
+#: the real boundaries; this only throws out what is obviously not a geocode of
+#: a New York address.
+NYC_BOUNDS = (40.4, 41.1, -74.3, -73.6)
+
+#: What DOHMH writes in ``action`` when an inspection closed the place.
+#:
+#: Case-insensitive on purpose: the dataset carries both "Establishment Closed
+#: by DOHMH" and "Establishment re-closed by DOHMH", and a case-sensitive
+#: ``LIKE '%Closed%'`` silently misses the second. It must also not match
+#: "Establishment re-opened by DOHMH", which is the record of a place opening
+#: again and contains no form of the word.
+#:
+#: **This catches inspection-ordered closures and nothing else.** A cafe that
+#: shut quietly, without a final inspection to record it, is still in the
+#: dataset and still in this snapshot. There is no field that would say so.
+CLOSURE_ACTION = re.compile(r"\bre-?closed\b|\bclosed\b", re.IGNORECASE)
+
+#: How far apart a DOHMH establishment and a Dining Out licence may be and still
+#: be taken for the same storefront.
+#:
+#: A backstop rather than the test: the match is made on name and address, and
+#: this only rejects a pair whose two geocodes disagree so badly that one of
+#: them must be wrong. No pair that matched on name and address was rejected by
+#: it, which is the result worth recording -- it fires on nothing today and is
+#: here so that a future re-geocode cannot quietly move a licence across town.
+OUTDOOR_MATCH_RADIUS_METRES = 200.0
+
 EARTH_RADIUS_METRES = 6_371_000.0
 
 #: Initialisms FacDB shouts for a reason, and which title case would mangle.
@@ -337,6 +451,48 @@ ORDINAL = re.compile(r"^(\d+)(ST|ND|RD|TH)$", re.IGNORECASE)
 #: "St John'S", and keeps every other run of punctuation as a separator, so
 #: "100% COFFEE" keeps its per cent sign.
 WORD_BOUNDARY = re.compile(r"([^\w']+)")
+
+#: Street-type and direction words folded to one spelling before matching.
+#:
+#: The two registers write the same address differently and neither is wrong:
+#: DOHMH stores "CENTRAL AVE" where Dining Out stores "1875 UTICA AVENUE". Only
+#: the forms that actually occur in the two datasets are here, because an
+#: abbreviation table nobody has checked against the data is a guess.
+STREET_WORDS = {
+    "AVENUE": "AVE",
+    "AV": "AVE",
+    "STREET": "ST",
+    "STR": "ST",
+    "ROAD": "RD",
+    "PLACE": "PL",
+    "BOULEVARD": "BLVD",
+    "BLV": "BLVD",
+    "DRIVE": "DR",
+    "LANE": "LN",
+    "COURT": "CT",
+    "TERRACE": "TER",
+    "PARKWAY": "PKWY",
+    "PLAZA": "PLZ",
+    "SQUARE": "SQ",
+    "HIGHWAY": "HWY",
+    "TURNPIKE": "TPKE",
+    "CIRCLE": "CIR",
+    "EXPRESSWAY": "EXPY",
+    "NORTH": "N",
+    "SOUTH": "S",
+    "EAST": "E",
+    "WEST": "W",
+}
+
+#: "5TH" and "5" are the same street. Dining Out writes one and DOHMH the other.
+MATCH_ORDINAL = re.compile(r"^(\d+)(?:ST|ND|RD|TH)$")
+
+#: Everything that is not a letter, a digit or a space, for match keys only.
+#:
+#: Separate from :data:`WORD_BOUNDARY`, which serves presentation and has to
+#: keep punctuation. Here punctuation is noise: "TETE-A-TETE" and "TETE A TETE"
+#: are one cafe, and "JEAN'S" and "JEANS" are one name.
+MATCH_NOISE = re.compile(r"[^0-9A-Z ]+")
 
 
 class IngestError(Exception):
@@ -426,12 +582,15 @@ def fixture_rows(directory: Path, name: str) -> list[Any]:
     return rows
 
 
-def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any], list[Any]]:
+def read_sources(
+    fixtures: Path | None,
+) -> tuple[list[Any], list[Any], list[Any], list[Any], list[Any]]:
     """The raw upstream records, from the network or from a fixture directory."""
     if fixtures is not None:
         return (
             fixture_rows(fixtures, "facilities"),
             fixture_rows(fixtures, "cafes"),
+            fixture_rows(fixtures, "outdoor_dining"),
             fixture_rows(fixtures, "neighborhoods"),
             fixture_rows(fixtures, "wifi"),
         )
@@ -443,7 +602,21 @@ def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any]
     facilities = socrata_rows(FACILITIES_DATASET, {"$where": FACILITIES_WHERE}, token, order="uid")
     cafes = socrata_rows(
         CAFES_DATASET,
-        {"$where": CAFES_WHERE},
+        # Only the columns the snapshot or the join reads. The full row carries
+        # the violation text for every inspection, which is 21,000 rows of prose
+        # this importer has no use for.
+        {
+            "$select": (
+                "camis,dba,boro,building,street,zipcode,latitude,longitude,inspection_date,action"
+            ),
+            "$where": CAFES_WHERE,
+        },
+        token,
+        order=CAFES_ORDER,
+    )
+    outdoor_dining = socrata_rows(
+        OUTDOOR_DINING_DATASET,
+        {"$where": OUTDOOR_DINING_WHERE},
         token,
         # Dining Out publishes no stable row identifier, so paging is ordered on
         # Socrata's own row id: without a total order the pages can overlap and
@@ -452,9 +625,12 @@ def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any]
     )
     neighborhoods = socrata_rows(
         NEIGHBORHOODS_DATASET,
-        # The boundaries themselves are megabytes of geometry, and the code and
-        # its name are all this needs.
-        {"$select": "nta2020,ntaname"},
+        # The boundary geometry is about 4.5 MB, which this does now have to
+        # download: DOHMH publishes no 2020 NTA code, so a cafe is placed by
+        # locating its coordinates rather than by looking a code up. One request
+        # serves both readings -- the code-to-name map for FacDB and the polygons
+        # for the cafes -- so there is one definition of what an NTA is.
+        {"$select": "nta2020,ntaname,boroname,the_geom"},
         token,
         order="nta2020",
     )
@@ -466,7 +642,7 @@ def read_sources(fixtures: Path | None) -> tuple[list[Any], list[Any], list[Any]
         token,
         order="objectid",
     )
-    return facilities, cafes, neighborhoods, hotspots
+    return facilities, cafes, outdoor_dining, neighborhoods, hotspots
 
 
 # -- Normalization -----------------------------------------------------------
@@ -624,10 +800,15 @@ def neighborhood_names(rows: list[Any]) -> dict[str, str]:
 def neighborhood(record: dict[str, Any], names: dict[str, str], identifier: str) -> str | None:
     """The 2020 NTA name, or ``None`` when the source does not place the record.
 
-    Both upstream datasets carry ``nta2020``, which is the whole reason cafes
-    could join this snapshot without a point-in-polygon test against the
-    boundary geometry. The identifier is passed in rather than derived: a
-    Dining Out row has no ``uid`` for :func:`spot_id` to read.
+    FacDB only: it publishes the 2020 code but not its name, so this is a
+    dictionary lookup. DOHMH publishes no 2020 code -- its ``nta`` column is the
+    2010 vintage -- so a cafe's neighborhood comes from :func:`locate_nta`
+    instead, which tests the coordinates against the boundary polygons. See the
+    module docstring for why one field is derived two ways.
+
+    The identifier is passed in rather than derived so that the warning below
+    can name the record; a caller that is not mapping a FacDB row has no ``uid``
+    for :func:`spot_id` to read.
     """
     code = text(record.get("nta2020"))
     if code is None:
@@ -641,85 +822,393 @@ def neighborhood(record: dict[str, Any], names: dict[str, str], identifier: str)
     return name
 
 
-def cafe_id(name: str, address: str) -> str:
-    """A stable identifier for one storefront.
+def cafe_id(camis: str) -> str:
+    """The identifier for one establishment.
 
-    Dining Out publishes no row identifier that survives a re-licensing, so the
-    identity has to be derived. Name and address together are what distinguishes
-    one storefront from another, and both stay put between runs, which is what
-    :func:`write_snapshot` needs to produce a stable diff.
+    ``camis`` is the health department's own permit number for an establishment
+    and is stable across inspections, which is exactly the property the module
+    docstring asks an identifier for: it is upstream's notion of identity rather
+    than a digest of the record's contents, so a re-geocode or a corrected
+    street name moves one row of the snapshot instead of retiring a spot and
+    inventing a new one.
+
+    This is the one real gain from changing source that has nothing to do with
+    the category. The previous cafe identifier was a hash of name and address
+    because a licence register has no durable key, so renaming a cafe deleted it
+    and created a stranger in its place.
     """
-    digest = hashlib.sha1(f"{name}|{address}".encode()).hexdigest()[:16]
-    return f"{CAFE_PREFIX}:{digest}"
+    return f"{CAFE_PREFIX}:{camis}"
 
 
 def cafe_address(record: dict[str, Any]) -> str | None:
     """The address as the contract publishes it, or ``None``.
 
-    Dining Out names the pieces differently from FacDB -- ``street`` and
-    ``postcode`` rather than ``address`` and ``zipcode`` -- and stores them in
-    upper case, so they are title-cased here as the facility names are.
+    DOHMH splits the street address into ``building`` and ``street`` where FacDB
+    and Dining Out each keep one string, and stores both in upper case, so they
+    are joined and title-cased here as the facility names are.
+
+    A row with no ``street`` has no address worth publishing, and a row with a
+    ``street`` but no ``building`` does: "Penn Station" and "JFK International
+    Airport" are where several of these actually are.
     """
     street = text(record.get("street"))
     if street is None:
         return None
 
-    parts = [title_case(street)]
-    city = text(record.get("city"))
-    if city:
-        parts.append(title_case(city))
-    postcode = text(record.get("postcode"))
-    parts.append(f"NY {postcode}" if postcode else "NY")
+    building = text(record.get("building"))
+    parts = [title_case(f"{building} {street}" if building else street)]
+    zipcode = text(record.get("zipcode"))
+    # No city: DOHMH records the borough in `boro`, and that column is the one
+    # the module docstring calls uneven -- five establishments have "0". The
+    # borough published on the record comes from the boundary polygon instead,
+    # and repeating it inside the address string would mean trusting `boro`
+    # again for presentation after refusing to trust it for data.
+    parts.append(f"NY {zipcode}" if zipcode else "NY")
     return ", ".join(parts)
 
 
-def cafe_spot(record: dict[str, Any], names: dict[str, str]) -> dict[str, Any] | None:
-    """Map one Dining Out row onto the contract, or ``None`` if it cannot be.
+def cafe_coordinates(record: dict[str, Any]) -> tuple[float, float] | None:
+    """A geocode inside :data:`NYC_BOUNDS`, or ``None``.
 
-    ``assumed_name_s`` is the name over the door; ``business_legal_name`` is the
-    entity that holds the licence, and is usually something like "CGM-LLNR LLC".
-    Nobody searches for that, so the trading name is preferred and the legal one
-    is only a fallback.
+    Unlike :func:`coordinate` this returns ``None`` rather than raising for a
+    value it cannot use. A facility with a broken coordinate is a bug in an
+    import of 264 records and should stop the run; DOHMH ships 42 establishments
+    with no geocode or with ``0, 0`` on any given day, and failing the whole
+    snapshot over them would mean never publishing a cafe again.
     """
-    name = text(record.get("assumed_name_s")) or text(record.get("business_legal_name"))
-    address = cafe_address(record)
-    latitude = coordinate(record, "latitude", 90.0)
-    longitude = coordinate(record, "longitude", 180.0)
-    named_borough = text(record.get("borough"))
+    raw_latitude, raw_longitude = record.get("latitude"), record.get("longitude")
+    if raw_latitude in (None, "") or raw_longitude in (None, ""):
+        return None
+    try:
+        latitude, longitude = float(raw_latitude), float(raw_longitude)
+    except (TypeError, ValueError):
+        return None
+    if not (math.isfinite(latitude) and math.isfinite(longitude)):
+        return None
 
-    # A licence with no name, address, borough or coordinates describes nothing
-    # anyone could walk to. Unlike a facility this does not fail the import: the
-    # register is maintained for licensing rather than for mapping, and a
-    # handful of rows are missing a borough at any given time.
-    if name is None or address is None or latitude is None or longitude is None:
+    south, north, west, east = NYC_BOUNDS
+    if not (south <= latitude <= north and west <= longitude <= east):
         return None
-    if named_borough is None:
+    return round(latitude, COORDINATE_DIGITS), round(longitude, COORDINATE_DIGITS)
+
+
+def establishments(rows: list[Any]) -> dict[str, dict[str, Any]]:
+    """One record per establishment: the most recent inspection of each.
+
+    ``43nn-pn8j`` is one row per inspection -- 21,422 rows describing 2,225
+    coffee shops -- so this is what turns an inspection log into a directory.
+    The most recent row is the one whose ``action`` says whether the place is
+    currently closed, and whose address and geocode are the freshest the city
+    has.
+
+    Ties are broken on ``record_date`` and then on nothing: two rows of the same
+    inspection differ only in which violation they cite, and the fields this
+    importer reads are identical across them. Measured rather than assumed --
+    ``dba`` and ``(building, street)`` are constant within every single
+    ``camis`` in the dataset, so there is no row here whose choice could change
+    a published name or address.
+    """
+    by_camis: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise IngestError("An upstream record is not a JSON object.")
+        camis = text(row.get("camis"))
+        if camis is None:
+            # Without the permit number there is no identity to publish under.
+            continue
+        by_camis.setdefault(camis, []).append(row)
+
+    return {
+        camis: max(
+            group,
+            key=lambda row: (row.get("inspection_date") or "", row.get("record_date") or ""),
+        )
+        for camis, group in by_camis.items()
+    }
+
+
+@dataclass(frozen=True)
+class NtaArea:
+    """One 2020 Neighborhood Tabulation Area, as a polygon with a bounding box.
+
+    The bounding box is carried rather than recomputed because it turns the
+    point-in-polygon pass from 262 polygon tests per cafe into the handful whose
+    box the point falls inside.
+    """
+
+    name: str
+    borough: str
+    #: Outer ring first, then any holes, each a list of ``(longitude, latitude)``.
+    rings: tuple[tuple[tuple[float, float], ...], ...]
+    west: float
+    south: float
+    east: float
+    north: float
+
+
+def nta_areas(rows: list[Any]) -> list[NtaArea]:
+    """The boundary polygons, for the records that arrive without an NTA code.
+
+    A MultiPolygon becomes one :class:`NtaArea` per polygon rather than one per
+    NTA: several neighborhoods are more than one piece of land, and testing each
+    piece against its own bounding box is both simpler and faster than testing a
+    box that spans the water between them.
+
+    An NTA row with no geometry is not an error. The same request serves
+    :func:`neighborhood_names`, which needs only the code and the name, and a
+    trimmed fixture has no reason to carry 4.5 MB of coastline.
+    """
+    areas: list[NtaArea] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name = text(row.get("ntaname"))
+        borough = text(row.get("boroname"))
+        geometry = row.get("the_geom")
+        if name is None or borough is None or not isinstance(geometry, dict):
+            continue
+        if borough.upper() not in BOROUGH_BY_FACILITY_BOROUGH:
+            raise IngestError(f"NTA {name!r} is in {borough!r}, which is not one of the five.")
+
+        for polygon in geometry.get("coordinates") or ():
+            rings: list[tuple[tuple[float, float], ...]] = []
+            for ring in polygon:
+                try:
+                    points = tuple((float(x), float(y)) for x, y in ring)
+                except (TypeError, ValueError):
+                    raise IngestError(f"NTA {name!r} has a non-numeric boundary point.") from None
+                if len(points) >= 3:
+                    rings.append(points)
+            if not rings:
+                continue
+            longitudes = [x for x, _ in rings[0]]
+            latitudes = [y for _, y in rings[0]]
+            areas.append(
+                NtaArea(
+                    name=name,
+                    borough=BOROUGH_BY_FACILITY_BOROUGH[borough.upper()],
+                    rings=tuple(rings),
+                    west=min(longitudes),
+                    south=min(latitudes),
+                    east=max(longitudes),
+                    north=max(latitudes),
+                )
+            )
+
+    if not areas:
+        raise IngestError("The neighborhood dataset supplied no 2020 NTA boundaries.")
+    return areas
+
+
+def point_in_ring(longitude: float, latitude: float, ring: tuple[tuple[float, float], ...]) -> bool:
+    """Ray casting: whether a point is inside one closed ring.
+
+    Counts the ring's edges crossed by a ray running east from the point. An odd
+    count means inside. ``(y1 > latitude) != (y2 > latitude)`` is what makes a
+    vertex count once rather than twice when the ray passes exactly through it,
+    which is the usual way this algorithm is got wrong.
+
+    A point exactly on the boundary may land either way. That is acceptable
+    here and nowhere near the precision the field claims: two adjacent NTAs
+    share an edge, and a cafe on it is in one neighborhood or the other.
+    """
+    inside = False
+    count = len(ring)
+    for index in range(count):
+        first_longitude, first_latitude = ring[index]
+        next_longitude, next_latitude = ring[(index + 1) % count]
+        if (first_latitude > latitude) != (next_latitude > latitude):
+            along = (latitude - first_latitude) / (next_latitude - first_latitude)
+            if longitude < first_longitude + along * (next_longitude - first_longitude):
+                inside = not inside
+    return inside
+
+
+def locate_nta(latitude: float, longitude: float, areas: list[NtaArea]) -> NtaArea | None:
+    """The NTA whose boundary contains the point, or ``None``.
+
+    Inside the outer ring and outside every hole. The holes matter: an NTA with
+    another carved out of it would otherwise claim points belonging to its
+    neighbor.
+    """
+    for area in areas:
+        if not (area.west <= longitude <= area.east and area.south <= latitude <= area.north):
+            continue
+        if not point_in_ring(longitude, latitude, area.rings[0]):
+            continue
+        if any(point_in_ring(longitude, latitude, hole) for hole in area.rings[1:]):
+            continue
+        return area
+    return None
+
+
+def match_words(value: str | None) -> list[str]:
+    """One spelling of a name or an address, for comparison and never for display.
+
+    Upper-cased, stripped of punctuation, with street types and compass
+    directions folded to one form and ordinals reduced to their number. The
+    result is never published: it exists so that "1875 Utica Avenue" and "1875
+    UTICA AVE" can be recognized as one address.
+    """
+    if not isinstance(value, str):
+        return []
+    words: list[str] = []
+    for word in MATCH_NOISE.sub(" ", value.upper()).split():
+        ordinal = MATCH_ORDINAL.match(word)
+        if ordinal:
+            word = ordinal.group(1)
+        words.append(STREET_WORDS.get(word, word))
+    return words
+
+
+def match_key(value: str | None) -> str:
+    return " ".join(match_words(value))
+
+
+def outdoor_dining_index(rows: list[Any]) -> dict[tuple[str, str], list[tuple[float, float]]]:
+    """Sidewalk licences keyed on ``(name, address)``, for the seating join.
+
+    Both of a licence's names are indexed. ``assumed_name_s`` is the name over
+    the door and is what DOHMH records too, but a few licences are held under
+    the legal name alone, and DOHMH occasionally records that instead.
+
+    The key is name *and* address because address alone is not a storefront. The
+    module docstring has the measurement: 28 DOHMH cafes share a street address
+    with a licence held under a different name, and inspecting them shows almost
+    every one is a different business in the same building. Requiring the name
+    too costs a handful of genuine matches -- "Tete A Tete Cafe" is licensed as
+    "Tete-A-Tete" and keeps its seating, but a cafe licensed under a trading
+    name DOHMH does not know reads as false -- and that is the direction to err
+    in: ``false`` already means "no licence matched", while a wrong match is a
+    claim about a real business that is simply untrue.
+
+    The value is the licence's coordinates, so :func:`has_outdoor_seating` can
+    reject a pair whose geocodes put them hundreds of metres apart.
+    """
+    index: dict[tuple[str, str], list[tuple[float, float]]] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise IngestError("An upstream record is not a JSON object.")
+        address = match_key(row.get("street"))
+        if not address:
+            continue
+
+        point: tuple[float, float] | None = None
+        try:
+            latitude, longitude = float(row["latitude"]), float(row["longitude"])
+        except (TypeError, ValueError, KeyError):
+            # A licence with no geocode still joins on name and address; there
+            # is simply nothing for the distance backstop to check.
+            point = None
+        else:
+            if math.isfinite(latitude) and math.isfinite(longitude):
+                point = (latitude, longitude)
+
+        for name in {
+            match_key(row.get("assumed_name_s")),
+            match_key(row.get("business_legal_name")),
+        }:
+            if not name:
+                continue
+            licences = index.setdefault((name, address), [])
+            if point is not None:
+                licences.append(point)
+
+    return index
+
+
+def has_outdoor_seating(
+    record: dict[str, Any],
+    latitude: float,
+    longitude: float,
+    index: dict[tuple[str, str], list[tuple[float, float]]],
+) -> bool:
+    """Whether a sidewalk licence matches this establishment's name and address.
+
+    ``False`` means no licence matched, which is not the same as no outdoor
+    seating: the licence may be held under a trading name the health department
+    does not record, and the join is strict on purpose. The field is worded in
+    the model to say exactly that, the same way ``free_public_wifi`` is.
+    """
+    name = match_key(record.get("dba"))
+    building = text(record.get("building")) or ""
+    address = match_key(f"{building} {text(record.get('street')) or ''}")
+    if not name or not address:
+        return False
+
+    key = (name, address)
+    if key not in index:
+        return False
+
+    points = index[key]
+    if not points:
+        # Matched on name and address, with no geocode on the licence to check
+        # it against. The name and address agreeing is the match; the distance
+        # is only a backstop, and a missing geocode is not evidence against.
+        return True
+    return any(
+        haversine_metres(latitude, longitude, licence_latitude, licence_longitude)
+        <= OUTDOOR_MATCH_RADIUS_METRES
+        for licence_latitude, licence_longitude in points
+    )
+
+
+def cafe_spot(
+    camis: str,
+    record: dict[str, Any],
+    areas: list[NtaArea],
+    index: dict[tuple[str, str], list[tuple[float, float]]],
+) -> dict[str, Any] | None:
+    """Map one DOHMH establishment onto the contract, or ``None`` if it cannot be.
+
+    ``dba`` is "doing business as", the name over the door, and is the only name
+    the dataset carries -- which is a second small gain over the licence
+    register, where the name was as likely to be "CGM-LLNR LLC" as "Jean's".
+
+    Returns ``None`` rather than raising for a record that cannot be placed.
+    Unlike a facility this must not fail the import: the register is maintained
+    for inspections rather than for mapping, and a few dozen rows are
+    ungeocoded at any given time.
+    """
+    name = text(record.get("dba"))
+    address = cafe_address(record)
+    point = cafe_coordinates(record)
+    if name is None or address is None or point is None:
         return None
-    # Dining Out already title-cases the borough where FacDB shouts it; the
-    # same mapping serves both because it is keyed on the upper-cased name.
-    where = BOROUGH_BY_FACILITY_BOROUGH.get(named_borough.upper())
-    if where is None:
+
+    latitude, longitude = point
+    # Borough and neighborhood both come from the boundary polygon. DOHMH does
+    # publish `boro`, and it agrees with the polygon for every one of the 2,166
+    # establishments that reach this point -- but it is also "0" for five of
+    # them, and a field that is right except when it is blank is not a field
+    # worth reading when the polygon answers the same question exactly.
+    area = locate_nta(latitude, longitude, areas)
+    if area is None:
+        # Inside the bounding box and outside every neighborhood: the geocode
+        # is in the harbour or just over a county line. Nothing places it, and
+        # the contract requires a borough.
         return None
 
     return {
-        "id": cafe_id(name, address),
+        "id": cafe_id(camis),
         "name": title_case(name),
         "category": CAFE_CATEGORY,
         "address": address,
-        "neighborhood": neighborhood(record, names, cafe_id(name, address)),
-        "borough": where,
+        "neighborhood": area.name,
+        "borough": area.borough,
         "latitude": latitude,
         "longitude": longitude,
         # Filled in by normalize(), from the rest of the snapshot.
         "university": None,
-        # Dining Out carries `business_legal_name`, the entity holding the
-        # licence, which is "CGM-LLNR LLC" where the trading name is "JEAN'S".
-        # That is a registration rather than an operator anyone would search
-        # for, so cafes have none.
+        # DOHMH records the establishment, not who runs it. The old licence
+        # register did carry `business_legal_name`, which was a registration
+        # rather than an operator anyone would search for, so this field has
+        # been null for cafes from the start and stays null.
         "operator": None,
         "free_public_wifi": False,
         # A cafe is where you buy something. That is what a cafe is.
         "no_purchase_needed": False,
+        "outdoor_seating": has_outdoor_seating(record, latitude, longitude, index),
     }
 
 
@@ -801,7 +1290,13 @@ def nearest_campus(latitude: float, longitude: float, campuses: list[Campus]) ->
 
 
 def normalize(
-    facilities: list[Any], cafes: list[Any], names: dict[str, str], hotspots: list[Any]
+    facilities: list[Any],
+    cafes: list[Any],
+    names: dict[str, str],
+    hotspots: list[Any],
+    *,
+    areas: list[NtaArea] | None = None,
+    outdoor_dining: list[Any] | None = None,
 ) -> list[dict[str, Any]]:
     """The whole mapping, from raw upstream records to contract records.
 
@@ -809,7 +1304,16 @@ def normalize(
     the two derivations that depend on the whole snapshot -- the Wi-Fi
     proximity test and the nearest campus -- are applied once, to everything,
     and cannot drift between sources.
+
+    ``areas`` and ``outdoor_dining`` are keyword-only and serve the cafes alone:
+    a caller mapping facilities needs neither, and most of the test suite is
+    exactly that caller. Passing cafes without ``areas`` is an error rather than
+    a default, because the fallback would be to drop every cafe for want of a
+    borough -- which looks like upstream having no coffee shops today.
     """
+    if cafes and not areas:
+        raise IngestError("Mapping cafes needs the NTA boundaries; pass areas=nta_areas(rows).")
+    areas = areas or []
     spots: list[dict[str, Any]] = []
     skipped = 0
 
@@ -848,32 +1352,50 @@ def normalize(
                 "operator": operator(record),
                 "free_public_wifi": False,
                 "no_purchase_needed": published_category in NO_PURCHASE_CATEGORIES,
+                # Nothing licenses a library to put tables on the pavement, so
+                # no facility can match the seating join. False here is the
+                # absence of a licence, which is what the field means
+                # everywhere.
+                "outdoor_seating": False,
             }
         )
 
     if skipped:
         warn(f"skipped {skipped} record(s) without coordinates")
 
-    # Licences, not facilities: one storefront can hold more than one, and a
-    # re-licensing issues a new row for a cafe that was already here. Keyed on
-    # the derived identifier, which is the storefront rather than the licence.
-    by_id: dict[str, dict[str, Any]] = {}
+    # Inspections, not establishments: 21,422 rows describe 2,225 coffee shops,
+    # so the log is folded down to the most recent inspection of each before
+    # anything is mapped.
+    inspected = establishments(cafes)
+    index = outdoor_dining_index(outdoor_dining or [])
+
+    closed = 0
     unusable = 0
-    for record in cafes:
-        if not isinstance(record, dict):
-            raise IngestError("An upstream record is not a JSON object.")
-        spot = cafe_spot(record, names)
+    seated = 0
+    for camis, record in inspected.items():
+        if CLOSURE_ACTION.search(text(record.get("action")) or ""):
+            # The health department closed it at its most recent inspection and
+            # has not recorded a re-opening since. Publishing it as somewhere to
+            # go would send a student to a locked door.
+            closed += 1
+            continue
+        spot = cafe_spot(camis, record, areas, index)
         if spot is None:
             unusable += 1
             continue
-        by_id[spot["id"]] = spot
+        if spot["outdoor_seating"]:
+            seated += 1
+        spots.append(spot)
 
+    if closed:
+        warn(f"skipped {closed} establishment(s) closed at their most recent inspection")
     if unusable:
-        warn(f"skipped {unusable} licence(s) that could not be placed")
-    duplicates = len(cafes) - unusable - len(by_id)
-    if duplicates:
-        warn(f"merged {duplicates} repeat licence(s) onto storefronts already seen")
-    spots.extend(by_id.values())
+        warn(f"skipped {unusable} establishment(s) that could not be placed")
+    print(
+        f"ingest: {len(inspected)} coffee/tea establishments from {len(cafes)} inspection rows; "
+        f"{seated} matched a sidewalk licence",
+        file=sys.stderr,
+    )
 
     points = hotspot_points(hotspots)
     for spot in spots:
@@ -1037,9 +1559,16 @@ def main(argv: list[str] | None = None) -> int:
     options = parser.parse_args(argv)
 
     try:
-        facilities, cafes, neighborhoods, hotspots = read_sources(options.fixtures)
+        facilities, cafes, outdoor_dining, neighborhoods, hotspots = read_sources(options.fixtures)
         spots = combine(
-            normalize(facilities, cafes, neighborhood_names(neighborhoods), hotspots),
+            normalize(
+                facilities,
+                cafes,
+                neighborhood_names(neighborhoods),
+                hotspots,
+                areas=nta_areas(neighborhoods),
+                outdoor_dining=outdoor_dining,
+            ),
             curated_spots(),
         )
     except IngestError as error:
@@ -1050,7 +1579,11 @@ def main(argv: list[str] | None = None) -> int:
     counts = Counter(spot["category"] for spot in spots)
     summary = ", ".join(f"{count} {name}" for name, count in sorted(counts.items()))
     wifi = sum(1 for spot in spots if spot["free_public_wifi"])
-    print(f"wrote {len(spots)} spots ({summary}; {wifi} with free public wifi) to {options.output}")
+    outdoor = sum(1 for spot in spots if spot["outdoor_seating"])
+    print(
+        f"wrote {len(spots)} spots ({summary}; {wifi} with free public wifi; "
+        f"{outdoor} with outdoor seating) to {options.output}"
+    )
     return 0
 
 

@@ -1,1050 +1,4189 @@
 [
   {
     "nta2020": "BK0101",
-    "ntaname": "Greenpoint"
+    "ntaname": "Greenpoint",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0102",
-    "ntaname": "Williamsburg"
+    "ntaname": "Williamsburg",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0103",
-    "ntaname": "South Williamsburg"
+    "ntaname": "South Williamsburg",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0104",
-    "ntaname": "East Williamsburg"
+    "ntaname": "East Williamsburg",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0201",
-    "ntaname": "Brooklyn Heights"
+    "ntaname": "Brooklyn Heights",
+    "boroname": "Brooklyn",
+    "the_geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              -73.9923636691119,
+              40.68969012377707
+            ],
+            [
+              -73.99436092742167,
+              40.69023948058712
+            ],
+            [
+              -73.99623278034552,
+              40.69075777508913
+            ],
+            [
+              -73.99776924312978,
+              40.69119469786095
+            ],
+            [
+              -73.99803048556956,
+              40.691253722876375
+            ],
+            [
+              -73.99845271716661,
+              40.69136998347773
+            ],
+            [
+              -73.99893828846372,
+              40.69149514553722
+            ],
+            [
+              -73.99910057184516,
+              40.69153697499923
+            ],
+            [
+              -73.99920161806008,
+              40.69157183485039
+            ],
+            [
+              -73.99928819474523,
+              40.6915939599273
+            ],
+            [
+              -73.99936540041006,
+              40.69161307877562
+            ],
+            [
+              -73.99951274051004,
+              40.69165145081166
+            ],
+            [
+              -73.99991517234571,
+              40.69176723001051
+            ],
+            [
+              -74.00019040254134,
+              40.69189644763296
+            ],
+            [
+              -74.00062303398147,
+              40.692041490667684
+            ],
+            [
+              -74.00058547368536,
+              40.69212586286201
+            ],
+            [
+              -74.00104717398014,
+              40.692264598415015
+            ],
+            [
+              -74.00161727401692,
+              40.692549071104274
+            ],
+            [
+              -74.00169989306643,
+              40.69238276713675
+            ],
+            [
+              -74.00174362045013,
+              40.69240674970571
+            ],
+            [
+              -74.00154172832214,
+              40.69278596325292
+            ],
+            [
+              -74.00127014902638,
+              40.693296062679124
+            ],
+            [
+              -74.00095868350955,
+              40.6940690835824
+            ],
+            [
+              -74.0007829520964,
+              40.694286516167416
+            ],
+            [
+              -74.0007010467911,
+              40.69438785684503
+            ],
+            [
+              -74.00026872245725,
+              40.69496580308072
+            ],
+            [
+              -73.99988214894336,
+              40.695605199245854
+            ],
+            [
+              -73.99959546708455,
+              40.69606503883681
+            ],
+            [
+              -73.99946143382599,
+              40.69628002660449
+            ],
+            [
+              -73.99941971836027,
+              40.6963469378187
+            ],
+            [
+              -73.9994130234517,
+              40.69635767695609
+            ],
+            [
+              -73.99952373771443,
+              40.69657482704623
+            ],
+            [
+              -73.99947406666517,
+              40.69670413446216
+            ],
+            [
+              -73.9992946874815,
+              40.69679512579427
+            ],
+            [
+              -73.99918198884797,
+              40.69688518856751
+            ],
+            [
+              -73.99899604139183,
+              40.69681227837313
+            ],
+            [
+              -73.99893968902612,
+              40.69694094051601
+            ],
+            [
+              -73.99887207177386,
+              40.69692378457437
+            ],
+            [
+              -73.9987645793966,
+              40.69712073309415
+            ],
+            [
+              -73.99887117009611,
+              40.69715757729603
+            ],
+            [
+              -73.99837760531686,
+              40.698063296146245
+            ],
+            [
+              -73.99802102637064,
+              40.69876173657396
+            ],
+            [
+              -73.99799957452076,
+              40.69879768554446
+            ],
+            [
+              -73.99749898221943,
+              40.6996388693214
+            ],
+            [
+              -73.99736745723641,
+              40.699634235432534
+            ],
+            [
+              -73.99716054155857,
+              40.69979281264432
+            ],
+            [
+              -73.99718148292295,
+              40.69999448496822
+            ],
+            [
+              -73.9971758426784,
+              40.70010599196655
+            ],
+            [
+              -73.9972446280566,
+              40.70014140989724
+            ],
+            [
+              -73.99669768931422,
+              40.700876976917264
+            ],
+            [
+              -73.9966173606358,
+              40.70098500803151
+            ],
+            [
+              -73.99649828913475,
+              40.701144908530765
+            ],
+            [
+              -73.99628992097371,
+              40.701425176037255
+            ],
+            [
+              -73.99621639402828,
+              40.70152407416985
+            ],
+            [
+              -73.99538448316606,
+              40.702643010065984
+            ],
+            [
+              -73.9952601511738,
+              40.70281020953896
+            ],
+            [
+              -73.99513826774651,
+              40.70297411472304
+            ],
+            [
+              -73.99506438403465,
+              40.703100313653664
+            ],
+            [
+              -73.99504592660271,
+              40.70313183979975
+            ],
+            [
+              -73.994709232231,
+              40.702993886624846
+            ],
+            [
+              -73.99438297747511,
+              40.702886001923396
+            ],
+            [
+              -73.99432513594951,
+              40.702862436890854
+            ],
+            [
+              -73.99418494703517,
+              40.70280579934062
+            ],
+            [
+              -73.99385200058994,
+              40.702673910335896
+            ],
+            [
+              -73.9938175487711,
+              40.70266030930377
+            ],
+            [
+              -73.99329920434633,
+              40.702431941073755
+            ],
+            [
+              -73.99316590319201,
+              40.7023652244116
+            ],
+            [
+              -73.99292459908979,
+              40.70223700679924
+            ],
+            [
+              -73.9928286475002,
+              40.70218477794371
+            ],
+            [
+              -73.99261204840333,
+              40.702061129508806
+            ],
+            [
+              -73.99232767724718,
+              40.701855370917805
+            ],
+            [
+              -73.9922201356212,
+              40.70177366302743
+            ],
+            [
+              -73.99211067700602,
+              40.70169344371865
+            ],
+            [
+              -73.99206681772297,
+              40.70165886040826
+            ],
+            [
+              -73.9920277279279,
+              40.70162814159404
+            ],
+            [
+              -73.99193644847901,
+              40.70155641013664
+            ],
+            [
+              -73.99126294393739,
+              40.70102710314248
+            ],
+            [
+              -73.9909320167545,
+              40.70076621604885
+            ],
+            [
+              -73.99087453692033,
+              40.70067311729603
+            ],
+            [
+              -73.99083516107234,
+              40.700569762264045
+            ],
+            [
+              -73.99081766426958,
+              40.70046229332319
+            ],
+            [
+              -73.99082271942416,
+              40.70035475430946
+            ],
+            [
+              -73.99084157764725,
+              40.7002812575926
+            ],
+            [
+              -73.99102957979694,
+              40.6998471711206
+            ],
+            [
+              -73.99124033141192,
+              40.69936760307141
+            ],
+            [
+              -73.99128668104328,
+              40.69923479201824
+            ],
+            [
+              -73.99132676776645,
+              40.69910080567201
+            ],
+            [
+              -73.99136054045563,
+              40.69896581504354
+            ],
+            [
+              -73.99138795604428,
+              40.69882999242459
+            ],
+            [
+              -73.99140897929448,
+              40.69869351102169
+            ],
+            [
+              -73.99142358369248,
+              40.698556545180836
+            ],
+            [
+              -73.99143175063786,
+              40.6984192697115
+            ],
+            [
+              -73.99143346974742,
+              40.69828185981727
+            ],
+            [
+              -73.99142289692212,
+              40.69778099282289
+            ],
+            [
+              -73.99136812009702,
+              40.697013752735835
+            ],
+            [
+              -73.99128413621706,
+              40.69658821028391
+            ],
+            [
+              -73.99123105443927,
+              40.696431260462546
+            ],
+            [
+              -73.99119642476859,
+              40.69632448361136
+            ],
+            [
+              -73.99117494990465,
+              40.69625135310766
+            ],
+            [
+              -73.99115271246612,
+              40.69618446745668
+            ],
+            [
+              -73.99080803711345,
+              40.69502713429717
+            ],
+            [
+              -73.99073995876253,
+              40.69503174773626
+            ],
+            [
+              -73.99060604604496,
+              40.69457195420854
+            ],
+            [
+              -73.99066605499314,
+              40.69456882398415
+            ],
+            [
+              -73.99044474028206,
+              40.693828251433736
+            ],
+            [
+              -73.99045286440258,
+              40.69372058527927
+            ],
+            [
+              -73.99058794398027,
+              40.69339137896971
+            ],
+            [
+              -73.99062189107138,
+              40.69330864448905
+            ],
+            [
+              -73.99067802513405,
+              40.69317183663664
+            ],
+            [
+              -73.99072895894423,
+              40.69304770144766
+            ],
+            [
+              -73.9908504140943,
+              40.6927982506496
+            ],
+            [
+              -73.99097186833538,
+              40.69254880139072
+            ],
+            [
+              -73.99066626224919,
+              40.692497177565805
+            ],
+            [
+              -73.98947108586748,
+              40.692291417617035
+            ],
+            [
+              -73.98910541677041,
+              40.69215331402481
+            ],
+            [
+              -73.98902944698989,
+              40.69212386202275
+            ],
+            [
+              -73.98893356245586,
+              40.69208664198901
+            ],
+            [
+              -73.98910377141544,
+              40.69142157102879
+            ],
+            [
+              -73.98920727558654,
+              40.69101671741053
+            ],
+            [
+              -73.98922003518615,
+              40.69096597169854
+            ],
+            [
+              -73.9896394921704,
+              40.690326708923344
+            ],
+            [
+              -73.98988094811193,
+              40.689993112387356
+            ],
+            [
+              -73.99009014842022,
+              40.68970407888336
+            ],
+            [
+              -73.99047488040556,
+              40.68914107450508
+            ],
+            [
+              -73.99070669492916,
+              40.6891367446134
+            ],
+            [
+              -73.9923636691119,
+              40.68969012377707
+            ]
+          ]
+        ]
+      ]
+    }
   },
   {
     "nta2020": "BK0202",
-    "ntaname": "Downtown Brooklyn-DUMBO-Boerum Hill"
+    "ntaname": "Downtown Brooklyn-DUMBO-Boerum Hill",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0203",
-    "ntaname": "Fort Greene"
+    "ntaname": "Fort Greene",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0204",
-    "ntaname": "Clinton Hill"
+    "ntaname": "Clinton Hill",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0261",
-    "ntaname": "Brooklyn Navy Yard"
+    "ntaname": "Brooklyn Navy Yard",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0301",
-    "ntaname": "Bedford-Stuyvesant (West)"
+    "ntaname": "Bedford-Stuyvesant (West)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0302",
-    "ntaname": "Bedford-Stuyvesant (East)"
+    "ntaname": "Bedford-Stuyvesant (East)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0401",
-    "ntaname": "Bushwick (West)"
+    "ntaname": "Bushwick (West)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0402",
-    "ntaname": "Bushwick (East)"
+    "ntaname": "Bushwick (East)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0471",
-    "ntaname": "The Evergreens Cemetery"
+    "ntaname": "The Evergreens Cemetery",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0501",
-    "ntaname": "Cypress Hills"
+    "ntaname": "Cypress Hills",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0502",
-    "ntaname": "East New York (North)"
+    "ntaname": "East New York (North)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0503",
-    "ntaname": "East New York-New Lots"
+    "ntaname": "East New York-New Lots",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0504",
-    "ntaname": "Spring Creek-Starrett City"
+    "ntaname": "Spring Creek-Starrett City",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0505",
-    "ntaname": "East New York-City Line"
+    "ntaname": "East New York-City Line",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0571",
-    "ntaname": "Highland Park-Cypress Hills Cemeteries (South)"
+    "ntaname": "Highland Park-Cypress Hills Cemeteries (South)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0601",
-    "ntaname": "Carroll Gardens-Cobble Hill-Gowanus-Red Hook"
+    "ntaname": "Carroll Gardens-Cobble Hill-Gowanus-Red Hook",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0602",
-    "ntaname": "Park Slope"
+    "ntaname": "Park Slope",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0701",
-    "ntaname": "Windsor Terrace-South Slope"
+    "ntaname": "Windsor Terrace-South Slope",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0702",
-    "ntaname": "Sunset Park (West)"
+    "ntaname": "Sunset Park (West)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0703",
-    "ntaname": "Sunset Park (Central)"
+    "ntaname": "Sunset Park (Central)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0771",
-    "ntaname": "Green-Wood Cemetery"
+    "ntaname": "Green-Wood Cemetery",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0801",
-    "ntaname": "Prospect Heights"
+    "ntaname": "Prospect Heights",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0802",
-    "ntaname": "Crown Heights (North)"
+    "ntaname": "Crown Heights (North)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0891",
-    "ntaname": "Lincoln Terrace Park"
+    "ntaname": "Lincoln Terrace Park",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0901",
-    "ntaname": "Crown Heights (South)"
+    "ntaname": "Crown Heights (South)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK0902",
-    "ntaname": "Prospect Lefferts Gardens-Wingate"
+    "ntaname": "Prospect Lefferts Gardens-Wingate",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1001",
-    "ntaname": "Bay Ridge"
+    "ntaname": "Bay Ridge",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1002",
-    "ntaname": "Dyker Heights"
+    "ntaname": "Dyker Heights",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1061",
-    "ntaname": "Fort Hamilton"
+    "ntaname": "Fort Hamilton",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1091",
-    "ntaname": "Dyker Beach Park"
+    "ntaname": "Dyker Beach Park",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1101",
-    "ntaname": "Bensonhurst"
+    "ntaname": "Bensonhurst",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1102",
-    "ntaname": "Bath Beach"
+    "ntaname": "Bath Beach",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1103",
-    "ntaname": "Gravesend (West)"
+    "ntaname": "Gravesend (West)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1201",
-    "ntaname": "Sunset Park (East)-Borough Park (West)"
+    "ntaname": "Sunset Park (East)-Borough Park (West)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1202",
-    "ntaname": "Borough Park"
+    "ntaname": "Borough Park",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1203",
-    "ntaname": "Kensington"
+    "ntaname": "Kensington",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1204",
-    "ntaname": "Mapleton-Midwood (West)"
+    "ntaname": "Mapleton-Midwood (West)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1301",
-    "ntaname": "Gravesend (South)"
+    "ntaname": "Gravesend (South)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1302",
-    "ntaname": "Coney Island-Sea Gate"
+    "ntaname": "Coney Island-Sea Gate",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1303",
-    "ntaname": "Brighton Beach"
+    "ntaname": "Brighton Beach",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1391",
-    "ntaname": "Calvert Vaux Park"
+    "ntaname": "Calvert Vaux Park",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1401",
-    "ntaname": "Flatbush"
+    "ntaname": "Flatbush",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1402",
-    "ntaname": "Flatbush (West)-Ditmas Park-Parkville"
+    "ntaname": "Flatbush (West)-Ditmas Park-Parkville",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1403",
-    "ntaname": "Midwood"
+    "ntaname": "Midwood",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1501",
-    "ntaname": "Gravesend (East)-Homecrest"
+    "ntaname": "Gravesend (East)-Homecrest",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1502",
-    "ntaname": "Madison"
+    "ntaname": "Madison",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1503",
-    "ntaname": "Sheepshead Bay-Manhattan Beach-Gerritsen Beach"
+    "ntaname": "Sheepshead Bay-Manhattan Beach-Gerritsen Beach",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1601",
-    "ntaname": "Ocean Hill"
+    "ntaname": "Ocean Hill",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1602",
-    "ntaname": "Brownsville"
+    "ntaname": "Brownsville",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1701",
-    "ntaname": "East Flatbush-Erasmus"
+    "ntaname": "East Flatbush-Erasmus",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1702",
-    "ntaname": "East Flatbush-Farragut"
+    "ntaname": "East Flatbush-Farragut",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1703",
-    "ntaname": "East Flatbush-Rugby"
+    "ntaname": "East Flatbush-Rugby",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1704",
-    "ntaname": "East Flatbush-Remsen Village"
+    "ntaname": "East Flatbush-Remsen Village",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1771",
-    "ntaname": "Holy Cross Cemetery"
+    "ntaname": "Holy Cross Cemetery",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1801",
-    "ntaname": "Flatlands"
+    "ntaname": "Flatlands",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1802",
-    "ntaname": "Marine Park-Mill Basin-Bergen Beach"
+    "ntaname": "Marine Park-Mill Basin-Bergen Beach",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1803",
-    "ntaname": "Canarsie"
+    "ntaname": "Canarsie",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1891",
-    "ntaname": "Marine Park-Plumb Island"
+    "ntaname": "Marine Park-Plumb Island",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1892",
-    "ntaname": "McGuire Fields"
+    "ntaname": "McGuire Fields",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK1893",
-    "ntaname": "Canarsie Park & Pier"
+    "ntaname": "Canarsie Park & Pier",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK5591",
-    "ntaname": "Prospect Park"
+    "ntaname": "Prospect Park",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK5691",
-    "ntaname": "Barren Island-Floyd Bennett Field"
+    "ntaname": "Barren Island-Floyd Bennett Field",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK5692",
-    "ntaname": "Jamaica Bay (West)"
+    "ntaname": "Jamaica Bay (West)",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BK5693",
-    "ntaname": "Shirley Chisholm State Park"
+    "ntaname": "Shirley Chisholm State Park",
+    "boroname": "Brooklyn"
   },
   {
     "nta2020": "BX0101",
-    "ntaname": "Mott Haven-Port Morris"
+    "ntaname": "Mott Haven-Port Morris",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0102",
-    "ntaname": "Melrose"
+    "ntaname": "Melrose",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0201",
-    "ntaname": "Hunts Point"
+    "ntaname": "Hunts Point",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0202",
-    "ntaname": "Longwood"
+    "ntaname": "Longwood",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0291",
-    "ntaname": "North & South Brother Islands"
+    "ntaname": "North & South Brother Islands",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0301",
-    "ntaname": "Morrisania"
+    "ntaname": "Morrisania",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0302",
-    "ntaname": "Claremont Village-Claremont (East)"
+    "ntaname": "Claremont Village-Claremont (East)",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0303",
-    "ntaname": "Crotona Park East"
+    "ntaname": "Crotona Park East",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0391",
-    "ntaname": "Crotona Park"
+    "ntaname": "Crotona Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0401",
-    "ntaname": "Concourse-Concourse Village"
+    "ntaname": "Concourse-Concourse Village",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0402",
-    "ntaname": "Highbridge"
+    "ntaname": "Highbridge",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0403",
-    "ntaname": "Mount Eden-Claremont (West)"
+    "ntaname": "Mount Eden-Claremont (West)",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0491",
-    "ntaname": "Yankee Stadium-Macombs Dam Park"
+    "ntaname": "Yankee Stadium-Macombs Dam Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0492",
-    "ntaname": "Claremont Park"
+    "ntaname": "Claremont Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0501",
-    "ntaname": "University Heights (South)-Morris Heights"
+    "ntaname": "University Heights (South)-Morris Heights",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0502",
-    "ntaname": "Mount Hope"
+    "ntaname": "Mount Hope",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0503",
-    "ntaname": "Fordham Heights"
+    "ntaname": "Fordham Heights",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0601",
-    "ntaname": "West Farms"
+    "ntaname": "West Farms",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0602",
-    "ntaname": "Tremont"
+    "ntaname": "Tremont",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0603",
-    "ntaname": "Belmont"
+    "ntaname": "Belmont",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0701",
-    "ntaname": "University Heights (North)-Fordham"
+    "ntaname": "University Heights (North)-Fordham",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0702",
-    "ntaname": "Bedford Park"
+    "ntaname": "Bedford Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0703",
-    "ntaname": "Norwood"
+    "ntaname": "Norwood",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0801",
-    "ntaname": "Kingsbridge Heights-Van Cortlandt Village"
+    "ntaname": "Kingsbridge Heights-Van Cortlandt Village",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0802",
-    "ntaname": "Kingsbridge-Marble Hill"
+    "ntaname": "Kingsbridge-Marble Hill",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0803",
-    "ntaname": "Riverdale-Spuyten Duyvil"
+    "ntaname": "Riverdale-Spuyten Duyvil",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0901",
-    "ntaname": "Soundview-Bruckner-Bronx River"
+    "ntaname": "Soundview-Bruckner-Bronx River",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0902",
-    "ntaname": "Soundview-Clason Point"
+    "ntaname": "Soundview-Clason Point",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0903",
-    "ntaname": "Castle Hill-Unionport"
+    "ntaname": "Castle Hill-Unionport",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0904",
-    "ntaname": "Parkchester"
+    "ntaname": "Parkchester",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX0991",
-    "ntaname": "Soundview Park"
+    "ntaname": "Soundview Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1001",
-    "ntaname": "Westchester Square"
+    "ntaname": "Westchester Square",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1002",
-    "ntaname": "Throgs Neck-Schuylerville"
+    "ntaname": "Throgs Neck-Schuylerville",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1003",
-    "ntaname": "Pelham Bay-Country Club-City Island"
+    "ntaname": "Pelham Bay-Country Club-City Island",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1004",
-    "ntaname": "Co-op City"
+    "ntaname": "Co-op City",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1071",
-    "ntaname": "Hart Island"
+    "ntaname": "Hart Island",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1091",
-    "ntaname": "Ferry Point Park-St. Raymond Cemetery"
+    "ntaname": "Ferry Point Park-St. Raymond Cemetery",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1101",
-    "ntaname": "Pelham Parkway-Van Nest"
+    "ntaname": "Pelham Parkway-Van Nest",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1102",
-    "ntaname": "Morris Park"
+    "ntaname": "Morris Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1103",
-    "ntaname": "Pelham Gardens"
+    "ntaname": "Pelham Gardens",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1104",
-    "ntaname": "Allerton"
+    "ntaname": "Allerton",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1161",
-    "ntaname": "Hutchinson Metro Center"
+    "ntaname": "Hutchinson Metro Center",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1201",
-    "ntaname": "Williamsbridge-Olinville"
+    "ntaname": "Williamsbridge-Olinville",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1202",
-    "ntaname": "Eastchester-Edenwald-Baychester"
+    "ntaname": "Eastchester-Edenwald-Baychester",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1203",
-    "ntaname": "Wakefield-Woodlawn"
+    "ntaname": "Wakefield-Woodlawn",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX1271",
-    "ntaname": "Woodlawn Cemetery"
+    "ntaname": "Woodlawn Cemetery",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX2691",
-    "ntaname": "Van Cortlandt Park"
+    "ntaname": "Van Cortlandt Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX2791",
-    "ntaname": "Bronx Park"
+    "ntaname": "Bronx Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "BX2891",
-    "ntaname": "Pelham Bay Park"
+    "ntaname": "Pelham Bay Park",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "MN0101",
-    "ntaname": "Financial District-Battery Park City"
+    "ntaname": "Financial District-Battery Park City",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0102",
-    "ntaname": "Tribeca-Civic Center"
+    "ntaname": "Tribeca-Civic Center",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0191",
-    "ntaname": "The Battery-Governors Island-Ellis Island-Liberty Island"
+    "ntaname": "The Battery-Governors Island-Ellis Island-Liberty Island",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0201",
-    "ntaname": "SoHo-Little Italy-Hudson Square"
+    "ntaname": "SoHo-Little Italy-Hudson Square",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0202",
-    "ntaname": "Greenwich Village"
+    "ntaname": "Greenwich Village",
+    "boroname": "Manhattan",
+    "the_geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              -73.9899029597005,
+              40.73443479013707
+            ],
+            [
+              -73.98987421212178,
+              40.73428455726339
+            ],
+            [
+              -73.98985463157418,
+              40.734133473635026
+            ],
+            [
+              -73.98984425991894,
+              40.73398186273539
+            ],
+            [
+              -73.98984311917769,
+              40.7338300493733
+            ],
+            [
+              -73.98985121183952,
+              40.73367835838743
+            ],
+            [
+              -73.98986852051472,
+              40.733527114554995
+            ],
+            [
+              -73.99003455647767,
+              40.7327541513741
+            ],
+            [
+              -73.99010225655749,
+              40.73244537234051
+            ],
+            [
+              -73.99011350142582,
+              40.73240050534898
+            ],
+            [
+              -73.99021190884345,
+              40.73199633490752
+            ],
+            [
+              -73.99039009870532,
+              40.73128852433012
+            ],
+            [
+              -73.9905055844942,
+              40.730564957742956
+            ],
+            [
+              -73.99072530255718,
+              40.72987868747649
+            ],
+            [
+              -73.99078461514357,
+              40.72974574833861
+            ],
+            [
+              -73.99097394420761,
+              40.729195707209264
+            ],
+            [
+              -73.99114315146113,
+              40.72858815765818
+            ],
+            [
+              -73.99122943516693,
+              40.728072618365864
+            ],
+            [
+              -73.99129790628717,
+              40.72775524906495
+            ],
+            [
+              -73.9912343947096,
+              40.72772680526246
+            ],
+            [
+              -73.99135288829764,
+              40.72755739856281
+            ],
+            [
+              -73.99138898249227,
+              40.72749770114226
+            ],
+            [
+              -73.99155207512996,
+              40.72709433722655
+            ],
+            [
+              -73.99156762773715,
+              40.72703464761885
+            ],
+            [
+              -73.99163853343113,
+              40.726833256277615
+            ],
+            [
+              -73.99179396131375,
+              40.72639179586429
+            ],
+            [
+              -73.9920610841139,
+              40.725644614334406
+            ],
+            [
+              -73.99221516524891,
+              40.72523259566825
+            ],
+            [
+              -73.99232767870696,
+              40.7249060983973
+            ],
+            [
+              -73.99257987308616,
+              40.72420155492336
+            ],
+            [
+              -73.99260322198438,
+              40.72413644968358
+            ],
+            [
+              -73.99267182358393,
+              40.724160254422166
+            ],
+            [
+              -73.9934576903203,
+              40.724432895683435
+            ],
+            [
+              -73.99417930331387,
+              40.724692407314286
+            ],
+            [
+              -73.99490827256867,
+              40.7249512302247
+            ],
+            [
+              -73.99532907805332,
+              40.725083740231476
+            ],
+            [
+              -73.99584577426455,
+              40.72520835398448
+            ],
+            [
+              -73.99677175711443,
+              40.725431943502805
+            ],
+            [
+              -73.99761019459693,
+              40.72579713910515
+            ],
+            [
+              -73.9983611915256,
+              40.72616746876579
+            ],
+            [
+              -73.99911824651605,
+              40.72654231308996
+            ],
+            [
+              -73.99991579063095,
+              40.72693471343464
+            ],
+            [
+              -74.0006323912446,
+              40.727286612660954
+            ],
+            [
+              -74.00139033470369,
+              40.727660002595584
+            ],
+            [
+              -74.00214891366657,
+              40.72803536650219
+            ],
+            [
+              -74.00242264678387,
+              40.728175537960354
+            ],
+            [
+              -74.00262399528637,
+              40.7282786424938
+            ],
+            [
+              -74.00272009661748,
+              40.728322816026434
+            ],
+            [
+              -74.00281726484997,
+              40.72836312980689
+            ],
+            [
+              -74.00278351015878,
+              40.728435470293604
+            ],
+            [
+              -74.00252602956398,
+              40.729007920329686
+            ],
+            [
+              -74.00220337099437,
+              40.72965325629844
+            ],
+            [
+              -74.00215659160689,
+              40.72975679045379
+            ],
+            [
+              -74.00168465480945,
+              40.73058156329249
+            ],
+            [
+              -74.00141242386637,
+              40.73106525649165
+            ],
+            [
+              -74.00095442165967,
+              40.73170609830191
+            ],
+            [
+              -74.0005106621846,
+              40.73231522422859
+            ],
+            [
+              -74.00006842651058,
+              40.73292466183512
+            ],
+            [
+              -73.99976346863303,
+              40.7333592335659
+            ],
+            [
+              -73.99956212470227,
+              40.733612394825
+            ],
+            [
+              -73.99918595313538,
+              40.73413858241086
+            ],
+            [
+              -73.9987144369552,
+              40.734783860928175
+            ],
+            [
+              -73.99853021578028,
+              40.73503789283323
+            ],
+            [
+              -73.99827418854026,
+              40.73539113958088
+            ],
+            [
+              -73.99780750942062,
+              40.736035906572496
+            ],
+            [
+              -73.99734132767398,
+              40.736667889863455
+            ],
+            [
+              -73.99683993860414,
+              40.73736088990093
+            ],
+            [
+              -73.99361688263357,
+              40.736004491616136
+            ],
+            [
+              -73.99171498619222,
+              40.735215301169255
+            ],
+            [
+              -73.99119899334929,
+              40.73501236908623
+            ],
+            [
+              -73.99075396728541,
+              40.734839155076365
+            ],
+            [
+              -73.9899029597005,
+              40.73443479013707
+            ]
+          ]
+        ]
+      ]
+    }
   },
   {
     "nta2020": "MN0203",
-    "ntaname": "West Village"
+    "ntaname": "West Village",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0301",
-    "ntaname": "Chinatown-Two Bridges"
+    "ntaname": "Chinatown-Two Bridges",
+    "boroname": "Manhattan",
+    "the_geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              -73.98449647010706,
+              40.7095096644421
+            ],
+            [
+              -73.98639828917558,
+              40.70932658388322
+            ],
+            [
+              -73.98814626172096,
+              40.70915916701502
+            ],
+            [
+              -73.98815546051418,
+              40.70914914197087
+            ],
+            [
+              -73.98839064023267,
+              40.70912694916282
+            ],
+            [
+              -73.98844653437385,
+              40.70913382054716
+            ],
+            [
+              -73.98847967268766,
+              40.70915584730865
+            ],
+            [
+              -73.98849727173871,
+              40.70917630579592
+            ],
+            [
+              -73.98863658005804,
+              40.7099120615164
+            ],
+            [
+              -73.98864533493685,
+              40.709916933898725
+            ],
+            [
+              -73.98866750580943,
+              40.7099200348309
+            ],
+            [
+              -73.98869610271322,
+              40.7099284503473
+            ],
+            [
+              -73.98871771045194,
+              40.70994709051896
+            ],
+            [
+              -73.98873681707516,
+              40.70997074234784
+            ],
+            [
+              -73.98879717785803,
+              40.70996660747239
+            ],
+            [
+              -73.98889845980884,
+              40.709954735765194
+            ],
+            [
+              -73.98935765630632,
+              40.70990098670798
+            ],
+            [
+              -73.98946067019428,
+              40.70988928705146
+            ],
+            [
+              -73.98957449608709,
+              40.709874082109266
+            ],
+            [
+              -73.98974515155733,
+              40.70984876215841
+            ],
+            [
+              -73.99015825373382,
+              40.709790372663925
+            ],
+            [
+              -73.99051420376698,
+              40.70973388411898
+            ],
+            [
+              -73.99078913018568,
+              40.709689506086285
+            ],
+            [
+              -73.99106783463014,
+              40.709657229340216
+            ],
+            [
+              -73.9913510923706,
+              40.7096203327035
+            ],
+            [
+              -73.99170260226472,
+              40.709565262956176
+            ],
+            [
+              -73.99176779580138,
+              40.7095550550213
+            ],
+            [
+              -73.99190544366458,
+              40.70952539607984
+            ],
+            [
+              -73.99203926968352,
+              40.709516919162915
+            ],
+            [
+              -73.99209131635973,
+              40.70950822240137
+            ],
+            [
+              -73.9921486897015,
+              40.709498609104266
+            ],
+            [
+              -73.99236116139905,
+              40.70946436931418
+            ],
+            [
+              -73.99284846748647,
+              40.709381877638926
+            ],
+            [
+              -73.99374012862224,
+              40.7092461209381
+            ],
+            [
+              -73.99400820164043,
+              40.70923748042178
+            ],
+            [
+              -73.99414063200345,
+              40.70923326740011
+            ],
+            [
+              -73.99437823543936,
+              40.7091926391991
+            ],
+            [
+              -73.99457899963724,
+              40.70913097291024
+            ],
+            [
+              -73.99517577369834,
+              40.70903429381047
+            ],
+            [
+              -73.99601898395763,
+              40.70891622384763
+            ],
+            [
+              -73.99666400996587,
+              40.70882690502046
+            ],
+            [
+              -73.99728287195578,
+              40.708731619843086
+            ],
+            [
+              -73.99808351186998,
+              40.708509615869886
+            ],
+            [
+              -73.99828602320592,
+              40.708429931467776
+            ],
+            [
+              -73.99852758585311,
+              40.70833152790845
+            ],
+            [
+              -73.99856114620617,
+              40.70831528273114
+            ],
+            [
+              -73.99872197955064,
+              40.70823745289637
+            ],
+            [
+              -73.99875396570859,
+              40.70822365052479
+            ],
+            [
+              -73.99880846276645,
+              40.708200134490276
+            ],
+            [
+              -73.99882158420985,
+              40.708175481175076
+            ],
+            [
+              -73.9988813086388,
+              40.70813663391996
+            ],
+            [
+              -73.99898340963244,
+              40.70809265331633
+            ],
+            [
+              -73.99905276738552,
+              40.70803254536394
+            ],
+            [
+              -73.99913434786863,
+              40.70798239694609
+            ],
+            [
+              -73.9992236326119,
+              40.70805305212369
+            ],
+            [
+              -73.9992963135218,
+              40.70811056798333
+            ],
+            [
+              -73.9993344994738,
+              40.708143761185525
+            ],
+            [
+              -73.99937681738193,
+              40.70817992532228
+            ],
+            [
+              -73.99949511700498,
+              40.70827907227096
+            ],
+            [
+              -73.99975899410508,
+              40.7084838220178
+            ],
+            [
+              -73.99986942608709,
+              40.70856951479835
+            ],
+            [
+              -73.9999583436469,
+              40.70863954804239
+            ],
+            [
+              -74.0000648350309,
+              40.708723431340076
+            ],
+            [
+              -74.00013547110545,
+              40.708779072540835
+            ],
+            [
+              -74.00020611874571,
+              40.70883471537311
+            ],
+            [
+              -74.00047449159945,
+              40.7090514992698
+            ],
+            [
+              -74.0012241191708,
+              40.70965701921405
+            ],
+            [
+              -74.00141934562184,
+              40.709814795772104
+            ],
+            [
+              -74.00128258532506,
+              40.70999405347307
+            ],
+            [
+              -74.0012347649664,
+              40.710055333035804
+            ],
+            [
+              -74.00113646625368,
+              40.710175964728094
+            ],
+            [
+              -74.00100325442946,
+              40.71035403076899
+            ],
+            [
+              -74.00090633549209,
+              40.71047783135652
+            ],
+            [
+              -74.00079637659104,
+              40.71061828715173
+            ],
+            [
+              -74.00065774519857,
+              40.71080077084201
+            ],
+            [
+              -74.0005098596514,
+              40.71098427045357
+            ],
+            [
+              -74.00057195570146,
+              40.71104595572029
+            ],
+            [
+              -74.00062881532277,
+              40.71111049841079
+            ],
+            [
+              -74.00068021208688,
+              40.71117764151832
+            ],
+            [
+              -74.00072594131632,
+              40.71124711768066
+            ],
+            [
+              -74.0007658208999,
+              40.71131865024449
+            ],
+            [
+              -74.00079969198939,
+              40.71139195459113
+            ],
+            [
+              -74.00082741969965,
+              40.71146673859666
+            ],
+            [
+              -74.0008488935974,
+              40.711542704469196
+            ],
+            [
+              -74.00086402815117,
+              40.71161954970954
+            ],
+            [
+              -74.00087276307242,
+              40.71169696831581
+            ],
+            [
+              -74.00089166198869,
+              40.712999258356206
+            ],
+            [
+              -74.00089354259464,
+              40.713029950788005
+            ],
+            [
+              -74.00089640187132,
+              40.71304741461341
+            ],
+            [
+              -74.00093174200283,
+              40.713263253045476
+            ],
+            [
+              -74.00125701936294,
+              40.71349677866777
+            ],
+            [
+              -74.00156635547326,
+              40.71368306399954
+            ],
+            [
+              -74.00096840382477,
+              40.713905596114685
+            ],
+            [
+              -74.00074652283325,
+              40.714510353738596
+            ],
+            [
+              -74.00045462977894,
+              40.71436504759906
+            ],
+            [
+              -74.00052734788574,
+              40.715170059365484
+            ],
+            [
+              -74.00078955054066,
+              40.71529096840161
+            ],
+            [
+              -74.0005783915007,
+              40.71557090342701
+            ],
+            [
+              -74.00013820907833,
+              40.716199730562494
+            ],
+            [
+              -73.999930976899,
+              40.716543914270694
+            ],
+            [
+              -73.99944838180335,
+              40.7173297970985
+            ],
+            [
+              -73.99931241612073,
+              40.71755024177758
+            ],
+            [
+              -73.9985892550198,
+              40.71709951153728
+            ],
+            [
+              -73.99776285925765,
+              40.71681392862427
+            ],
+            [
+              -73.99698375215492,
+              40.71654054317223
+            ],
+            [
+              -73.99605872612268,
+              40.71623164071364
+            ],
+            [
+              -73.99580912195114,
+              40.716644660210676
+            ],
+            [
+              -73.99542875812696,
+              40.71727924304803
+            ],
+            [
+              -73.99480778889196,
+              40.71845742685302
+            ],
+            [
+              -73.99382785532453,
+              40.71814447755253
+            ],
+            [
+              -73.99309432105578,
+              40.7179224792367
+            ],
+            [
+              -73.99222064285155,
+              40.71765844676515
+            ],
+            [
+              -73.99142272626793,
+              40.71741757692699
+            ],
+            [
+              -73.99130415304928,
+              40.71738168193557
+            ],
+            [
+              -73.99117623136941,
+              40.71734296009509
+            ],
+            [
+              -73.99070289946383,
+              40.71720060592557
+            ],
+            [
+              -73.9899501906863,
+              40.7169719755547
+            ],
+            [
+              -73.98915463750744,
+              40.716708646771785
+            ],
+            [
+              -73.98975418109097,
+              40.71555234834068
+            ],
+            [
+              -73.99020235909222,
+              40.714664430893045
+            ],
+            [
+              -73.99022155496816,
+              40.71457875640877
+            ],
+            [
+              -73.99022750964427,
+              40.714491670052816
+            ],
+            [
+              -73.99022012603876,
+              40.71440493989813
+            ],
+            [
+              -73.98933656444504,
+              40.71413337601421
+            ],
+            [
+              -73.98870191200442,
+              40.71418554116259
+            ],
+            [
+              -73.98840468949098,
+              40.71421005195973
+            ],
+            [
+              -73.98766690183298,
+              40.71427082223863
+            ],
+            [
+              -73.9871662796891,
+              40.714312057545854
+            ],
+            [
+              -73.98585437560017,
+              40.714420135766616
+            ],
+            [
+              -73.98567127734,
+              40.71443529826626
+            ],
+            [
+              -73.98558505205506,
+              40.714442405218534
+            ],
+            [
+              -73.98534404351345,
+              40.714461578232836
+            ],
+            [
+              -73.98522844623366,
+              40.71379292643618
+            ],
+            [
+              -73.98506509275862,
+              40.71380691898869
+            ],
+            [
+              -73.98511380650824,
+              40.713351257026694
+            ],
+            [
+              -73.98505770123434,
+              40.713077717775924
+            ],
+            [
+              -73.98503128411657,
+              40.71289988397275
+            ],
+            [
+              -73.9850246208341,
+              40.71285503094478
+            ],
+            [
+              -73.98495041919544,
+              40.712355530060826
+            ],
+            [
+              -73.98485280777922,
+              40.71169814288915
+            ],
+            [
+              -73.98478405997494,
+              40.71122878935756
+            ],
+            [
+              -73.98470278689686,
+              40.71070201588442
+            ],
+            [
+              -73.98468361401434,
+              40.71060508203816
+            ],
+            [
+              -73.98467459366353,
+              40.71056357736016
+            ],
+            [
+              -73.98466491357523,
+              40.71051417302448
+            ],
+            [
+              -73.98465524451053,
+              40.71046476215556
+            ],
+            [
+              -73.98449647010706,
+              40.7095096644421
+            ]
+          ]
+        ]
+      ]
+    }
   },
   {
     "nta2020": "MN0302",
-    "ntaname": "Lower East Side"
+    "ntaname": "Lower East Side",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0303",
-    "ntaname": "East Village"
+    "ntaname": "East Village",
+    "boroname": "Manhattan",
+    "the_geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              -73.96715101106554,
+              40.71831612593243
+            ],
+            [
+              -73.96656241831437,
+              40.71801586680629
+            ],
+            [
+              -73.96659690266586,
+              40.71796798189279
+            ],
+            [
+              -73.96718343223782,
+              40.71827592102777
+            ],
+            [
+              -73.96719282626925,
+              40.718265144524786
+            ],
+            [
+              -73.96730741474404,
+              40.71831306668176
+            ],
+            [
+              -73.96723013304984,
+              40.71841466834064
+            ],
+            [
+              -73.96718243631273,
+              40.718483055799176
+            ],
+            [
+              -73.96706867689147,
+              40.71843903579146
+            ],
+            [
+              -73.96709096267313,
+              40.71840576680846
+            ],
+            [
+              -73.96715101106554,
+              40.71831612593243
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              -73.9664432335092,
+              40.719243203651835
+            ],
+            [
+              -73.96650150486249,
+              40.719191280434885
+            ],
+            [
+              -73.96646644128893,
+              40.71917459142351
+            ],
+            [
+              -73.96644906386173,
+              40.7191791415829
+            ],
+            [
+              -73.96643687073039,
+              40.71913982534474
+            ],
+            [
+              -73.9663664313901,
+              40.719100491601516
+            ],
+            [
+              -73.96632227620144,
+              40.719104052376295
+            ],
+            [
+              -73.9663636385141,
+              40.719050456048485
+            ],
+            [
+              -73.96574267076741,
+              40.71870687777715
+            ],
+            [
+              -73.96575996467396,
+              40.718689035281855
+            ],
+            [
+              -73.96634580602186,
+              40.719016141341186
+            ],
+            [
+              -73.96637512035431,
+              40.71898467077628
+            ],
+            [
+              -73.96663600829616,
+              40.71913014321545
+            ],
+            [
+              -73.96654863232129,
+              40.71922157595245
+            ],
+            [
+              -73.96651371046346,
+              40.719202805475874
+            ],
+            [
+              -73.96646745714561,
+              40.71924344072401
+            ],
+            [
+              -73.96648075649595,
+              40.7193567910718
+            ],
+            [
+              -73.96650737099574,
+              40.719358659872796
+            ],
+            [
+              -73.96652341507118,
+              40.71936849300298
+            ],
+            [
+              -73.96653476032199,
+              40.71938070716422
+            ],
+            [
+              -73.96653866772373,
+              40.71939559908954
+            ],
+            [
+              -73.96653591996437,
+              40.71941197956665
+            ],
+            [
+              -73.96652886928423,
+              40.719420613692556
+            ],
+            [
+              -73.96651453667191,
+              40.71943097474466
+            ],
+            [
+              -73.96649136159756,
+              40.719436209413765
+            ],
+            [
+              -73.96645879444058,
+              40.719433340415215
+            ],
+            [
+              -73.96644063945848,
+              40.71941999228302
+            ],
+            [
+              -73.96643313544055,
+              40.719396641546474
+            ],
+            [
+              -73.96643690008688,
+              40.71938234640714
+            ],
+            [
+              -73.9664456742461,
+              40.719370913080745
+            ],
+            [
+              -73.96646509449421,
+              40.7193604344076
+            ],
+            [
+              -73.9664432335092,
+              40.719243203651835
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              -73.96503278262037,
+              40.72037706947495
+            ],
+            [
+              -73.96511736757607,
+              40.720316339861505
+            ],
+            [
+              -73.96567655698846,
+              40.7206789605406
+            ],
+            [
+              -73.96559823311401,
+              40.720744458402685
+            ],
+            [
+              -73.96503278262037,
+              40.72037706947495
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              -73.96483433609403,
+              40.720795547440936
+            ],
+            [
+              -73.96436107868253,
+              40.72047723987711
+            ],
+            [
+              -73.96439735617604,
+              40.7204418344266
+            ],
+            [
+              -73.96486440927369,
+              40.72077554186087
+            ],
+            [
+              -73.96492581691774,
+              40.72072028444723
+            ],
+            [
+              -73.96503100130573,
+              40.720790841371304
+            ],
+            [
+              -73.9649307430023,
+              40.720881350566174
+            ],
+            [
+              -73.96485304211566,
+              40.72095280435724
+            ],
+            [
+              -73.96475287190977,
+              40.720877483340075
+            ],
+            [
+              -73.96483433609403,
+              40.720795547440936
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              -73.96402617458521,
+              40.720880893068745
+            ],
+            [
+              -73.9640659124426,
+              40.72079991096256
+            ],
+            [
+              -73.96437504301146,
+              40.72099255076879
+            ],
+            [
+              -73.96430846303322,
+              40.7210556694886
+            ],
+            [
+              -73.96402617458521,
+              40.720880893068745
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              -73.96424069640435,
+              40.72061223099658
+            ],
+            [
+              -73.96427462409184,
+              40.720575767593864
+            ],
+            [
+              -73.96495059736658,
+              40.72142418210708
+            ],
+            [
+              -73.96484284863446,
+              40.721464176094834
+            ],
+            [
+              -73.96420193010492,
+              40.72065389425693
+            ],
+            [
+              -73.96424069640435,
+              40.72061223099658
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              -73.97177410965303,
+              40.72582128133725
+            ],
+            [
+              -73.97179142961485,
+              40.725814221149285
+            ],
+            [
+              -73.97181650521712,
+              40.72581496574734
+            ],
+            [
+              -73.97185935764855,
+              40.72558296903034
+            ],
+            [
+              -73.97187437695213,
+              40.725503116080006
+            ],
+            [
+              -73.97188490885411,
+              40.72542440506579
+            ],
+            [
+              -73.97191120732053,
+              40.725290370700094
+            ],
+            [
+              -73.97193374501082,
+              40.72517629035144
+            ],
+            [
+              -73.97193975456312,
+              40.72515803861023
+            ],
+            [
+              -73.97196154778612,
+              40.7250399783084
+            ],
+            [
+              -73.97200511841213,
+              40.72484148970844
+            ],
+            [
+              -73.97203666966882,
+              40.72468407002028
+            ],
+            [
+              -73.97206595867391,
+              40.72455915883146
+            ],
+            [
+              -73.97207196960318,
+              40.724536351360854
+            ],
+            [
+              -73.97208098151926,
+              40.724497567930555
+            ],
+            [
+              -73.97208400057282,
+              40.72446790554588
+            ],
+            [
+              -73.97209751290927,
+              40.72442341473228
+            ],
+            [
+              -73.97215609001717,
+              40.724170178278285
+            ],
+            [
+              -73.97216585996632,
+              40.72413196327332
+            ],
+            [
+              -73.9722169237619,
+              40.72393005464696
+            ],
+            [
+              -73.97223344676958,
+              40.7238467799265
+            ],
+            [
+              -73.97226499868268,
+              40.72371445683122
+            ],
+            [
+              -73.9723250773157,
+              40.72346349983007
+            ],
+            [
+              -73.97236115744644,
+              40.723312060476644
+            ],
+            [
+              -73.97239945748277,
+              40.72314881636684
+            ],
+            [
+              -73.97251011180381,
+              40.72269688600691
+            ],
+            [
+              -73.97288971396699,
+              40.72108829721954
+            ],
+            [
+              -73.97314808331096,
+              40.71999057325979
+            ],
+            [
+              -73.97357185653394,
+              40.71859722992405
+            ],
+            [
+              -73.9736123433092,
+              40.71860565408387
+            ],
+            [
+              -73.97464860405941,
+              40.718821269317
+            ],
+            [
+              -73.97468709704181,
+              40.71882935509298
+            ],
+            [
+              -73.97474239882223,
+              40.71884079474656
+            ],
+            [
+              -73.97480627348862,
+              40.7188177198584
+            ],
+            [
+              -73.97487087038486,
+              40.71879677988685
+            ],
+            [
+              -73.97492162524021,
+              40.71878173045884
+            ],
+            [
+              -73.97498996537453,
+              40.71877900827139
+            ],
+            [
+              -73.97506051050303,
+              40.718785451244116
+            ],
+            [
+              -73.97509719746351,
+              40.71879443343051
+            ],
+            [
+              -73.97548131398722,
+              40.71889110782664
+            ],
+            [
+              -73.97545167479797,
+              40.718946559928376
+            ],
+            [
+              -73.97551012651918,
+              40.71895861253018
+            ],
+            [
+              -73.97610198547082,
+              40.719080694260015
+            ],
+            [
+              -73.97635525073238,
+              40.719132884921976
+            ],
+            [
+              -73.97648182372318,
+              40.71915962886312
+            ],
+            [
+              -73.9767449554882,
+              40.71921523353867
+            ],
+            [
+              -73.97722379174816,
+              40.719309775859564
+            ],
+            [
+              -73.97803122530533,
+              40.71963834764645
+            ],
+            [
+              -73.97875234830163,
+              40.71993370711215
+            ],
+            [
+              -73.9796602165646,
+              40.72021282967874
+            ],
+            [
+              -73.98008058907905,
+              40.720339340510044
+            ],
+            [
+              -73.98130824107952,
+              40.72070878563628
+            ],
+            [
+              -73.98216615175821,
+              40.72096885477434
+            ],
+            [
+              -73.9830030854691,
+              40.72122268107842
+            ],
+            [
+              -73.98382387210108,
+              40.721472872067025
+            ],
+            [
+              -73.98467780163293,
+              40.72173060534054
+            ],
+            [
+              -73.9855168611052,
+              40.72198522495781
+            ],
+            [
+              -73.98585984110207,
+              40.7220997322586
+            ],
+            [
+              -73.98628573956006,
+              40.72224192000888
+            ],
+            [
+              -73.9871358474217,
+              40.722469811623306
+            ],
+            [
+              -73.98786491366825,
+              40.72269708870194
+            ],
+            [
+              -73.9885436135351,
+              40.722903617853575
+            ],
+            [
+              -73.98863862694621,
+              40.722933720766335
+            ],
+            [
+              -73.98875683194557,
+              40.72297036611125
+            ],
+            [
+              -73.9893921810376,
+              40.72317405899775
+            ],
+            [
+              -73.99027361581857,
+              40.72342601879592
+            ],
+            [
+              -73.99102410395398,
+              40.723649432740544
+            ],
+            [
+              -73.99127307096381,
+              40.72372981344214
+            ],
+            [
+              -73.99135472734818,
+              40.72375461958757
+            ],
+            [
+              -73.99219861177944,
+              40.724012609684195
+            ],
+            [
+              -73.99253198772745,
+              40.72411456659975
+            ],
+            [
+              -73.99260322198428,
+              40.72413644968361
+            ],
+            [
+              -73.99257987308604,
+              40.724201554923404
+            ],
+            [
+              -73.9923276787069,
+              40.72490609839734
+            ],
+            [
+              -73.99221516524881,
+              40.72523259566829
+            ],
+            [
+              -73.99206108411386,
+              40.725644614334406
+            ],
+            [
+              -73.99179396131375,
+              40.72639179586429
+            ],
+            [
+              -73.99163853343113,
+              40.72683325627766
+            ],
+            [
+              -73.991567627737,
+              40.727034647618886
+            ],
+            [
+              -73.99155207512986,
+              40.72709433722655
+            ],
+            [
+              -73.99138898249227,
+              40.72749770114226
+            ],
+            [
+              -73.99135288829754,
+              40.72755739856281
+            ],
+            [
+              -73.99123439470965,
+              40.7277268052625
+            ],
+            [
+              -73.99129790628707,
+              40.72775524906495
+            ],
+            [
+              -73.99122943516699,
+              40.728072618365914
+            ],
+            [
+              -73.99114315146102,
+              40.72858815765818
+            ],
+            [
+              -73.99097394420757,
+              40.729195707209264
+            ],
+            [
+              -73.99078461514345,
+              40.72974574833861
+            ],
+            [
+              -73.99072530255708,
+              40.72987868747649
+            ],
+            [
+              -73.9905055844942,
+              40.730564957743006
+            ],
+            [
+              -73.9903900987052,
+              40.731288524330154
+            ],
+            [
+              -73.99021190884338,
+              40.73199633490752
+            ],
+            [
+              -73.99011350142575,
+              40.73240050534902
+            ],
+            [
+              -73.99010225655745,
+              40.73244537234051
+            ],
+            [
+              -73.99003455647762,
+              40.7327541513741
+            ],
+            [
+              -73.9898685205146,
+              40.733527114554995
+            ],
+            [
+              -73.9898512118395,
+              40.733678358387486
+            ],
+            [
+              -73.9898431191777,
+              40.733830049373346
+            ],
+            [
+              -73.9898442599189,
+              40.73398186273539
+            ],
+            [
+              -73.98985463157419,
+              40.734133473635026
+            ],
+            [
+              -73.98987421212176,
+              40.73428455726343
+            ],
+            [
+              -73.98990295970046,
+              40.73443479013707
+            ],
+            [
+              -73.98883935023996,
+              40.733990479931485
+            ],
+            [
+              -73.98877931595969,
+              40.7339654002412
+            ],
+            [
+              -73.98757195138026,
+              40.73345699118114
+            ],
+            [
+              -73.98718049582432,
+              40.73329214826433
+            ],
+            [
+              -73.98494550511883,
+              40.73234967332065
+            ],
+            [
+              -73.98356052033174,
+              40.73177022543642
+            ],
+            [
+              -73.98346644120123,
+              40.73173108162115
+            ],
+            [
+              -73.98321467146553,
+              40.731624168291304
+            ],
+            [
+              -73.98296440531304,
+              40.7315208425476
+            ],
+            [
+              -73.98255629231726,
+              40.7313501345547
+            ],
+            [
+              -73.98246876214004,
+              40.73131488523588
+            ],
+            [
+              -73.98190911373968,
+              40.73109512931668
+            ],
+            [
+              -73.98166656898994,
+              40.7309985475813
+            ],
+            [
+              -73.98034007500232,
+              40.73044246137657
+            ],
+            [
+              -73.97992109976272,
+              40.73026220520887
+            ],
+            [
+              -73.97910803740506,
+              40.729910558980514
+            ],
+            [
+              -73.97802697796664,
+              40.72943306011242
+            ],
+            [
+              -73.97753843746929,
+              40.72922624841975
+            ],
+            [
+              -73.97690436239527,
+              40.72895782478054
+            ],
+            [
+              -73.97619632359164,
+              40.72866197702931
+            ],
+            [
+              -73.97581244833346,
+              40.728519767622544
+            ],
+            [
+              -73.97566782459063,
+              40.728462532509226
+            ],
+            [
+              -73.9732979670599,
+              40.727428009362406
+            ],
+            [
+              -73.97205015281106,
+              40.72688094679736
+            ],
+            [
+              -73.97197684905781,
+              40.726830356201454
+            ],
+            [
+              -73.97191244063708,
+              40.72679100926994
+            ],
+            [
+              -73.97185671237702,
+              40.726758685466315
+            ],
+            [
+              -73.9717960198695,
+              40.72671367965678
+            ],
+            [
+              -73.97162697271706,
+              40.726628453499636
+            ],
+            [
+              -73.97166972701153,
+              40.72639232765715
+            ],
+            [
+              -73.97169587451613,
+              40.72624182930254
+            ],
+            [
+              -73.97171894361502,
+              40.72612199325969
+            ],
+            [
+              -73.97173843313291,
+              40.72599966755558
+            ],
+            [
+              -73.97176755410212,
+              40.725833303454834
+            ],
+            [
+              -73.97177410965303,
+              40.72582128133725
+            ]
+          ]
+        ]
+      ]
+    }
   },
   {
     "nta2020": "MN0401",
-    "ntaname": "Chelsea-Hudson Yards"
+    "ntaname": "Chelsea-Hudson Yards",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0402",
-    "ntaname": "Hell's Kitchen"
+    "ntaname": "Hell's Kitchen",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0501",
-    "ntaname": "Midtown South-Flatiron-Union Square"
+    "ntaname": "Midtown South-Flatiron-Union Square",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0502",
-    "ntaname": "Midtown-Times Square"
+    "ntaname": "Midtown-Times Square",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0601",
-    "ntaname": "Stuyvesant Town-Peter Cooper Village"
+    "ntaname": "Stuyvesant Town-Peter Cooper Village",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0602",
-    "ntaname": "Gramercy"
+    "ntaname": "Gramercy",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0603",
-    "ntaname": "Murray Hill-Kips Bay"
+    "ntaname": "Murray Hill-Kips Bay",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0604",
-    "ntaname": "East Midtown-Turtle Bay"
+    "ntaname": "East Midtown-Turtle Bay",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0661",
-    "ntaname": "United Nations"
+    "ntaname": "United Nations",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0701",
-    "ntaname": "Upper West Side-Lincoln Square"
+    "ntaname": "Upper West Side-Lincoln Square",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0702",
-    "ntaname": "Upper West Side (Central)"
+    "ntaname": "Upper West Side (Central)",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0703",
-    "ntaname": "Upper West Side-Manhattan Valley"
+    "ntaname": "Upper West Side-Manhattan Valley",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0801",
-    "ntaname": "Upper East Side-Lenox Hill-Roosevelt Island"
+    "ntaname": "Upper East Side-Lenox Hill-Roosevelt Island",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0802",
-    "ntaname": "Upper East Side-Carnegie Hill"
+    "ntaname": "Upper East Side-Carnegie Hill",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0803",
-    "ntaname": "Upper East Side-Yorkville"
+    "ntaname": "Upper East Side-Yorkville",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0901",
-    "ntaname": "Morningside Heights"
+    "ntaname": "Morningside Heights",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0902",
-    "ntaname": "Manhattanville-West Harlem"
+    "ntaname": "Manhattanville-West Harlem",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN0903",
-    "ntaname": "Hamilton Heights-Sugar Hill"
+    "ntaname": "Hamilton Heights-Sugar Hill",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1001",
-    "ntaname": "Harlem (South)"
+    "ntaname": "Harlem (South)",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1002",
-    "ntaname": "Harlem (North)"
+    "ntaname": "Harlem (North)",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1101",
-    "ntaname": "East Harlem (South)"
+    "ntaname": "East Harlem (South)",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1102",
-    "ntaname": "East Harlem (North)"
+    "ntaname": "East Harlem (North)",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1191",
-    "ntaname": "Randall's Island"
+    "ntaname": "Randall's Island",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1201",
-    "ntaname": "Washington Heights (South)"
+    "ntaname": "Washington Heights (South)",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1202",
-    "ntaname": "Washington Heights (North)"
+    "ntaname": "Washington Heights (North)",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1203",
-    "ntaname": "Inwood"
+    "ntaname": "Inwood",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1291",
-    "ntaname": "Highbridge Park"
+    "ntaname": "Highbridge Park",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN1292",
-    "ntaname": "Inwood Hill Park"
+    "ntaname": "Inwood Hill Park",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "MN6491",
-    "ntaname": "Central Park"
+    "ntaname": "Central Park",
+    "boroname": "Manhattan"
   },
   {
     "nta2020": "QN0101",
-    "ntaname": "Astoria (North)-Ditmars-Steinway"
+    "ntaname": "Astoria (North)-Ditmars-Steinway",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0102",
-    "ntaname": "Old Astoria-Hallets Point"
+    "ntaname": "Old Astoria-Hallets Point",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0103",
-    "ntaname": "Astoria (Central)"
+    "ntaname": "Astoria (Central)",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0104",
-    "ntaname": "Astoria (East)-Woodside (North)"
+    "ntaname": "Astoria (East)-Woodside (North)",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0105",
-    "ntaname": "Queensbridge-Ravenswood-Dutch Kills"
+    "ntaname": "Queensbridge-Ravenswood-Dutch Kills",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0151",
-    "ntaname": "Rikers Island"
+    "ntaname": "Rikers Island",
+    "boroname": "Bronx"
   },
   {
     "nta2020": "QN0161",
-    "ntaname": "Sunnyside Yards (North)"
+    "ntaname": "Sunnyside Yards (North)",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0171",
-    "ntaname": "St. Michael's Cemetery"
+    "ntaname": "St. Michael's Cemetery",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0191",
-    "ntaname": "Astoria Park"
+    "ntaname": "Astoria Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0201",
-    "ntaname": "Long Island City-Hunters Point"
+    "ntaname": "Long Island City-Hunters Point",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0202",
-    "ntaname": "Sunnyside"
+    "ntaname": "Sunnyside",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0203",
-    "ntaname": "Woodside"
+    "ntaname": "Woodside",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0261",
-    "ntaname": "Sunnyside Yards (South)"
+    "ntaname": "Sunnyside Yards (South)",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0271",
-    "ntaname": "Calvary & Mount Zion Cemeteries"
+    "ntaname": "Calvary & Mount Zion Cemeteries",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0301",
-    "ntaname": "Jackson Heights"
+    "ntaname": "Jackson Heights",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0302",
-    "ntaname": "East Elmhurst"
+    "ntaname": "East Elmhurst",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0303",
-    "ntaname": "North Corona"
+    "ntaname": "North Corona",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0401",
-    "ntaname": "Elmhurst"
+    "ntaname": "Elmhurst",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0402",
-    "ntaname": "Corona"
+    "ntaname": "Corona",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0501",
-    "ntaname": "Maspeth"
+    "ntaname": "Maspeth",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0502",
-    "ntaname": "Ridgewood"
+    "ntaname": "Ridgewood",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0503",
-    "ntaname": "Glendale"
+    "ntaname": "Glendale",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0504",
-    "ntaname": "Middle Village"
+    "ntaname": "Middle Village",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0571",
-    "ntaname": "Mount Olivet & All Faiths Cemeteries"
+    "ntaname": "Mount Olivet & All Faiths Cemeteries",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0572",
-    "ntaname": "Middle Village Cemetery"
+    "ntaname": "Middle Village Cemetery",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0573",
-    "ntaname": "St. John Cemetery"
+    "ntaname": "St. John Cemetery",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0574",
-    "ntaname": "Highland Park-Cypress Hills Cemeteries (North)"
+    "ntaname": "Highland Park-Cypress Hills Cemeteries (North)",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0601",
-    "ntaname": "Rego Park"
+    "ntaname": "Rego Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0602",
-    "ntaname": "Forest Hills"
+    "ntaname": "Forest Hills",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0701",
-    "ntaname": "College Point"
+    "ntaname": "College Point",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0702",
-    "ntaname": "Whitestone-Beechhurst"
+    "ntaname": "Whitestone-Beechhurst",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0703",
-    "ntaname": "Bay Terrace-Clearview"
+    "ntaname": "Bay Terrace-Clearview",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0704",
-    "ntaname": "Murray Hill-Broadway Flushing"
+    "ntaname": "Murray Hill-Broadway Flushing",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0705",
-    "ntaname": "East Flushing"
+    "ntaname": "East Flushing",
+    "boroname": "Queens",
+    "the_geom": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              -73.79493246101809,
+              40.75779803007236
+            ],
+            [
+              -73.79474720509099,
+              40.75562818785364
+            ],
+            [
+              -73.7945772690188,
+              40.75356301133769
+            ],
+            [
+              -73.79462769065839,
+              40.75270267581991
+            ],
+            [
+              -73.79465583785355,
+              40.75198814453217
+            ],
+            [
+              -73.79468324579973,
+              40.75127504637706
+            ],
+            [
+              -73.79472141191256,
+              40.75062131979514
+            ],
+            [
+              -73.79488724488824,
+              40.75057003888814
+            ],
+            [
+              -73.79505006567065,
+              40.75051345048417
+            ],
+            [
+              -73.79520958069928,
+              40.750451656612896
+            ],
+            [
+              -73.79536550262804,
+              40.75038476812111
+            ],
+            [
+              -73.7955175500567,
+              40.75031290616859
+            ],
+            [
+              -73.79566544885662,
+              40.75023620032233
+            ],
+            [
+              -73.79606726024194,
+              40.75004218140057
+            ],
+            [
+              -73.79644617095514,
+              40.749859216562065
+            ],
+            [
+              -73.79729524633105,
+              40.74943505288953
+            ],
+            [
+              -73.79704715969253,
+              40.7493323184425
+            ],
+            [
+              -73.79658103548921,
+              40.748977398615715
+            ],
+            [
+              -73.7959826929456,
+              40.748531894159555
+            ],
+            [
+              -73.79472264877985,
+              40.74759933020805
+            ],
+            [
+              -73.79467568664064,
+              40.74721192846035
+            ],
+            [
+              -73.79457976040996,
+              40.746402683486714
+            ],
+            [
+              -73.79468101362406,
+              40.746404628250716
+            ],
+            [
+              -73.79473936046323,
+              40.746423557667725
+            ],
+            [
+              -73.79479379455873,
+              40.746448327990514
+            ],
+            [
+              -73.79484331089867,
+              40.74647848188894
+            ],
+            [
+              -73.79488699526331,
+              40.7465134626362
+            ],
+            [
+              -73.7949240411041,
+              40.74655262438723
+            ],
+            [
+              -73.79494370003309,
+              40.746577284800395
+            ],
+            [
+              -73.79496855138828,
+              40.746599066799924
+            ],
+            [
+              -73.7949978816153,
+              40.746617344957436
+            ],
+            [
+              -73.79503084855537,
+              40.7466315944502
+            ],
+            [
+              -73.79506650562638,
+              40.746641406130664
+            ],
+            [
+              -73.79510382900254,
+              40.74664649827461
+            ],
+            [
+              -73.79524517459208,
+              40.74665816260029
+            ],
+            [
+              -73.79538713322698,
+              40.7466641293441
+            ],
+            [
+              -73.79552930810908,
+              40.74666438182802
+            ],
+            [
+              -73.79567130183564,
+              40.74665891934628
+            ],
+            [
+              -73.79581271751043,
+              40.746647757167445
+            ],
+            [
+              -73.79588629412646,
+              40.74664017197308
+            ],
+            [
+              -73.79597252671975,
+              40.7466403247581
+            ],
+            [
+              -73.79606077334265,
+              40.74664457442218
+            ],
+            [
+              -73.79614919661839,
+              40.746644484210776
+            ],
+            [
+              -73.79623742793206,
+              40.74664005449998
+            ],
+            [
+              -73.79632509946912,
+              40.74663130375615
+            ],
+            [
+              -73.79646718353649,
+              40.746614194806654
+            ],
+            [
+              -73.79656485402636,
+              40.746606651417906
+            ],
+            [
+              -73.79665744319779,
+              40.74660199283075
+            ],
+            [
+              -73.79674982908237,
+              40.746596759606
+            ],
+            [
+              -73.79684168267927,
+              40.74658758847902
+            ],
+            [
+              -73.7969327140221,
+              40.7465745084015
+            ],
+            [
+              -73.79701892246405,
+              40.74655924956437
+            ],
+            [
+              -73.79710364408709,
+              40.74653976036189
+            ],
+            [
+              -73.79718652039895,
+              40.74651612326125
+            ],
+            [
+              -73.79723853503901,
+              40.74649886569322
+            ],
+            [
+              -73.79728935160021,
+              40.74647965415026
+            ],
+            [
+              -73.79730260564487,
+              40.74647357103713
+            ],
+            [
+              -73.7973169785311,
+              40.74646919778204
+            ],
+            [
+              -73.79733209203172,
+              40.74646664946852
+            ],
+            [
+              -73.79734754843032,
+              40.74646599315629
+            ],
+            [
+              -73.79736294098707,
+              40.74646724611632
+            ],
+            [
+              -73.79745160669563,
+              40.74648754046975
+            ],
+            [
+              -73.79753715666116,
+              40.74651448177126
+            ],
+            [
+              -73.79761873183573,
+              40.74654779949162
+            ],
+            [
+              -73.79769551308054,
+              40.74658715907294
+            ],
+            [
+              -73.79776672939094,
+              40.746632165287565
+            ],
+            [
+              -73.79783166563817,
+              40.74668236620661
+            ],
+            [
+              -73.79788966975023,
+              40.746737257737585
+            ],
+            [
+              -73.79810088810424,
+              40.74692280524258
+            ],
+            [
+              -73.79826235368711,
+              40.746965656177046
+            ],
+            [
+              -73.79921673511588,
+              40.74685628183298
+            ],
+            [
+              -73.80017472081974,
+              40.74675557902584
+            ],
+            [
+              -73.80327809121162,
+              40.746439510787766
+            ],
+            [
+              -73.80335214064682,
+              40.74643196519029
+            ],
+            [
+              -73.80302898475222,
+              40.74719480090682
+            ],
+            [
+              -73.80294034044728,
+              40.74740891696377
+            ],
+            [
+              -73.80286300293164,
+              40.74764297104306
+            ],
+            [
+              -73.80280481315948,
+              40.74788116392348
+            ],
+            [
+              -73.80276629121889,
+              40.74812214525458
+            ],
+            [
+              -73.80274770591537,
+              40.74836447629502
+            ],
+            [
+              -73.80274910854627,
+              40.748606751761486
+            ],
+            [
+              -73.80277033681786,
+              40.748847538855394
+            ],
+            [
+              -73.80280783934491,
+              40.74906666128903
+            ],
+            [
+              -73.80287666422223,
+              40.74976515017333
+            ],
+            [
+              -73.80295670574291,
+              40.749770527356894
+            ],
+            [
+              -73.8035307035942,
+              40.74982541320247
+            ],
+            [
+              -73.804469529945,
+              40.74989927631403
+            ],
+            [
+              -73.80539953643668,
+              40.749972729379834
+            ],
+            [
+              -73.80633253719915,
+              40.750047665759624
+            ],
+            [
+              -73.80727075986817,
+              40.75011897485865
+            ],
+            [
+              -73.80750599258123,
+              40.75013658725931
+            ],
+            [
+              -73.80976035303367,
+              40.748779223122874
+            ],
+            [
+              -73.81161754581872,
+              40.74766484309924
+            ],
+            [
+              -73.8123541185857,
+              40.747223284164825
+            ],
+            [
+              -73.81316297128559,
+              40.74673791985376
+            ],
+            [
+              -73.81341871845615,
+              40.746584445869296
+            ],
+            [
+              -73.81416171989086,
+              40.74613858082959
+            ],
+            [
+              -73.81477152563609,
+              40.74668237148102
+            ],
+            [
+              -73.815373172896,
+              40.74721833785883
+            ],
+            [
+              -73.81575069483411,
+              40.746979480114966
+            ],
+            [
+              -73.81657996162248,
+              40.74713778828754
+            ],
+            [
+              -73.81691898593776,
+              40.74720466784955
+            ],
+            [
+              -73.81782025822297,
+              40.74738541614714
+            ],
+            [
+              -73.81873142824399,
+              40.74771190075785
+            ],
+            [
+              -73.8196196263,
+              40.74804204315349
+            ],
+            [
+              -73.82052281675482,
+              40.74835684956996
+            ],
+            [
+              -73.82108427436813,
+              40.74855844694599
+            ],
+            [
+              -73.82131898119611,
+              40.7487581830458
+            ],
+            [
+              -73.82239598886518,
+              40.749864223421405
+            ],
+            [
+              -73.82321319722392,
+              40.75070793150672
+            ],
+            [
+              -73.82426493808411,
+              40.75183288858868
+            ],
+            [
+              -73.82292913792497,
+              40.75259578782913
+            ],
+            [
+              -73.82191828734253,
+              40.75317308071225
+            ],
+            [
+              -73.82084928748625,
+              40.752241544924296
+            ],
+            [
+              -73.81977819306222,
+              40.752936894626046
+            ],
+            [
+              -73.8190923200931,
+              40.753384820353645
+            ],
+            [
+              -73.81840782792052,
+              40.75383042207662
+            ],
+            [
+              -73.82030067670415,
+              40.755514980724726
+            ],
+            [
+              -73.8196175431565,
+              40.75596557940047
+            ],
+            [
+              -73.81926771913604,
+              40.75619984835978
+            ],
+            [
+              -73.81893695315142,
+              40.75640957797409
+            ],
+            [
+              -73.8178924559545,
+              40.75708633898605
+            ],
+            [
+              -73.81856914351864,
+              40.75751884856913
+            ],
+            [
+              -73.81923286345952,
+              40.757946813259466
+            ],
+            [
+              -73.82004500518588,
+              40.75848322816111
+            ],
+            [
+              -73.82063593185151,
+              40.758872267845774
+            ],
+            [
+              -73.81728821344713,
+              40.7597755470718
+            ],
+            [
+              -73.81508732443326,
+              40.76037161060358
+            ],
+            [
+              -73.8139988278775,
+              40.76066503482172
+            ],
+            [
+              -73.81313229741573,
+              40.76089834913844
+            ],
+            [
+              -73.81226778034534,
+              40.76113002164626
+            ],
+            [
+              -73.8110496301882,
+              40.76141702158745
+            ],
+            [
+              -73.81044348233249,
+              40.76137743901267
+            ],
+            [
+              -73.80951372555968,
+              40.761299911024054
+            ],
+            [
+              -73.80859483988218,
+              40.761132461823
+            ],
+            [
+              -73.80768023641374,
+              40.76095995883316
+            ],
+            [
+              -73.80676048517716,
+              40.76078777314503
+            ],
+            [
+              -73.80584005250704,
+              40.76061539065358
+            ],
+            [
+              -73.80491668451381,
+              40.76044041190004
+            ],
+            [
+              -73.80399971228329,
+              40.76027048753167
+            ],
+            [
+              -73.8030732877856,
+              40.760126248110495
+            ],
+            [
+              -73.80215291762853,
+              40.7599872190144
+            ],
+            [
+              -73.80125017419412,
+              40.75982823780207
+            ],
+            [
+              -73.8003003897138,
+              40.75970229914358
+            ],
+            [
+              -73.79940088770714,
+              40.759397219057
+            ],
+            [
+              -73.79850160140613,
+              40.759071035538554
+            ],
+            [
+              -73.79760259736614,
+              40.75874417854262
+            ],
+            [
+              -73.79670467805043,
+              40.758417712278856
+            ],
+            [
+              -73.79621926867169,
+              40.7582416795331
+            ],
+            [
+              -73.79580437588687,
+              40.75809121700371
+            ],
+            [
+              -73.79493246101809,
+              40.75779803007236
+            ]
+          ]
+        ]
+      ]
+    }
   },
   {
     "nta2020": "QN0706",
-    "ntaname": "Queensboro Hill"
+    "ntaname": "Queensboro Hill",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0707",
-    "ntaname": "Flushing-Willets Point"
+    "ntaname": "Flushing-Willets Point",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0761",
-    "ntaname": "Fort Totten"
+    "ntaname": "Fort Totten",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0791",
-    "ntaname": "Kissena Park"
+    "ntaname": "Kissena Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0801",
-    "ntaname": "Kew Gardens Hills"
+    "ntaname": "Kew Gardens Hills",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0802",
-    "ntaname": "Pomonok-Electchester-Hillcrest"
+    "ntaname": "Pomonok-Electchester-Hillcrest",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0803",
-    "ntaname": "Fresh Meadows-Utopia"
+    "ntaname": "Fresh Meadows-Utopia",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0804",
-    "ntaname": "Jamaica Estates-Holliswood"
+    "ntaname": "Jamaica Estates-Holliswood",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0805",
-    "ntaname": "Jamaica Hills-Briarwood"
+    "ntaname": "Jamaica Hills-Briarwood",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0871",
-    "ntaname": "Mount Hebron & Cedar Grove Cemeteries"
+    "ntaname": "Mount Hebron & Cedar Grove Cemeteries",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0891",
-    "ntaname": "Cunningham Park"
+    "ntaname": "Cunningham Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0901",
-    "ntaname": "Kew Gardens"
+    "ntaname": "Kew Gardens",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0902",
-    "ntaname": "Richmond Hill"
+    "ntaname": "Richmond Hill",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0903",
-    "ntaname": "South Richmond Hill"
+    "ntaname": "South Richmond Hill",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0904",
-    "ntaname": "Ozone Park (North)"
+    "ntaname": "Ozone Park (North)",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN0905",
-    "ntaname": "Woodhaven"
+    "ntaname": "Woodhaven",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1001",
-    "ntaname": "South Ozone Park"
+    "ntaname": "South Ozone Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1002",
-    "ntaname": "Ozone Park"
+    "ntaname": "Ozone Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1003",
-    "ntaname": "Howard Beach-Lindenwood"
+    "ntaname": "Howard Beach-Lindenwood",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1091",
-    "ntaname": "Spring Creek Park"
+    "ntaname": "Spring Creek Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1101",
-    "ntaname": "Auburndale"
+    "ntaname": "Auburndale",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1102",
-    "ntaname": "Bayside"
+    "ntaname": "Bayside",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1103",
-    "ntaname": "Douglaston-Little Neck"
+    "ntaname": "Douglaston-Little Neck",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1104",
-    "ntaname": "Oakland Gardens-Hollis Hills"
+    "ntaname": "Oakland Gardens-Hollis Hills",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1191",
-    "ntaname": "Alley Pond Park"
+    "ntaname": "Alley Pond Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1201",
-    "ntaname": "Jamaica"
+    "ntaname": "Jamaica",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1202",
-    "ntaname": "South Jamaica"
+    "ntaname": "South Jamaica",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1203",
-    "ntaname": "Baisley Park"
+    "ntaname": "Baisley Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1204",
-    "ntaname": "Springfield Gardens (North)-Rochdale Village"
+    "ntaname": "Springfield Gardens (North)-Rochdale Village",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1205",
-    "ntaname": "St. Albans"
+    "ntaname": "St. Albans",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1206",
-    "ntaname": "Hollis"
+    "ntaname": "Hollis",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1301",
-    "ntaname": "Glen Oaks-Floral Park-New Hyde Park"
+    "ntaname": "Glen Oaks-Floral Park-New Hyde Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1302",
-    "ntaname": "Bellerose"
+    "ntaname": "Bellerose",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1303",
-    "ntaname": "Queens Village"
+    "ntaname": "Queens Village",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1304",
-    "ntaname": "Cambria Heights"
+    "ntaname": "Cambria Heights",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1305",
-    "ntaname": "Laurelton"
+    "ntaname": "Laurelton",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1306",
-    "ntaname": "Springfield Gardens (South)-Brookville"
+    "ntaname": "Springfield Gardens (South)-Brookville",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1307",
-    "ntaname": "Rosedale"
+    "ntaname": "Rosedale",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1371",
-    "ntaname": "Montefiore Cemetery"
+    "ntaname": "Montefiore Cemetery",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1401",
-    "ntaname": "Far Rockaway-Bayswater"
+    "ntaname": "Far Rockaway-Bayswater",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1402",
-    "ntaname": "Rockaway Beach-Arverne-Edgemere"
+    "ntaname": "Rockaway Beach-Arverne-Edgemere",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1403",
-    "ntaname": "Breezy Point-Belle Harbor-Rockaway Park-Broad Channel"
+    "ntaname": "Breezy Point-Belle Harbor-Rockaway Park-Broad Channel",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN1491",
-    "ntaname": "Rockaway Community Park"
+    "ntaname": "Rockaway Community Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN8081",
-    "ntaname": "LaGuardia Airport"
+    "ntaname": "LaGuardia Airport",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN8191",
-    "ntaname": "Flushing Meadows-Corona Park"
+    "ntaname": "Flushing Meadows-Corona Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN8291",
-    "ntaname": "Forest Park"
+    "ntaname": "Forest Park",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN8381",
-    "ntaname": "John F. Kennedy International Airport"
+    "ntaname": "John F. Kennedy International Airport",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN8491",
-    "ntaname": "Jamaica Bay (East)"
+    "ntaname": "Jamaica Bay (East)",
+    "boroname": "Queens"
   },
   {
     "nta2020": "QN8492",
-    "ntaname": "Jacob Riis Park-Fort Tilden-Breezy Point Tip"
+    "ntaname": "Jacob Riis Park-Fort Tilden-Breezy Point Tip",
+    "boroname": "Queens"
   },
   {
     "nta2020": "SI0101",
-    "ntaname": "St. George-New Brighton"
+    "ntaname": "St. George-New Brighton",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0102",
-    "ntaname": "Tompkinsville-Stapleton-Clifton-Fox Hills"
+    "ntaname": "Tompkinsville-Stapleton-Clifton-Fox Hills",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0103",
-    "ntaname": "Rosebank-Shore Acres-Park Hill"
+    "ntaname": "Rosebank-Shore Acres-Park Hill",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0104",
-    "ntaname": "West New Brighton-Silver Lake-Grymes Hill"
+    "ntaname": "West New Brighton-Silver Lake-Grymes Hill",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0105",
-    "ntaname": "Westerleigh-Castleton Corners"
+    "ntaname": "Westerleigh-Castleton Corners",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0106",
-    "ntaname": "Port Richmond"
+    "ntaname": "Port Richmond",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0107",
-    "ntaname": "Mariner's Harbor-Arlington-Graniteville"
+    "ntaname": "Mariner's Harbor-Arlington-Graniteville",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0191",
-    "ntaname": "Snug Harbor"
+    "ntaname": "Snug Harbor",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0201",
-    "ntaname": "Grasmere-Arrochar-South Beach-Dongan Hills"
+    "ntaname": "Grasmere-Arrochar-South Beach-Dongan Hills",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0202",
-    "ntaname": "New Dorp-Midland Beach"
+    "ntaname": "New Dorp-Midland Beach",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0203",
-    "ntaname": "Todt Hill-Emerson Hill-Lighthouse Hill-Manor Heights"
+    "ntaname": "Todt Hill-Emerson Hill-Lighthouse Hill-Manor Heights",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0204",
-    "ntaname": "New Springville-Willowbrook-Bulls Head-Travis"
+    "ntaname": "New Springville-Willowbrook-Bulls Head-Travis",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0291",
-    "ntaname": "Freshkills Park (North)"
+    "ntaname": "Freshkills Park (North)",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0301",
-    "ntaname": "Oakwood-Richmondtown"
+    "ntaname": "Oakwood-Richmondtown",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0302",
-    "ntaname": "Great Kills-Eltingville"
+    "ntaname": "Great Kills-Eltingville",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0303",
-    "ntaname": "Arden Heights-Rossville"
+    "ntaname": "Arden Heights-Rossville",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0304",
-    "ntaname": "Annadale-Huguenot-Prince's Bay-Woodrow"
+    "ntaname": "Annadale-Huguenot-Prince's Bay-Woodrow",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0305",
-    "ntaname": "Tottenville-Charleston"
+    "ntaname": "Tottenville-Charleston",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI0391",
-    "ntaname": "Freshkills Park (South)"
+    "ntaname": "Freshkills Park (South)",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI9561",
-    "ntaname": "Fort Wadsworth"
+    "ntaname": "Fort Wadsworth",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI9591",
-    "ntaname": "Hoffman & Swinburne Islands"
+    "ntaname": "Hoffman & Swinburne Islands",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI9592",
-    "ntaname": "Miller Field"
+    "ntaname": "Miller Field",
+    "boroname": "Staten Island"
   },
   {
     "nta2020": "SI9593",
-    "ntaname": "Great Kills Park"
+    "ntaname": "Great Kills Park",
+    "boroname": "Staten Island"
   }
 ]
