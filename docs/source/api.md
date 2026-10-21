@@ -60,7 +60,7 @@ The records represent public third places — today the libraries of the city's 
 
 `nearby_spots` is how many other study spots are within 400 m, about a five-minute walk. **It counts places, not people.** A café on a dense stretch may be empty and an isolated library may be packed; nothing in open data knows. What it supports is how lively the surrounding block is, and whether there is anywhere else to go if this one is full. The browser bands it into Quiet, Moderate and Busy at 0 and 10, chosen from the real distribution — the median by borough is Manhattan 32, Brooklyn 9, Queens 6, Bronx 1, Staten Island 2 — and always shows the count beside the word, because a label you can check is a different thing from one you have to trust.
 
-`subway_station`, `subway_routes`, `subway_metres` and `subway_step_free` are the nearest station within 1.2 km, derived by the importer from the MTA's own list. All four are null together — 285 of 3,774 spots have none that close, mostly on Staten Island where the railway is not the subway. The distance is straight-line rather than walking, `routes` is space separated as the MTA publishes it, and `step_free` keeps their three states: `full`, `none`, and `partial` for a platform reachable going one way and not the other.
+`subway_station`, `subway_routes`, `subway_metres` and `subway_step_free` are the nearest station within 1.2 km, derived by the importer from the MTA's own list. All four are null together — 285 of 3,772 spots have none that close, mostly on Staten Island where the railway is not the subway. The distance is straight-line rather than walking, `routes` is space separated as the MTA publishes it, and `step_free` keeps their three states: `full`, `none`, and `partial` for a platform reachable going one way and not the other.
 
 `no_purchase_needed` is true where sitting down costs nothing — every library and every campus building, and no café. It answers the question a reader actually has, which no single category answers, and **it is about money rather than entry**: a campus building is free and still wants the university's credentials, and a special library may be open only by appointment.
 
@@ -79,9 +79,9 @@ borough names and the database refuses any other. `neighborhood` is the 2020 Nei
 
 `indoor_seating`, `venue_wifi` and `opening_hours` come from OpenStreetMap, and they are the only three fields in the contract where `null` means *nobody has recorded this* rather than *this record has no such thing*. **A consumer must not read `null` as `false`.** Everywhere else in this contract a null is an absence of the thing — a café has no operator, a spot with no station inside 1.2 km has no station — and treating it as a negative is harmless. Here it is the difference between "somebody went and looked and there is no Wi-Fi" and "nobody has said", and the whole reason the source is read is to be able to tell those apart.
 
-`venue_wifi` is Wi-Fi the venue itself provides, as recorded by a contributor. **It is a different claim from `free_public_wifi` and the two must not be merged or shown as one.** `free_public_wifi` is a hotspot *the city publishes* within 25 m of the point, which is usually a library's own and occasionally a LinkNYC kiosk on the pavement; a café can easily have its own Wi-Fi and no city hotspot anywhere near it, and a library the reverse. Their falses are also worth different amounts: a false here is a trustworthy negative, while a false `free_public_wifi` only ever meant that nothing the city publishes is nearby. Derived from OpenStreetMap's `internet_access`, where `wlan`, `yes` and `wifi` are true and `no` is false. `wired` and `terminal` read as `null`, not as false: an ethernet port and a public computer each say there is internet without saying whether there is Wi-Fi. 295 spots are true, 42 false, 3,437 unrecorded.
+`venue_wifi` is Wi-Fi the venue itself provides, as recorded by a contributor. **It is a different claim from `free_public_wifi` and the two must not be merged or shown as one.** `free_public_wifi` is a hotspot *the city publishes* within 25 m of the point, which is usually a library's own and occasionally a LinkNYC kiosk on the pavement; a café can easily have its own Wi-Fi and no city hotspot anywhere near it, and a library the reverse. Their falses are also worth different amounts: a false here is a trustworthy negative, while a false `free_public_wifi` only ever meant that nothing the city publishes is nearby. Derived from OpenStreetMap's `internet_access`, where `wlan`, `yes` and `wifi` are true and `no` is false. `wired` and `terminal` read as `null`, not as false: an ethernet port and a public computer each say there is internet without saying whether there is Wi-Fi. 295 spots are true, 42 false, 3,435 unrecorded.
 
-`indoor_seating` is true where a contributor has recorded somewhere to sit inside, false where one has recorded that there is nowhere, and `null` otherwise. 112 true, 13 false, 3,649 unrecorded. It is rare because that is how many contributors have tagged it, and nothing infers it from anything else — not from the category, not from the presence of a sidewalk licence, not from the words in the name.
+`indoor_seating` is true where a contributor has recorded somewhere to sit inside, false where one has recorded that there is nowhere, and `null` otherwise. 112 true, 13 false, 3,647 unrecorded. It is rare because that is how many contributors have tagged it, and nothing infers it from anything else — not from the category, not from the presence of a sidewalk licence, not from the words in the name.
 
 `opening_hours` is OpenStreetMap's own [opening hours syntax](https://wiki.openstreetmap.org/wiki/Key:opening_hours), served as the raw string: `Mo-Fr 07:00-19:00; Sa-Su 08:00-18:00`. 1,134 spots carry one, all of them cafés — no city source publishes a library's schedule. It is deliberately **not** turned into an "open now" flag, by this API or by the importer. Evaluating the syntax correctly needs a timezone and the public-holiday calendar the syntax can refer to, and telling someone a closed café is open is worse than telling them nothing. A client that wants "open now" has to take that on knowingly.
 
@@ -182,7 +182,7 @@ café -- not the absence of one.
 `indoor_seating` also takes `true` or `false`, and **its `false` does not mean
 what the other two mean.** The column has three states, so `?indoor_seating=false`
 is "places somebody recorded as having nowhere to sit inside" -- 13 spots -- and
-*not* "places not known to have indoor seating", which would be 3,649 and would
+*not* "places not known to have indoor seating", which would be 3,647 and would
 be asserting something about every one of them. Both values therefore exclude
 the unrecorded majority: this filter narrows to a recorded answer rather than to
 the absence of one. `?indoor_seating=true` returns around 112 spots, which is how
@@ -191,7 +191,7 @@ facet count beside it so a reader can see that before ticking.
 
 `venue_wifi` and `opening_hours` have no filter, and that is not an oversight.
 `?venue_wifi=false` would be a question whose honest answer is 42 rows and whose
-tempting wrong answer is 3,437, and a schedule in OpenStreetMap's syntax is not
+tempting wrong answer is 3,435, and a schedule in OpenStreetMap's syntax is not
 something to match on without evaluating it -- see
 [the three fields where `null` is an answer](#the-three-fields-where-null-is-an-answer).
 

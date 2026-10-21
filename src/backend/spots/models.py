@@ -142,7 +142,7 @@ class StudySpot(models.Model):
     #: and the rest of this model is flat. ``subway_routes`` is space-joined the
     #: way the MTA publishes it and the way a sign reads.
     #:
-    #: All four are null together: 285 of 3,774 spots have no station that close,
+    #: All four are null together: 285 of 3,772 spots have no station that close,
     #: mostly on Staten Island where the railway is not the subway.
     subway_station = models.TextField(
         blank=True,
@@ -346,7 +346,7 @@ class StudySpot(models.Model):
             # column nothing queries is a write cost for nothing.
             #
             # The column is nullable and the index covers the nulls too, which
-            # is wasted space on 3,649 of 3,774 rows -- a partial index would be
+            # is wasted space on 3,647 of 3,772 rows -- a partial index would be
             # tighter. Left plain because Django would then need the same
             # condition spelled identically here and in the migration, and the
             # table is small enough that the difference is theoretical.

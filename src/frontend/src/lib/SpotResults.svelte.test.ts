@@ -100,7 +100,7 @@ describe('the indoor-seating badge', () => {
 	});
 
 	it('does not appear when nobody has recorded it, which is most places', async () => {
-		// About 112 spots of 3,774 carry a true. Padding that by inferring
+		// About 112 spots of 3,772 carry a true. Padding that by inferring
 		// seating from anything else is exactly what this field is not for.
 		render(SpotResults, { spots: [{ ...SPOT, indoor_seating: null }], total: 1, hasMore: false });
 

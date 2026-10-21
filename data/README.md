@@ -172,9 +172,9 @@ Wi-Fi" and "nobody has said", and telling those apart is the whole point.
 
 | field | true | false | unrecorded |
 | --- | --- | --- | --- |
-| `indoor_seating` | 112 | 13 | 3,649 |
-| `venue_wifi` | 295 | 42 | 3,437 |
-| `opening_hours` | 1,134 recorded | — | 2,640 |
+| `indoor_seating` | 112 | 13 | 3,647 |
+| `venue_wifi` | 295 | 42 | 3,435 |
+| `opening_hours` | 1,134 recorded | — | 2,638 |
 
 `venue_wifi` comes from `internet_access`, where `wlan`, `yes` and `wifi` are true and `no` is
 false. `wired` and `terminal` read as unrecorded, not as false: an ethernet port and a public
@@ -230,6 +230,40 @@ The two registers spell an address differently and neither is wrong — DOHMH st
 `HICKS STREET` in separate columns where Dining Out stores `102 HICKS STREET` — so street types,
 compass directions and ordinals are folded to one form before comparing. Those match keys are
 never published.
+
+## A curated building beats the open-data row describing it
+
+FacDB registers *New York University Libraries* as an academic library at Bobst's coordinates,
+12 m from the curated `nyu:bobst-library`, with the **building name where a street address
+belongs** — "Elmer H Bobst Library, New York, NY 10012" — and "LIU-New York University Campus",
+which is Long Island University, as its campus. A search for "bobst" returned both records,
+because the search vector includes the address. The curated record wins: it has the real street
+address and the right university.
+
+Three conditions, and each one is there because dropping it costs real records.
+
+**Same category.** Nine non-curated records sit within 60 m of a curated building in the live
+data and all nine are cafés — *Peet's Coffee @ NYU* 10 m from the Kimmel Center, *Blank Street
+Coffee* 26 m from Rogers Hall, *The Uncommons* 24 m from the Global Center, *Think Coffee* 37 m
+from Courant. They are cafés inside or beside the building and they are separate study spots. A
+rule that went on distance alone would delete all nine to fix one duplicate.
+
+**Within 50 m.** Two records of one category across the street are two places.
+
+**No house number in the address.** This is the condition that is easy to leave out, and leaving
+it out costs a real record. *Two* academic libraries sit within 50 m of Bobst: the generic FacDB
+row above, and *NYU Tamiment Library* at 17 m — the Tamiment Library and Robert F. Wagner Labor
+Archives, a named special collection on Bobst's tenth floor, publishing its own street address.
+Same category, well inside the radius, and not a duplicate of anything.
+
+So the test is not "is it near the building" but **"does it claim an address of its own"**. A row
+that cannot say what street it is on, sitting on a curated building of the same kind, has recorded
+that building. A row with a street address is asserting a place, and is kept even when the street
+is the curated record's own — Tamiment is at Bobst's address, because it is on Bobst's tenth
+floor.
+
+One record is dropped in the live data, and the importer names it on stderr rather than deleting
+it quietly.
 
 ## Subway stations
 

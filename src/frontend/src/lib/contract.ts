@@ -66,7 +66,7 @@ export type StudySpot = {
 	/**
 	 * The nearest subway station within 1.2 km, derived by the importer.
 	 *
-	 * All four are null together — 285 of 3,774 spots have none that close,
+	 * All four are null together — 285 of 3,772 spots have none that close,
 	 * mostly on Staten Island, where the railway is not the subway. `routes` is
 	 * space separated the way the MTA publishes it; `metres` is straight-line
 	 * rather than walking distance; `step_free` is `full`, `partial` (one

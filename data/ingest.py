@@ -341,6 +341,14 @@ CAFE_CATEGORY = "cafe"
 #: information. They are the reason the snapshot has campus study space at all.
 CURATED_PATH = HERE / "nyu_buildings.json"
 
+#: The identifier prefix the curated buildings carry.
+#:
+#: Named here rather than only in the JSON because two things now depend on
+#: knowing which records were written by hand: :func:`curated_spots` checks
+#: them against the contract, and :func:`drop_curated_duplicates` lets them win
+#: against an open-data record describing the same building.
+CURATED_PREFIX = "nyu"
+
 #: The station list written by subway.py. Not a study-spot source: it exists so
 #: every spot can say which trains are near it.
 SUBWAY_PATH = HERE / "subway_stations.json"
@@ -612,6 +620,23 @@ STREET_WORDS = {
 
 #: "5TH" and "5" are the same street. Dining Out writes one and DOHMH the other.
 MATCH_ORDINAL = re.compile(r"^(\d+)(?:ST|ND|RD|TH)$")
+
+#: How close a non-curated record sits to a curated building before it is
+#: considered for being the same place.
+#:
+#: Deliberately small, and it is only half the test. See
+#: :func:`drop_curated_duplicates` for the other half and for why distance
+#: alone would delete nine good records to fix one duplicate.
+CURATED_DUPLICATE_METRES = 50.0
+
+#: Whether a published address begins with a house number, and so is a street
+#: address rather than something else.
+#:
+#: FacDB puts a building name in the address column when it has no street for a
+#: record -- "Elmer H Bobst Library, New York, NY 10012". That is the signature
+#: of a row describing a *building* the curated list already covers, as opposed
+#: to a place with an address of its own.
+HOUSE_NUMBER = re.compile(r"^\s*\d")
 
 #: Everything that is not a letter, a digit or a space, for match keys only.
 #:
@@ -2020,8 +2045,8 @@ def assign_nearby(spots: list[dict[str, Any]]) -> None:
     the surrounding streets are, and whether there is anywhere else to go if
     this place is full.
 
-    Bucketed onto a coarse grid first, so this is 3,774 lookups of a few
-    neighbours rather than 3,774 squared comparisons.
+    Bucketed onto a coarse grid first, so this is 3,772 lookups of a few
+    neighbours rather than 3,772 squared comparisons.
     """
     grid: dict[tuple[float, float], list[dict[str, Any]]] = {}
     for spot in spots:
@@ -2123,6 +2148,75 @@ def curated_spots(path: Path = CURATED_PATH) -> list[dict[str, Any]]:
     return spots
 
 
+def drop_curated_duplicates(
+    spots: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[tuple[str, str]]]:
+    """Drop open-data records that are really the curated building beside them.
+
+    FacDB registers "New York University Libraries" as an academic library at
+    Bobst's coordinates, 12 m from the curated ``nyu:bobst-library``. It is the
+    same building twice: a search for "bobst" returned both, because the search
+    vector includes the address and FacDB wrote the *building name* where a
+    street belongs. The curated record wins -- it has the real street address,
+    and the right university, where FacDB says "LIU-New York University
+    Campus", which is Long Island University.
+
+    Three conditions, and every one of them is load-bearing:
+
+    **Same category.** This is what protects the cafes. Nine non-curated
+    records sit within 60 m of a curated building and all nine are genuine
+    separate study spots -- Peet's Coffee @ NYU is 10 m from the Kimmel Center,
+    Blank Street Coffee is 26 m from Rogers Hall, The Uncommons 24 m from the
+    Global Center, Think Coffee 37 m from Courant. They are cafes *inside or
+    beside* the building. A proximity-only rule would delete all nine to fix
+    one duplicate.
+
+    **Within :data:`CURATED_DUPLICATE_METRES`.** Two records of one category
+    across the street from each other are two places.
+
+    **No house number in the address.** This is the condition that is easy to
+    leave out, and leaving it out costs a real record. *Two* academic libraries
+    sit within 50 m of Bobst, not one: the generic FacDB row above, and "NYU
+    Tamiment Library" at 17 m -- the Tamiment Library and Robert F. Wagner
+    Labor Archives, a named special collection on Bobst's tenth floor. It
+    publishes its own street address, "70 Washington Square South". It is a
+    library someone might search for by name and it is not a duplicate of
+    anything.
+
+    So the test is not "is it near the building" but "does it claim an address
+    of its own". A row that cannot say what street it is on, sitting on top of
+    a curated building of the same kind, has recorded that building. A row with
+    a street address is asserting a place, and is kept even when the street is
+    the curated record's own.
+
+    Returns the surviving spots and what was dropped, as ``(dropped, kept)``
+    name pairs, so the importer can report it rather than deleting records
+    quietly.
+    """
+    curated = [spot for spot in spots if spot["id"].startswith(f"{CURATED_PREFIX}:")]
+    if not curated:
+        return spots, []
+
+    dropped: dict[str, tuple[str, str]] = {}
+    for spot in spots:
+        if spot["id"].startswith(f"{CURATED_PREFIX}:"):
+            continue
+        if HOUSE_NUMBER.match(spot["address"] or ""):
+            continue
+        for building in curated:
+            if building["category"] != spot["category"]:
+                continue
+            metres = haversine_metres(
+                spot["latitude"], spot["longitude"], building["latitude"], building["longitude"]
+            )
+            if metres <= CURATED_DUPLICATE_METRES:
+                dropped[spot["id"]] = (spot["name"], building["name"])
+                break
+
+    kept = [spot for spot in spots if spot["id"] not in dropped]
+    return kept, list(dropped.values())
+
+
 def combine(
     facilities: list[dict[str, Any]],
     curated: list[dict[str, Any]],
@@ -2140,11 +2234,22 @@ def combine(
     open-data record that field is the nearest campus within 500 m; for these it
     is the institution whose building it is, which is the stronger claim the
     contract allows for a campus record.
+
+    A curated entry also wins against an open-data record that is the same
+    building under another name, which is a different thing from an identifier
+    collision and is what :func:`drop_curated_duplicates` resolves.
     """
     merged = {spot["id"]: spot for spot in facilities}
     merged.update({spot["id"]: spot for spot in curated})
 
     spots = sorted(merged.values(), key=lambda spot: spot["id"])
+
+    # Before the two derivations below rather than after: a record about to be
+    # dropped should not be counted as somebody else's neighbour.
+    spots, duplicates = drop_curated_duplicates(spots)
+    for name, building in duplicates:
+        warn(f"dropped {name!r}; it is the curated {building!r} under another name")
+
     # After merging rather than inside normalize(), because the curated records
     # never pass through it: this is the only point that sees every published
     # spot, and a hand-maintained station per building would go stale.

@@ -62,7 +62,7 @@ Four routes are available alongside `GET /health/live`, none of them with a trai
 
 See the [HTTP API guide](docs/source/api.md).
 
-Every spot also has its own page at `/spots/{id}`. All 3,774 are prerendered at build time from the committed snapshot, so each is real HTML in S3 rather than a route the browser assembles: the link works in a fresh tab, in a shared message, and to a crawler, with no request on load. The nearby-spots list on each page is computed at build time from the same coordinates the importer uses.
+Every spot also has its own page at `/spots/{id}`. All 3,772 are prerendered at build time from the committed snapshot, so each is real HTML in S3 rather than a route the browser assembles: the link works in a fresh tab, in a shared message, and to a crawler, with no request on load. The nearby-spots list on each page is computed at build time from the same coordinates the importer uses.
 
 ## Development
 
