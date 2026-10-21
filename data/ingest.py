@@ -263,6 +263,29 @@ CAFE_CATEGORY = "cafe"
 #: information. They are the reason the snapshot has campus study space at all.
 CURATED_PATH = HERE / "nyu_buildings.json"
 
+#: The station list written by subway.py. Not a study-spot source: it exists so
+#: every spot can say which trains are near it.
+SUBWAY_PATH = HERE / "subway_stations.json"
+
+#: How far a station can be before the answer is "none nearby" rather than a
+#: number nobody would act on.
+#:
+#: 91% of spots have one inside 800 m. Past this the furthest is 7.7 km, on
+#: Staten Island, where the railway is not the subway.
+SUBWAY_RADIUS_METRES = 1200.0
+
+#: Metres a minute, for turning a distance into something readable. Roughly
+#: 4.8 km/h, which is an unhurried walk rather than a commuter's.
+WALKING_METRES_PER_MINUTE = 80.0
+
+#: How far counts as "around here" when counting a spot's neighbours.
+#:
+#: About a five-minute walk. The medians it produces separate the boroughs
+#: cleanly -- Manhattan 23, Brooklyn 6, Queens 3, Bronx 1, Staten Island 0 --
+#: which is what a reader would recognise as the difference between a dense
+#: stretch and an isolated branch.
+NEARBY_RADIUS_METRES = 400.0
+
 #: Socrata serves at most 1,000 rows per request.
 PAGE_SIZE = 1000
 
@@ -292,6 +315,11 @@ CONTRACT_FIELDS = (
     "operator",
     "free_public_wifi",
     "no_purchase_needed",
+    "subway_station",
+    "subway_routes",
+    "subway_metres",
+    "subway_step_free",
+    "nearby_spots",
     "outdoor_seating",
 )
 
@@ -378,21 +406,26 @@ BOROUGH_BY_FACILITY_BOROUGH = {
 #: About a tenth of a metre, and what the published example record shows.
 COORDINATE_DIGITS = 6
 
-#: A loose box around the five boroughs, used to reject a geocode rather than to
-#: locate one.
+#: A generous box around the five boroughs, as (south, north, west, east).
 #:
-#: Needed because DOHMH's geocoding is uneven in a way FacDB's is not. The rows
-#: that fail this are not near-misses: they are ``0, 0``, and addresses carrying
-#: an out-of-state zip code -- a "Columbus Ave" with Mount Vernon's 10550, a
-#: "Central Ave" with Jersey City's 07307. Those rows also have no coordinates
-#: at all, so the box and the null check catch the same 42 establishments
-#: between them.
+#: The model already rejects a latitude outside -90..90, which catches a null
+#: island or a swapped pair and nothing else. Upstream geocoding fails in a
+#: narrower way: Dining Out placed "Enzo's of Arthur Ave" -- a real address in
+#: the Bronx -- at 42.126441,-70.848088, which is in Massachusetts Bay. The
+#: record passed every check, and would have put a Bronx restaurant in the
+#: Atlantic on any map and given it a nearest subway 284 km away.
 #:
-#: Deliberately generous. The precise test for "is this in New York" is the
-#: point-in-polygon pass in :func:`locate_nta`, which runs afterwards against
-#: the real boundaries; this only throws out what is obviously not a geocode of
-#: a New York address.
-NYC_BOUNDS = (40.4, 41.1, -74.3, -73.6)
+#: DOHMH fails the same way for its own reasons: its rows that miss this box
+#: are ``0, 0`` or carry an out-of-state zip -- a "Columbus Ave" with Mount
+#: Vernon's 10550, a "Central Ave" with Jersey City's 07307. Those rows have no
+#: coordinates at all either, so the box and the null check catch the same 42
+#: establishments between them.
+#:
+#: Deliberately loose: the point is to catch a record in another state, not to
+#: adjudicate the waterline. For a cafe the precise test is the point-in-polygon
+#: pass in :func:`locate_nta`, which runs afterwards against the real
+#: boundaries.
+NYC_BOUNDS = (40.47, 40.93, -74.30, -73.68)
 
 #: What DOHMH writes in ``action`` when an inspection closed the place.
 #:
@@ -885,9 +918,7 @@ def cafe_coordinates(record: dict[str, Any]) -> tuple[float, float] | None:
         return None
     if not (math.isfinite(latitude) and math.isfinite(longitude)):
         return None
-
-    south, north, west, east = NYC_BOUNDS
-    if not (south <= latitude <= north and west <= longitude <= east):
+    if not in_new_york_city(latitude, longitude):
         return None
     return round(latitude, COORDINATE_DIGITS), round(longitude, COORDINATE_DIGITS)
 
@@ -1208,8 +1239,21 @@ def cafe_spot(
         "free_public_wifi": False,
         # A cafe is where you buy something. That is what a cafe is.
         "no_purchase_needed": False,
+        # Filled in by combine(), which is the only point that sees
+        # every published spot including the curated ones.
+        "subway_station": None,
+        "subway_routes": None,
+        "subway_metres": None,
+        "subway_step_free": None,
+        "nearby_spots": 0,
         "outdoor_seating": has_outdoor_seating(record, latitude, longitude, index),
     }
+
+
+def in_new_york_city(latitude: float, longitude: float) -> bool:
+    """Whether a point is plausibly in the five boroughs."""
+    south, north, west, east = NYC_BOUNDS
+    return south <= latitude <= north and west <= longitude <= east
 
 
 def coordinate(record: dict[str, Any], field: str, limit: float) -> float | None:
@@ -1337,6 +1381,13 @@ def normalize(
             skipped += 1
             continue
 
+        if not in_new_york_city(latitude, longitude):
+            # Geocoded, but not to here. Publishing it would put the spot in
+            # the wrong place on a map and give it nonsense neighbours.
+            warn(f"{spot_id(record)} is at {latitude},{longitude}, outside the city; skipping")
+            skipped += 1
+            continue
+
         spots.append(
             {
                 "id": spot_id(record),
@@ -1352,6 +1403,13 @@ def normalize(
                 "operator": operator(record),
                 "free_public_wifi": False,
                 "no_purchase_needed": published_category in NO_PURCHASE_CATEGORIES,
+                # Filled in by combine(), which is the only point that sees
+                # every published spot including the curated ones.
+                "subway_station": None,
+                "subway_routes": None,
+                "subway_metres": None,
+                "subway_step_free": None,
+                "nearby_spots": 0,
                 # Nothing licenses a library to put tables on the pavement, so
                 # no facility can match the seating join. False here is the
                 # absence of a licence, which is what the field means
@@ -1444,6 +1502,95 @@ def normalize(
     return sorted(published, key=lambda spot: spot["id"])
 
 
+def subway_stations(path: Path = SUBWAY_PATH) -> list[dict[str, Any]]:
+    """The committed station list, or an empty list when it has not been built."""
+    if not path.exists():
+        warn(f"no {path.name}; spots will publish no subway. Run `just ingest-subway`.")
+        return []
+    stations = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(stations, list):
+        raise IngestError(f"{path} must contain a JSON array of stations.")
+    return stations
+
+
+def assign_nearby(spots: list[dict[str, Any]]) -> None:
+    """Count each spot's neighbours within :data:`NEARBY_RADIUS_METRES`, in place.
+
+    This is the only thing in the snapshot that says anything about what a
+    block is like, and it is worth being precise about what it does and does
+    not mean. It counts *other study spots*, not people. A café on a dense
+    stretch may be empty and an isolated library may be packed; nothing here
+    knows. What it does support is the question a reader can act on -- how busy
+    the surrounding streets are, and whether there is anywhere else to go if
+    this place is full.
+
+    Bucketed onto a coarse grid first, so this is 2,422 lookups of a few
+    neighbours rather than 2,422 squared comparisons.
+    """
+    grid: dict[tuple[float, float], list[dict[str, Any]]] = {}
+    for spot in spots:
+        key = (round(spot["latitude"], 2), round(spot["longitude"], 2))
+        grid.setdefault(key, []).append(spot)
+
+    # A hundredth of a degree is about 1.1 km north-south and 850 m east-west
+    # in New York, so the neighbouring cells comfortably cover the radius.
+    offsets = (-0.01, 0.0, 0.01)
+    for spot in spots:
+        latitude, longitude = spot["latitude"], spot["longitude"]
+        count = 0
+        for delta_lat in offsets:
+            for delta_lon in offsets:
+                cell = (round(latitude + delta_lat, 2), round(longitude + delta_lon, 2))
+                for other in grid.get(cell, ()):
+                    if other["id"] == spot["id"]:
+                        continue
+                    if (
+                        haversine_metres(latitude, longitude, other["latitude"], other["longitude"])
+                        <= NEARBY_RADIUS_METRES
+                    ):
+                        count += 1
+        spot["nearby_spots"] = count
+
+
+def assign_subway(spots: list[dict[str, Any]], stations: list[dict[str, Any]]) -> None:
+    """Give every spot its nearest station, in place.
+
+    Derived here rather than in the browser or the frontend build, for the
+    reason `no_purchase_needed` had to learn: the result cards are rendered
+    from the API and the detail pages from the snapshot, so anything computed
+    in one of those places is missing from the other. The importer is the only
+    point both of them read from.
+
+    Measured to the station rather than to an entrance. The MTA publishes
+    entrances too and they would be closer to the truth, but a station can span
+    two avenues and an entrance list invites a precision the rest of this
+    snapshot does not have: the spot coordinates are themselves building
+    centroids.
+    """
+    for spot in spots:
+        nearest: tuple[float, dict[str, Any]] | None = None
+        for station in stations:
+            metres = haversine_metres(
+                spot["latitude"], spot["longitude"], station["latitude"], station["longitude"]
+            )
+            if metres <= SUBWAY_RADIUS_METRES and (nearest is None or metres < nearest[0]):
+                nearest = (metres, station)
+
+        if nearest is None:
+            spot["subway_station"] = None
+            spot["subway_routes"] = None
+            spot["subway_metres"] = None
+            spot["subway_step_free"] = None
+            continue
+
+        metres, station = nearest
+        spot["subway_station"] = station["name"]
+        # Space-joined, the way the MTA publishes it and the way a sign reads.
+        spot["subway_routes"] = " ".join(station["routes"])
+        spot["subway_metres"] = round(metres)
+        spot["subway_step_free"] = station["step_free"]
+
+
 def curated_spots(path: Path = CURATED_PATH) -> list[dict[str, Any]]:
     """Read the hand-maintained building records.
 
@@ -1481,7 +1628,9 @@ def curated_spots(path: Path = CURATED_PATH) -> list[dict[str, Any]]:
 
 
 def combine(
-    facilities: list[dict[str, Any]], curated: list[dict[str, Any]]
+    facilities: list[dict[str, Any]],
+    curated: list[dict[str, Any]],
+    stations: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Merge the curated buildings over the open-data records.
 
@@ -1500,6 +1649,11 @@ def combine(
     merged.update({spot["id"]: spot for spot in curated})
 
     spots = sorted(merged.values(), key=lambda spot: spot["id"])
+    # After merging rather than inside normalize(), because the curated records
+    # never pass through it: this is the only point that sees every published
+    # spot, and a hand-maintained station per building would go stale.
+    assign_subway(spots, stations if stations is not None else [])
+    assign_nearby(spots)
     validate(spots)
     return spots
 
@@ -1570,6 +1724,7 @@ def main(argv: list[str] | None = None) -> int:
                 outdoor_dining=outdoor_dining,
             ),
             curated_spots(),
+            subway_stations(),
         )
     except IngestError as error:
         warn(str(error))

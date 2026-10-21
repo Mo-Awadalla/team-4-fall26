@@ -7,7 +7,7 @@
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data.
 
 > [!IMPORTANT]
-> StudySpot is deployed and working. `data/spots.json` holds 2,421 real places — 2,157 cafés, 227 public library branches, 21 special libraries, and 16 academic libraries and NYU campus buildings — 429 of them with a free public Wi-Fi hotspot nearby, and 108 cafés with a sidewalk-dining licence. Every one is somewhere a person can go: the city's 126 campus records anchor the "near which campus" label but are not published as spots, because an institution's administrative point is not a room. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
+> StudySpot is deployed and working. `data/spots.json` holds 2,422 real places — 2,158 cafés, 227 public library branches, 21 special libraries, and 16 academic libraries and NYU campus buildings — 429 of them with a free public Wi-Fi hotspot nearby, and 108 cafés with a sidewalk-dining licence. Every one is somewhere a person can go: the city's 126 campus records anchor the "near which campus" label but are not published as spots, because an institution's administrative point is not a room. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
 
 ## How will it work?
 
@@ -39,6 +39,11 @@ The shared study-spot summary contract is intentionally small:
   "operator": "New York Public Library",
   "free_public_wifi": true,
   "no_purchase_needed": true,
+  "subway_station": "125 St",
+  "subway_routes": "4 5 6",
+  "subway_metres": 180,
+  "subway_step_free": "full",
+  "nearby_spots": 23,
   "outdoor_seating": false
 }
 ```
@@ -56,7 +61,7 @@ Four routes are available alongside `GET /health/live`, none of them with a trai
 
 See the [HTTP API guide](docs/source/api.md).
 
-Every spot also has its own page at `/spots/{id}`. All 2,421 are prerendered at build time from the committed snapshot, so each is real HTML in S3 rather than a route the browser assembles: the link works in a fresh tab, in a shared message, and to a crawler, with no request on load. The nearby-spots list on each page is computed at build time from the same coordinates the importer uses.
+Every spot also has its own page at `/spots/{id}`. All 2,422 are prerendered at build time from the committed snapshot, so each is real HTML in S3 rather than a route the browser assembles: the link works in a fresh tab, in a shared message, and to a crawler, with no request on load. The nearby-spots list on each page is computed at build time from the same coordinates the importer uses.
 
 ## Development
 

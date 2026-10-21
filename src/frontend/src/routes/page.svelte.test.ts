@@ -40,6 +40,11 @@ function spot(id: string, name: string): StudySpot {
 		operator: 'New York Public Library',
 		free_public_wifi: false,
 		no_purchase_needed: true,
+		subway_station: 'W 4 St-Wash Sq',
+		subway_routes: 'A C E',
+		subway_metres: 409,
+		subway_step_free: 'full',
+		nearby_spots: 41,
 		outdoor_seating: false
 	};
 }
@@ -172,6 +177,52 @@ describe('paging', () => {
 });
 
 describe('the place card', () => {
+	it('copies a link to the spot when sharing', async () => {
+		// The link is the prerendered detail page, so whoever receives it opens
+		// real HTML rather than a shell that has to fetch first.
+		const written: string[] = [];
+		const realClipboard = navigator.clipboard;
+		Object.defineProperty(navigator, 'clipboard', {
+			configurable: true,
+			value: {
+				writeText: async (text: string) => {
+					written.push(text);
+				}
+			}
+		});
+
+		try {
+			render(Home);
+			await box().fill('library');
+			await searchButton().click();
+			await expect.element(page.getByText('Bobst Library')).toBeInTheDocument();
+
+			await page.getByRole('button', { name: 'Share' }).first().click();
+
+			await expect.element(page.getByText('Copied')).toBeInTheDocument();
+			expect(written[0]).toContain('/spots/facdb:bobst');
+		} finally {
+			Object.defineProperty(navigator, 'clipboard', {
+				configurable: true,
+				value: realClipboard
+			});
+		}
+	});
+
+	it('offers a link straight into a maps app', async () => {
+		// A hyperlink rather than an embedded map: nothing is loaded from
+		// anyone else to render a card.
+		render(Home);
+
+		await box().fill('library');
+		await searchButton().click();
+		await expect.element(page.getByText('Bobst Library')).toBeInTheDocument();
+
+		const maps = page.getByRole('link', { name: 'Maps' }).first();
+		await expect.element(maps).toBeInTheDocument();
+		expect(await maps.element().getAttribute('href')).toContain('google.com/maps');
+	});
+
 	it('names who runs the place', async () => {
 		// A branch is named after its neighbourhood, so its own name never says
 		// which library system it belongs to -- and the three have separate

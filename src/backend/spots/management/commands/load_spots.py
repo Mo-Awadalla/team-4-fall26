@@ -49,6 +49,11 @@ CONTRACT_FIELDS = {
     "operator",
     "free_public_wifi",
     "no_purchase_needed",
+    "subway_station",
+    "subway_routes",
+    "subway_metres",
+    "subway_step_free",
+    "nearby_spots",
     "outdoor_seating",
 }
 
@@ -110,6 +115,11 @@ def to_spot(record: Any, index: int) -> StudySpot:
         operator=record.get("operator"),
         free_public_wifi=record.get("free_public_wifi", False),
         no_purchase_needed=record.get("no_purchase_needed", False),
+        subway_station=record.get("subway_station"),
+        subway_routes=record.get("subway_routes"),
+        subway_metres=record.get("subway_metres"),
+        subway_step_free=record.get("subway_step_free"),
+        nearby_spots=record.get("nearby_spots", 0),
         outdoor_seating=record.get("outdoor_seating", False),
     )
 

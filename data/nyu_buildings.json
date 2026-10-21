@@ -12,6 +12,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -27,6 +32,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -42,6 +52,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -57,6 +72,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -72,6 +92,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -87,6 +112,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -102,6 +132,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -117,6 +152,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -132,6 +172,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   },
   {
@@ -147,6 +192,11 @@
     "operator": "New York University",
     "free_public_wifi": false,
     "no_purchase_needed": true,
+    "subway_station": null,
+    "subway_routes": null,
+    "subway_metres": null,
+    "subway_step_free": null,
+    "nearby_spots": 0,
     "outdoor_seating": false
   }
 ]
