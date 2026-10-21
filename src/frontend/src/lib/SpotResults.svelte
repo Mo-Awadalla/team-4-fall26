@@ -16,26 +16,6 @@
 	let { spots, total, hasMore, loadingMore = false, onShowMore }: Props = $props();
 
 	/**
-	 * How many other spots sit within a five-minute walk, said as a number.
-	 *
-	 * This replaced a Quiet/Moderate/Busy label. The underlying count is of
-	 * *places*, not people -- nothing in open data knows whether a cafe has a
-	 * free table -- so a word like "Busy" read as a claim about the venue that
-	 * the data could not support. The count says the same thing without the
-	 * inference, and a reader can check it.
-	 *
-	 * The walk is kept in the sentence because "nearby" alone gives no scale.
-	 */
-	function alternatives(nearby: number): string {
-		if (nearby === 0) {
-			return 'No alternatives within a 5-minute walk';
-		}
-
-		const noun = nearby === 1 ? 'alternative' : 'alternatives';
-		return `${nearby} ${noun} within a 5-minute walk`;
-	}
-
-	/**
 	 * The spot whose link was just copied, so one card can say so without the
 	 * others claiming it too.
 	 */
@@ -195,8 +175,6 @@
 					</p>
 				{/if}
 
-				<p class="alternatives">{alternatives(spot.nearby_spots)}</p>
-
 				<p class="actions">
 					<!--
 						A link, not an embedded map: it opens the viewer's own maps app with
@@ -326,8 +304,7 @@
 
 	.address,
 	.operator,
-	.campus,
-	.alternatives {
+	.campus {
 		margin: 10px 0 0;
 		color: var(--color-muted);
 		font-size: 13px;

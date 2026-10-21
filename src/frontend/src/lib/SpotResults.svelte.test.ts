@@ -1,11 +1,14 @@
 /**
- * What a result card says about the places around a spot.
+ * What a result card does not say.
  *
- * This line used to be a Quiet/Moderate/Busy label with a row of icons. The
- * number underneath it counts *other study spots* within 400 m -- places, not
- * people -- so "Busy" sitting under a cafe's name read as a claim about that
- * cafe that nothing in the data could support. These assertions pin the
- * replacement: the count itself, and no word derived from it.
+ * The card briefly carried a Quiet/Moderate/Busy label, then a count of the
+ * other spots within 400 m. Both came from the same number, and that number
+ * counts *places, not people* -- nothing in open data knows whether a cafe has
+ * a free table. The label inferred a conclusion the data could not support,
+ * and the count restated the list the card already sits in.
+ *
+ * So the card says neither. This holds that line, because the pull to put a
+ * lively-looking word back on a card is a strong one.
  */
 
 import { page } from 'vitest/browser';
@@ -15,65 +18,48 @@ import { render } from 'vitest-browser-svelte';
 import SpotResults from './SpotResults.svelte';
 import type { StudySpot } from './contract';
 
-function spot(nearby: number): StudySpot {
-	return {
-		id: 'facdb:bobst',
-		name: 'Bobst Library',
-		category: 'academic_library',
-		address: '70 Washington Square South, New York, NY 10012',
-		neighborhood: 'Greenwich Village',
-		borough: 'Manhattan',
-		latitude: 40.72925,
-		longitude: -73.99712,
-		university: 'New York University',
-		operator: 'New York University',
-		free_public_wifi: true,
-		no_purchase_needed: false,
-		subway_station: 'W 4 St-Wash Sq',
-		subway_routes: 'A C E',
-		subway_metres: 409,
-		subway_step_free: 'full',
-		nearby_spots: nearby
-	};
-}
+const SPOT: StudySpot = {
+	id: 'facdb:bobst',
+	name: 'Bobst Library',
+	category: 'academic_library',
+	address: '70 Washington Square South, New York, NY 10012',
+	neighborhood: 'Greenwich Village',
+	borough: 'Manhattan',
+	latitude: 40.72925,
+	longitude: -73.99712,
+	university: 'New York University',
+	operator: 'New York University',
+	free_public_wifi: true,
+	no_purchase_needed: false,
+	subway_station: 'W 4 St-Wash Sq',
+	subway_routes: 'A C E',
+	subway_metres: 409,
+	subway_step_free: 'full',
+	nearby_spots: 41
+};
 
-function show(nearby: number): void {
-	render(SpotResults, { spots: [spot(nearby)], total: 1, hasMore: false });
-}
+describe('a result card', () => {
+	it('shows what it knows about the place', async () => {
+		render(SpotResults, { spots: [SPOT], total: 1, hasMore: false });
 
-describe('the alternatives line', () => {
-	it('gives the count when there are several', async () => {
-		show(41);
-
-		await expect
-			.element(page.getByText('41 alternatives within a 5-minute walk'))
-			.toBeInTheDocument();
-	});
-
-	it('says it in the singular when there is one', async () => {
-		show(1);
-
-		await expect
-			.element(page.getByText('1 alternative within a 5-minute walk'))
-			.toBeInTheDocument();
-	});
-
-	it('says so plainly when there are none', async () => {
-		// Not an empty line: that this one is on its own is the thing worth
-		// knowing before making the trip.
-		show(0);
-
-		await expect
-			.element(page.getByText('No alternatives within a 5-minute walk'))
-			.toBeInTheDocument();
+		await expect.element(page.getByText('Bobst Library')).toBeInTheDocument();
+		await expect.element(page.getByText(/W 4 St-Wash Sq/)).toBeInTheDocument();
 	});
 
 	it('draws no conclusion about how busy the place is', async () => {
-		// The count is of places, not people. A word here would be an inference
-		// presented as a measurement, which is what this replaced.
-		show(41);
+		render(SpotResults, { spots: [SPOT], total: 1, hasMore: false });
 
 		await expect.element(page.getByText('Bobst Library')).toBeInTheDocument();
 		await expect.element(page.getByText(/Quiet|Moderate|Busy/)).not.toBeInTheDocument();
+	});
+
+	it('does not count the places around it', async () => {
+		// nearby_spots is 41 above. The detail page lists those neighbours by
+		// name, which is actionable; a bare number on a card in a list of
+		// alternatives is not.
+		render(SpotResults, { spots: [SPOT], total: 1, hasMore: false });
+
+		await expect.element(page.getByText('Bobst Library')).toBeInTheDocument();
+		await expect.element(page.getByText(/41|alternatives?|nearby/i)).not.toBeInTheDocument();
 	});
 });
