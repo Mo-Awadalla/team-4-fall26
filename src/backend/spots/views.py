@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import StudySpot
-from .search import expand, search
+from .search import expanded_words, search
 from .serializers import (
     SpotFacetsQuerySerializer,
     SpotQuerySerializer,
@@ -61,7 +61,7 @@ def campus(value: str) -> Q:
     a borough was also chosen.
     """
     candidates = [value]
-    expanded = expand(value)
+    expanded = " ".join(expanded_words(value))
     if expanded.casefold() != value.casefold():
         candidates.append(expanded)
 

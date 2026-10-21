@@ -99,16 +99,41 @@ INITIALISMS = {
 }
 
 
+def expanded_words(query: str) -> list[str]:
+    """Every known initialism replaced by what it stands for, as plain text.
+
+    Separate from :func:`expand` because that one emits tsquery syntax. A
+    caller filtering a column wants the words, not the quotes -- the campus
+    filter looked up ``'"New York University"'`` once, with the quotes in the
+    string, and matched nothing.
+    """
+    return [INITIALISMS.get(word.casefold(), word) for word in query.split()]
+
+
 def expand(query: str) -> str:
-    """Expand every word of ``query`` that is a known initialism.
+    """Expand every word of ``query`` that is a known initialism, as a phrase.
 
     This used to expand only when the whole query was one, because against a
     single trigram comparison replacing one word of several changed what the
     rest was measured against in ways that were hard to predict. Full text has
     no such problem: it matches word by word, so "nyu library" can become "New
     York University library" and mean exactly what it says.
+
+    The quotes are what make it mean that. Expanded to three bare words, "nyu"
+    became ``new & york & university``, and the vector spans four fields, so a
+    row matched if any of them held "New" and "York" and any other held
+    "University". Typing NYU returned 21 spots, of which nine were not NYU at
+    all:
+
+        125th Street Library   -- "New York Public Library", Touro University
+        Columbia Butler        -- "New York, NY", Columbia University
+        Francis Martin Library -- "New York Public Library", University Heights
+
+    As a phrase the three words have to sit together in one field, which is
+    the only place the name actually appears. The same query returns 12, all
+    of them NYU.
     """
-    return " ".join(INITIALISMS.get(word.casefold(), word) for word in query.split())
+    return " ".join(f'"{word}"' if " " in word else word for word in expanded_words(query))
 
 
 def _tsquery(query: str) -> SearchQuery:
@@ -327,6 +352,7 @@ __all__ = [
     "INITIALISMS",
     "THRESHOLD",
     "expand",
+    "expanded_words",
     "is_plain",
     "partial",
     "precise",
