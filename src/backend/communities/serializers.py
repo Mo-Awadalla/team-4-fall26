@@ -42,7 +42,7 @@ class ChannelWriteSerializer(serializers.Serializer):
 
 
 class MemberSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(read_only=True)
+    user_id = serializers.CharField(read_only=True)
 
     class Meta:
         model = Membership

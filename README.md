@@ -6,6 +6,8 @@
 
 StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data and OpenStreetMap.
 
+Public study communities are available at `/communities`. Students and business owners can create and join groups for courses, schools, or neighborhoods; owners manage channels and members, and moderators can manage members and invites. Discussions, live chat, direct messages, and message search are later work. Community writes use Django's authenticated session; the account signup and login experience is being built separately.
+
 > [!IMPORTANT]
 > StudySpot is deployed and working. `data/spots.json` holds 2,422 real places — 2,158 cafés, 227 public library branches, 21 special libraries, and 16 academic libraries and NYU campus buildings — 429 of them with a free public Wi-Fi hotspot nearby, and 108 cafés with a sidewalk-dining licence. Every one is somewhere a person can go: the city's 126 campus records anchor the "near which campus" label but are not published as spots, because an institution's administrative point is not a room. Search runs entirely in Postgres: full text ranks across name, campus, neighborhood and address, with trigram similarity behind it for misspellings, and it searches as you type. Results filter by borough, type, campus, and Wi-Fi. A spot detail page is the notable gap.
 
@@ -73,6 +75,8 @@ docker compose up --build --watch
 ```
 
 Open <http://localhost:7500>. Source changes are synchronized into the frontend and backend containers; dependency changes rebuild only the affected image.
+
+To try community writes before the account UI is integrated, run `docker compose exec backend uv run python manage.py createsuperuser`, sign in at <http://localhost:7501/admin/>, then visit <http://localhost:7500/communities>. The backend and frontend share the `localhost` session cookie. Public browsing needs no account.
 
 For a pinned toolchain, use [Nix](https://nixos.org/). You will still need a running Docker engine.
 

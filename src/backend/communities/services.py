@@ -18,7 +18,7 @@ MAX_CHANNELS = 20
 MAX_INVITES = 10
 
 
-def _lock_user(user_id: int) -> None:
+def _lock_user(user_id: object) -> None:
     get_user_model().objects.select_for_update().get(pk=user_id)
 
 
@@ -130,7 +130,7 @@ def redeem(token: str, user: object) -> Community:
 
 
 @transaction.atomic
-def set_role(community: Community, actor: object, target_id: int, role: str) -> None:
+def set_role(community: Community, actor: object, target_id: object, role: str) -> None:
     community = Community.objects.select_for_update().get(pk=community.pk)
     require(community, actor, Action.SET_MODERATOR)
     if target_id == community.owner_id:
@@ -146,7 +146,7 @@ def set_role(community: Community, actor: object, target_id: int, role: str) -> 
 
 
 @transaction.atomic
-def moderate(community: Community, actor: object, target_id: int, action: str) -> None:
+def moderate(community: Community, actor: object, target_id: object, action: str) -> None:
     community = Community.objects.select_for_update().get(pk=community.pk)
     require(community, actor, Action.MODERATE)
     if target_id == community.owner_id:
@@ -169,12 +169,14 @@ def moderate(community: Community, actor: object, target_id: int, action: str) -
 
 
 @transaction.atomic
-def transfer(community: Community, actor: object, target_id: int) -> None:
+def transfer(community: Community, actor: object, target_id: object) -> None:
     community = Community.objects.select_for_update().get(pk=community.pk)
     require(community, actor, Action.TRANSFER)
     member = Membership.objects.filter(community=community, user_id=target_id).first()
     if member is None:
         raise NotFound("New owner must be a member.")
+    if community.owner_id == target_id:
+        return
     _lock_user(target_id)
     if Community.objects.filter(owner_id=target_id).count() >= MAX_OWNED:
         raise ValidationError("This member already owns the maximum number of communities.")

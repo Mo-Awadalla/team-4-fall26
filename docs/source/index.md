@@ -22,6 +22,7 @@ nix
 
 architecture
 api
+communities
 data-and-search
 database
 ```
