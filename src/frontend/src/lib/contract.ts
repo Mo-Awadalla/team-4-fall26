@@ -231,3 +231,32 @@ export type ErrorEnvelope = {
 		details: ErrorDetail[];
 	};
 };
+
+/**
+ * Where the browser logs in, from `GET /auth/config`.
+ *
+ * Served by the API rather than built into the frontend, so one build works
+ * against any tenant, and a deployment without Auth0 says so instead of
+ * offering a log-in that cannot work.
+ */
+export type AuthConfig =
+	{ enabled: false } | { enabled: true; domain: string; client_id: string; audience: string };
+
+export type AccountType = 'student' | 'business';
+
+/** The logged-in person's own account, from `GET /account`. */
+export type Account = {
+	email: string;
+	/** Auth0's word that the address belongs to whoever is logged in. */
+	email_verified: boolean;
+	username: string;
+	/** Null until sign-up is finished by choosing one. */
+	account_type: AccountType | null;
+	/** Blank unless `account_type` is `business`. */
+	business_name: string;
+	created_at: string;
+};
+
+/** The body of `POST /account`, which finishes sign-up. */
+export type CompleteSignUp =
+	{ account_type: 'student' } | { account_type: 'business'; business_name: string };
