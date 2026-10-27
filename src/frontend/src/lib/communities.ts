@@ -1,0 +1,56 @@
+/** Browser contract for the public community API. */
+export type Community = {
+	id: number;
+	name: string;
+	description: string;
+	school: string;
+	course: string;
+	owner_id: string | number;
+	member_count: number;
+	role: 'visitor' | 'member' | 'moderator' | 'owner';
+	channels?: Channel[];
+};
+
+export type Channel = { id: number; name: string; position: number; archived: boolean };
+export type Member = { user_id: string; role: 'member' | 'moderator'; joined_at: string };
+export type Invite = {
+	id: number;
+	created_at: string;
+	expires_at: string | null;
+	max_uses: number | null;
+	uses: number;
+	revoked: boolean;
+};
+
+function csrfToken(): string {
+	return (
+		document.cookie
+			.split('; ')
+			.find((part) => part.startsWith('csrftoken='))
+			?.split('=')[1] ?? ''
+	);
+}
+
+export async function communityRequest<T>(path: string, method = 'GET', body?: object): Promise<T> {
+	const response = await fetch(`/api${path}`, {
+		method,
+		credentials: 'same-origin',
+		headers: {
+			accept: 'application/json',
+			...(body ? { 'content-type': 'application/json' } : {}),
+			...(method !== 'GET' ? { 'x-csrftoken': csrfToken() } : {})
+		},
+		...(body ? { body: JSON.stringify(body) } : {})
+	});
+	if (!response.ok) {
+		const result = await response.json().catch(() => null);
+		if (
+			response.status === 401 ||
+			(response.status === 403 && result?.error?.code === 'unauthorized')
+		) {
+			throw new Error('Sign in to your StudySpot account to continue.');
+		}
+		throw new Error(result?.error?.message ?? `Request failed (${response.status}).`);
+	}
+	return response.status === 204 ? (undefined as T) : await response.json();
+}

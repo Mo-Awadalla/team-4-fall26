@@ -119,3 +119,34 @@ def test_channels_are_scoped_and_name_unique():
         ).status_code
         == 200
     )
+    other = client.post(f"/communities/{first.pk}/channels", {"name": "exams"}).data["id"]
+    assert (
+        client.patch(f"/communities/{first.pk}/channels/{other}", {"position": 0}).status_code
+        == 200
+    )
+    assert list(first.channels.values_list("name", flat=True)) == ["exams", "homework"]
+
+
+def test_session_requires_csrf_and_staff_action_is_separate():
+    users = get_user_model().objects
+    users.create_user(username="owner", password="test-password")
+    staff = users.create_user(username="staff", password="test-password", is_staff=True)
+    client = APIClient(enforce_csrf_checks=True)
+    client.get("/admin/login/")
+    assert client.login(username="owner", password="test-password")
+    assert client.post("/communities", {"name": "Course"}, format="json").status_code == 403
+    token = client.cookies["csrftoken"].value
+    response = client.post(
+        "/communities",
+        {"name": "Course"},
+        format="json",
+        HTTP_X_CSRFTOKEN=token,
+        HTTP_ORIGIN="http://localhost:7500",
+    )
+    assert response.status_code == 201
+    community_id = response.data["id"]
+    assert (
+        client.delete(f"/communities/{community_id}/admin", HTTP_X_CSRFTOKEN=token).status_code
+        == 403
+    )
+    assert client_for(staff).delete(f"/communities/{community_id}/admin").status_code == 204

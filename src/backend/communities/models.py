@@ -69,7 +69,7 @@ class Ban(models.Model):
 class Invite(models.Model):
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="invites")
     token_hash = models.CharField(max_length=64, unique=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     max_uses = models.PositiveIntegerField(null=True, blank=True)
@@ -82,7 +82,7 @@ class Invite(models.Model):
 
 class ModerationEvent(models.Model):
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="moderation")
-    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     target = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+"
     )
