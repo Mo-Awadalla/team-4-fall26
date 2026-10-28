@@ -189,7 +189,7 @@
 
 <div class="chat">
 	<div class="toolbar">
-		<strong># {channel.name}</strong>
+		<strong>Messages</strong>
 		<div class="tools">
 			<form
 				onsubmit={(event) => {
@@ -348,8 +348,7 @@
 		width: 170px;
 	}
 	.messages {
-		min-height: 240px;
-		max-height: 500px;
+		height: clamp(120px, 18vh, 200px);
 		overflow-y: auto;
 		padding: 16px;
 	}
@@ -416,7 +415,14 @@
 		border: 1px solid #ddd2d5;
 		border-radius: 7px;
 		background: white;
-		padding: 6px 10px;
+		padding: 8px 10px;
+		min-height: 40px;
+		font: inherit;
+	}
+	button:focus-visible,
+	input:focus-visible {
+		outline: 3px solid #2458a6;
+		outline-offset: 2px;
 	}
 	button:disabled {
 		opacity: 0.5;

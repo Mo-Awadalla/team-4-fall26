@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
 	import ChannelChat from '$lib/ChannelChat.svelte';
 	import DirectMessages from '$lib/DirectMessages.svelte';
@@ -37,9 +37,18 @@
 	let school = $state('');
 	let course = $state('');
 	let channelName = $state('');
+	let channelCreateOpen = $state(false);
+	let channelMenuOpen = $state<number | null>(null);
+	let editingChannelId = $state<number | null>(null);
+	let renameValue = $state('');
+	let deleteTarget = $state<Channel | null>(null);
+	let channelNameInput = $state<HTMLInputElement>();
+	let renameInput = $state<HTMLInputElement>();
+	let deleteDialog = $state<HTMLDialogElement>();
 	let activeChannelId = $state<number | null>(null);
 	let inviteLink = $state('');
 	let shareLink = $state('');
+	let copyStatus = $state('');
 	let tab = $state<'about' | 'members' | 'settings'>('about');
 	let requestNumber = 0;
 	const activeCommunityId = () => selected?.id;
@@ -76,7 +85,11 @@
 		try {
 			selected = await communityRequest<Community>(`/communities/${id}`);
 			selectedDM = null;
+			channelCreateOpen = false;
+			channelMenuOpen = null;
+			editingChannelId = null;
 			shareLink = '';
+			copyStatus = '';
 			activeChannelId =
 				selected.channels?.find((channel) => channel.id === channelId)?.id ??
 				selected.channels?.[0]?.id ??
@@ -151,7 +164,9 @@
 
 	function selectChannel(channelId: number) {
 		activeChannelId = channelId;
+		channelMenuOpen = null;
 		shareLink = '';
+		copyStatus = '';
 		if (selected) history.replaceState(null, '', `?id=${selected.id}&channel=${channelId}`);
 	}
 
@@ -165,9 +180,100 @@
 			);
 			channelName = '';
 			await choose(selected.id, created.id);
+			await tick();
+			document.getElementById(`channel-select-${created.id}`)?.focus();
 		} catch (cause) {
 			error = message(cause);
 		}
+	}
+
+	async function openChannelCreate() {
+		channelMenuOpen = null;
+		channelCreateOpen = true;
+		await tick();
+		channelNameInput?.focus();
+	}
+
+	async function closeChannelCreate() {
+		channelCreateOpen = false;
+		await tick();
+		document.getElementById('add-channel-button')?.focus();
+	}
+
+	async function toggleChannelMenu(channelId: number) {
+		channelMenuOpen = channelMenuOpen === channelId ? null : channelId;
+		if (channelMenuOpen !== null) {
+			await tick();
+			document.querySelector<HTMLButtonElement>(`#channel-options-${channelId} button`)?.focus();
+		}
+	}
+
+	async function startChannelRename(channel: Channel) {
+		channelMenuOpen = null;
+		editingChannelId = channel.id;
+		renameValue = channel.name;
+		await tick();
+		renameInput?.focus();
+	}
+
+	async function cancelChannelRename(channelId: number) {
+		editingChannelId = null;
+		await tick();
+		document.getElementById(`channel-trigger-${channelId}`)?.focus();
+	}
+
+	async function renameChannel(channel: Channel) {
+		if (!selected) return;
+		try {
+			await communityRequest(`/communities/${selected.id}/channels/${channel.id}`, 'PATCH', {
+				name: renameValue
+			});
+			await choose(selected.id, activeChannelId);
+			await tick();
+			document.getElementById(`channel-trigger-${channel.id}`)?.focus();
+		} catch (cause) {
+			error = message(cause);
+		}
+	}
+
+	async function updateChannel(channelId: number, changes: object) {
+		await action(`/communities/${activeCommunityId()}/channels/${channelId}`, 'PATCH', changes);
+		await tick();
+		document.getElementById(`channel-trigger-${channelId}`)?.focus();
+	}
+
+	async function confirmChannelDelete(channel: Channel) {
+		channelMenuOpen = null;
+		deleteTarget = channel;
+		await tick();
+		deleteDialog?.showModal();
+	}
+
+	async function deleteChannel() {
+		if (!selected || !deleteTarget) return;
+		const channelId = deleteTarget.id;
+		deleteDialog?.close();
+		deleteTarget = null;
+		await action(`/communities/${selected.id}/channels/${channelId}`, 'DELETE');
+		await tick();
+		if (activeChannelId) document.getElementById(`channel-select-${activeChannelId}`)?.focus();
+	}
+
+	async function closeDeleteDialog() {
+		const channelId = deleteTarget?.id;
+		deleteTarget = null;
+		await tick();
+		if (channelId) document.getElementById(`channel-trigger-${channelId}`)?.focus();
+	}
+
+	function handleEscape(event: KeyboardEvent) {
+		if (event.key !== 'Escape' || deleteDialog?.open) return;
+		if (channelMenuOpen !== null) {
+			const channelId = channelMenuOpen;
+			channelMenuOpen = null;
+			void tick().then(() => document.getElementById(`channel-trigger-${channelId}`)?.focus());
+		} else if (editingChannelId !== null) void cancelChannelRename(editingChannelId);
+		else if (channelCreateOpen) void closeChannelCreate();
 	}
 
 	async function shareChannel() {
@@ -175,8 +281,9 @@
 		shareLink = `${location.origin}${resolve('/communities')}?id=${selected.id}&channel=${activeChannelId}`;
 		try {
 			await navigator.clipboard.writeText(shareLink);
+			copyStatus = 'Channel link copied. Anyone can use it to join this public community.';
 		} catch {
-			/* The visible link can be copied manually. */
+			copyStatus = 'Select and copy the link below to share this channel.';
 		}
 	}
 
@@ -295,6 +402,8 @@
 	});
 </script>
 
+<svelte:window onkeydown={handleEscape} />
+
 <svelte:head>
 	<title>Communities · StudySpot</title>
 	<meta name="description" content="Find and create public study communities in New York City." />
@@ -302,15 +411,36 @@
 
 <div class="shell">
 	<SiteHeader />
+	<dialog
+		bind:this={deleteDialog}
+		class="confirm-dialog"
+		aria-labelledby="delete-channel-title"
+		aria-describedby="delete-channel-description"
+		onclose={() => void closeDeleteDialog()}
+	>
+		{#if deleteTarget}
+			<h2 id="delete-channel-title">Delete #{deleteTarget.name}?</h2>
+			<p id="delete-channel-description">
+				This removes the channel and its messages for everyone in the community.
+			</p>
+			<div class="form-actions">
+				<button onclick={() => deleteDialog?.close()}>Cancel</button><button
+					class="destructive"
+					onclick={() => void deleteChannel()}>Delete channel</button
+				>
+			</div>
+		{/if}
+	</dialog>
 	<main>
 		<aside class="sidebar">
 			<h1>Find your people.</h1>
 			<p>Public study communities for courses, schools, and neighborhoods.</p>
 			<label for="community-search">Search communities</label>
 			<div class="tabs">
-				<button class:chosen={!viewMine} onclick={() => (viewMine = false)}>All</button><button
-					class:chosen={viewMine}
-					onclick={() => (viewMine = true)}>Mine</button
+				<button class:chosen={!viewMine} aria-pressed={!viewMine} onclick={() => (viewMine = false)}
+					>All</button
+				><button class:chosen={viewMine} aria-pressed={viewMine} onclick={() => (viewMine = true)}
+					>Mine</button
 				>
 			</div>
 			<input id="community-search" bind:value={query} placeholder="Math 51A, NYU, Brooklyn…" />
@@ -327,6 +457,7 @@
 				{#each communities as community (community.id)}
 					<button
 						class:active={selected?.id === community.id}
+						aria-current={selected?.id === community.id ? 'page' : undefined}
 						onclick={() => void choose(community.id)}
 					>
 						<strong>{community.name}</strong>
@@ -343,6 +474,7 @@
 				{#each directConversations as conversation (conversation.id)}
 					<button
 						class:active={selectedDM?.id === conversation.id}
+						aria-current={selectedDM?.id === conversation.id ? 'page' : undefined}
 						onclick={() => openDM(conversation)}
 						><strong>{conversation.other_name}</strong><span>Private conversation</span></button
 					>
@@ -395,66 +527,179 @@
 						>{/if}
 				</div>
 				<div class="tabs">
-					<button class:chosen={tab === 'about'} onclick={() => (tab = 'about')}>About</button
-					><button class:chosen={tab === 'members'} onclick={() => void loadMembers()}
-						>Members</button
+					<button
+						class:chosen={tab === 'about'}
+						aria-pressed={tab === 'about'}
+						onclick={() => (tab = 'about')}>About</button
+					><button
+						class:chosen={tab === 'members'}
+						aria-pressed={tab === 'members'}
+						onclick={() => void loadMembers()}>Members</button
 					>{#if selected.role === 'owner' || selected.role === 'moderator'}<button
 							class:chosen={tab === 'settings'}
+							aria-pressed={tab === 'settings'}
 							onclick={() => void loadSettings()}>Manage</button
 						>{/if}
 				</div>
 				{#if tab === 'about'}
-					<p class="description">{selected.description || 'A place to study together.'}</p>
-					<h3>Channels</h3>
-					<div class="channel-list">
-						{#each selected.channels ?? [] as channel (channel.id)}<button
-								class:active={activeChannelId === channel.id}
-								onclick={() => selectChannel(channel.id)}
-								># {channel.name}{channel.archived ? ' · Archived' : ''}</button
-							>{/each}
+					<div class="workspace">
+						<nav class="channel-rail" aria-label={`Channels in ${selected.name}`}>
+							<div class="rail-heading">
+								<h3>Channels</h3>
+								{#if selected.role === 'owner'}<button
+										class="icon-button"
+										id="add-channel-button"
+										aria-label="Add channel"
+										title="Add channel"
+										onclick={() => void openChannelCreate()}>+</button
+									>{/if}
+							</div>
+							{#if channelCreateOpen}
+								<form
+									class="channel-form"
+									onsubmit={(event) => {
+										event.preventDefault();
+										void createChannel();
+									}}
+								>
+									<label for="new-channel-name">Channel name</label>
+									<input
+										id="new-channel-name"
+										bind:this={channelNameInput}
+										required
+										pattern="[a-z0-9][a-z0-9-]*"
+										maxlength="50"
+										bind:value={channelName}
+										placeholder="exam-prep"
+										aria-describedby="channel-name-help"
+									/>
+									<p id="channel-name-help">Lowercase letters, numbers, and hyphens.</p>
+									<div class="form-actions">
+										<button class="primary">Create</button><button
+											type="button"
+											onclick={() => void closeChannelCreate()}>Cancel</button
+										>
+									</div>
+								</form>
+							{/if}
+							<ul class="channel-list">
+								{#each selected.channels ?? [] as channel (channel.id)}
+									<li class="channel-item">
+										<div class="channel-row" class:active={activeChannelId === channel.id}>
+											<button
+												class="channel-select"
+												id={`channel-select-${channel.id}`}
+												aria-current={activeChannelId === channel.id ? 'page' : undefined}
+												onclick={() => selectChannel(channel.id)}
+												><span aria-hidden="true">#</span><span
+													>{channel.name}{channel.archived ? ' · Archived' : ''}</span
+												></button
+											>
+											{#if selected.role === 'owner'}<button
+													class="icon-button options-trigger"
+													id={`channel-trigger-${channel.id}`}
+													aria-label={`Options for #${channel.name}`}
+													aria-expanded={channelMenuOpen === channel.id}
+													aria-controls={`channel-options-${channel.id}`}
+													onclick={() => void toggleChannelMenu(channel.id)}>···</button
+												>{/if}
+										</div>
+										{#if channelMenuOpen === channel.id}
+											<div
+												class="channel-options"
+												id={`channel-options-${channel.id}`}
+												role="group"
+												aria-label={`Options for #${channel.name}`}
+											>
+												<button onclick={() => void startChannelRename(channel)}>Rename</button>
+												<button
+													disabled={channel.position === 0}
+													onclick={() =>
+														void updateChannel(channel.id, { position: channel.position - 1 })}
+													>Move up</button
+												>
+												<button
+													disabled={channel.position >= (selected.channels?.length ?? 0) - 1}
+													onclick={() =>
+														void updateChannel(channel.id, { position: channel.position + 1 })}
+													>Move down</button
+												>
+												<button
+													onclick={() =>
+														void updateChannel(channel.id, { archived: !channel.archived })}
+													>{channel.archived ? 'Restore' : 'Archive'}</button
+												>
+												<button
+													class="destructive"
+													onclick={() => void confirmChannelDelete(channel)}>Delete channel</button
+												>
+											</div>
+										{/if}
+										{#if editingChannelId === channel.id}
+											<form
+												class="channel-form"
+												onsubmit={(event) => {
+													event.preventDefault();
+													void renameChannel(channel);
+												}}
+											>
+												<label for={`rename-channel-${channel.id}`}>Rename #{channel.name}</label>
+												<input
+													id={`rename-channel-${channel.id}`}
+													bind:this={renameInput}
+													required
+													pattern="[a-z0-9][a-z0-9-]*"
+													maxlength="50"
+													bind:value={renameValue}
+												/>
+												<div class="form-actions">
+													<button class="primary">Save</button><button
+														type="button"
+														onclick={() => void cancelChannelRename(channel.id)}>Cancel</button
+													>
+												</div>
+											</form>
+										{/if}
+									</li>
+								{/each}
+							</ul>
+						</nav>
+						<div class="workspace-main">
+							{#each selected.channels?.filter((channel) => channel.id === activeChannelId) ?? [] as channel (channel.id)}
+								<div class="channel-intro">
+									<div>
+										<p class="eyebrow">Text channel</p>
+										<h3># {channel.name}</h3>
+										<p>{selected.description || 'A place to study together.'}</p>
+									</div>
+									<button onclick={() => void shareChannel()}>Share channel</button>
+								</div>
+								{#if copyStatus}<p class="copy-status" role="status">{copyStatus}</p>{/if}
+								{#if shareLink}<input
+										class="share-link"
+										readonly
+										aria-label="Channel invite link"
+										value={shareLink}
+										onclick={(event) => event.currentTarget.select()}
+									/>{/if}
+								{#if selected.role === 'visitor'}<div class="join-prompt">
+										<h4>Join to take part</h4>
+										<p>Join this public community to read and send messages in #{channel.name}.</p>
+										<button
+											class="primary"
+											onclick={() => void action(`/communities/${activeCommunityId()}/join`)}
+											>Join community</button
+										>
+									</div>
+								{:else}<ChannelChat
+										communityId={selected.id}
+										{channel}
+										role={selected.role}
+										onDirectMessage={openDM}
+									/>{/if}
+							{/each}
+						</div>
 					</div>
-					{#if selected.role === 'owner'}
-						<form
-							class="channel-create"
-							onsubmit={(event) => {
-								event.preventDefault();
-								void createChannel();
-							}}
-						>
-							<input
-								required
-								pattern="[a-z0-9][a-z0-9-]*"
-								maxlength="50"
-								bind:value={channelName}
-								placeholder="New channel name, e.g. exam-prep"
-								aria-label="New channel name"
-							/>
-							<button>Add channel</button>
-						</form>
-					{/if}
-					{#if activeChannelId}
-						<button class="share-button" onclick={() => void shareChannel()}
-							>Copy channel invite link</button
-						>
-						{#if shareLink}<input
-								readonly
-								aria-label="Channel invite link"
-								value={shareLink}
-								onclick={(event) => event.currentTarget.select()}
-							/>{/if}
-					{/if}
-					{#if selected.role === 'visitor'}
-						<p class="muted">Join this community to read and send channel messages.</p>
-					{:else if activeChannelId}
-						{#each selected.channels?.filter((channel) => channel.id === activeChannelId) ?? [] as channel (channel.id)}
-							<ChannelChat
-								communityId={selected.id}
-								{channel}
-								role={selected.role}
-								onDirectMessage={openDM}
-							/>
-						{/each}
-					{/if}
 				{:else if tab === 'members'}
 					<h3>Members</h3>
 					{#if guestCount}<p class="muted">{guestCount} people joined without an account.</p>{/if}
@@ -565,51 +810,6 @@
 								>Course<input maxlength="100" bind:value={course} /></label
 							><button>Save details</button>
 						</form>
-						<h3>Channels</h3>
-						{#each selected.channels ?? [] as channel (channel.id)}<div class="row">
-								<span># {channel.name}</span><button
-									onclick={() => {
-										const next = prompt('Channel name', channel.name);
-										if (next && next !== channel.name)
-											void action(
-												`/communities/${activeCommunityId()}/channels/${channel.id}`,
-												'PATCH',
-												{ name: next }
-											);
-									}}>Rename</button
-								><button
-									disabled={channel.position === 0}
-									onclick={() =>
-										void action(
-											`/communities/${activeCommunityId()}/channels/${channel.id}`,
-											'PATCH',
-											{ position: channel.position - 1 }
-										)}>↑</button
-								><button
-									disabled={channel.position >= (selected?.channels?.length ?? 0) - 1}
-									onclick={() =>
-										void action(
-											`/communities/${activeCommunityId()}/channels/${channel.id}`,
-											'PATCH',
-											{ position: channel.position + 1 }
-										)}>↓</button
-								><button
-									onclick={() =>
-										void action(
-											`/communities/${activeCommunityId()}/channels/${channel.id}`,
-											'PATCH',
-											{ archived: !channel.archived }
-										)}>{channel.archived ? 'Restore' : 'Archive'}</button
-								><button
-									onclick={() => {
-										if (confirm(`Remove #${channel.name}?`))
-											void action(
-												`/communities/${activeCommunityId()}/channels/${channel.id}`,
-												'DELETE'
-											);
-									}}>Remove</button
-								>
-							</div>{/each}
 						<button class="danger" onclick={() => void deleteCommunity()}>Delete community</button>
 					{/if}
 				{/if}
@@ -627,24 +827,25 @@
 <style>
 	.shell {
 		min-height: 100vh;
-		background: #faf9f7;
+		background: #f8f5f6;
 		color: #262526;
+		--accent: #a51d3d;
 	}
 	main {
-		max-width: 1220px;
+		max-width: 1440px;
 		min-height: calc(100vh - 76px);
 		margin: auto;
 		display: grid;
-		grid-template-columns: 320px 1fr;
+		grid-template-columns: 280px minmax(0, 1fr);
 		background: white;
-		border: 1px solid #eee7e7;
+		border: 1px solid #eadfe3;
 		border-radius: 16px 16px 0 0;
-		overflow: hidden;
+		box-shadow: 0 12px 40px rgb(45 22 31 / 5%);
 	}
 	.sidebar {
-		background: #fff7f7;
+		background: #fcf7f8;
 		padding: 32px 22px;
-		border-right: 1px solid #f0e3e3;
+		border-right: 1px solid #eadfe3;
 	}
 	h1 {
 		font-size: 29px;
@@ -696,16 +897,30 @@
 		border-radius: 8px;
 		background: white;
 		padding: 9px 13px;
+		min-height: 40px;
 		font: inherit;
 		font-weight: 650;
 	}
 	button:hover {
-		border-color: #df3150;
+		border-color: var(--accent);
+	}
+	button:focus-visible,
+	input:focus-visible,
+	textarea:focus-visible {
+		outline: 3px solid #2458a6;
+		outline-offset: 2px;
+	}
+	button:disabled {
+		cursor: default;
+		opacity: 0.55;
+	}
+	button:disabled:hover {
+		border-color: #ddd2d5;
 	}
 	.primary {
-		background: #df3150;
+		background: var(--accent);
 		color: white;
-		border-color: #df3150;
+		border-color: var(--accent);
 	}
 	.sidebar > .primary {
 		width: 100%;
@@ -725,7 +940,7 @@
 	}
 	.list button.active,
 	.list button:hover {
-		background: #ffe9ed;
+		background: #f8e0e7;
 	}
 	.list span {
 		font-size: 13px;
@@ -733,7 +948,8 @@
 		font-weight: 400;
 	}
 	.content {
-		padding: 40px 48px;
+		padding: 36px;
+		min-width: 0;
 	}
 	.title {
 		display: flex;
@@ -742,7 +958,7 @@
 		gap: 16px;
 	}
 	.eyebrow {
-		color: #df3150;
+		color: var(--accent);
 		text-transform: uppercase;
 		font-size: 12px;
 		font-weight: 800;
@@ -761,33 +977,202 @@
 		border-bottom: 3px solid transparent;
 	}
 	.tabs button.chosen {
-		color: #df3150;
-		border-color: #df3150;
+		color: var(--accent);
+		border-color: var(--accent);
 	}
-	.description {
-		font-size: 17px;
-		margin-top: 28px;
-		white-space: pre-wrap;
+	.workspace {
+		display: grid;
+		grid-template-columns: 210px minmax(0, 1fr);
+		margin-top: 24px;
+		border: 1px solid #eadfe3;
+		border-radius: 14px;
+		min-height: 510px;
+	}
+	.channel-rail {
+		min-width: 0;
+		padding: 16px 10px;
+		background: #fbf7f8;
+		border-right: 1px solid #eadfe3;
+		border-radius: 14px 0 0 14px;
+	}
+	.rail-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 7px;
+	}
+	.rail-heading h3 {
+		font-size: 14px;
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: #56464e;
+	}
+	.icon-button {
+		display: inline-grid;
+		place-items: center;
+		min-width: 40px;
+		padding: 0;
+		font-size: 22px;
+		line-height: 1;
 	}
 	.channel-list {
+		list-style: none;
+		display: grid;
+		gap: 4px;
+		margin: 12px 0 0;
+		padding: 0;
+	}
+	.channel-item {
+		position: relative;
+		min-width: 0;
+	}
+	.channel-row {
+		display: flex;
+		align-items: center;
+		border-radius: 8px;
+	}
+	.channel-row:hover,
+	.channel-row.active {
+		background: #f6dfe6;
+	}
+	.channel-select {
+		flex: 1;
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		min-width: 0;
+		text-align: left;
+		background: transparent;
+		border: 0;
+		font-weight: 600;
+	}
+	.channel-select span:last-child {
+		overflow-wrap: anywhere;
+	}
+	.channel-select span:first-child {
+		color: #866e77;
+		font-size: 19px;
+	}
+	.options-trigger {
+		flex: 0 0 40px;
+		border: 0;
+		background: transparent;
+		font-size: 20px;
+		letter-spacing: 1px;
+	}
+	.channel-options {
+		position: absolute;
+		top: 42px;
+		right: 0;
+		z-index: 5;
+		display: grid;
+		width: 174px;
+		padding: 6px;
+		background: white;
+		border: 1px solid #d9cbd0;
+		border-radius: 10px;
+		box-shadow: 0 12px 28px rgb(43 20 30 / 16%);
+	}
+	.channel-options button {
+		min-height: 40px;
+		text-align: left;
+		border: 0;
+		background: transparent;
+	}
+	.channel-options button:hover {
+		background: #f8e9ed;
+	}
+	.destructive {
+		color: #a31630;
+	}
+	.channel-form {
+		margin: 12px 4px;
+		padding: 12px;
+		border: 1px solid #e3d5da;
+		border-radius: 10px;
+		background: white;
+	}
+	.channel-form label {
+		margin: 0 0 6px;
+	}
+	.channel-form p {
+		margin: 6px 0 0;
+		font-size: 12px;
+		color: #65585d;
+	}
+	.form-actions {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
+		margin-top: 12px;
 	}
-	.channel-list button.active {
-		background: #ffe9ed;
-		border-color: #df3150;
+	.workspace-main {
+		min-width: 0;
+		padding: 20px;
 	}
-	.channel-create {
+	.channel-intro {
 		display: flex;
-		gap: 8px;
-		margin-top: 12px;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 14px;
 	}
-	.channel-create input {
-		flex: 1;
+	.channel-intro h3 {
+		margin: 0;
+		font-size: 24px;
 	}
-	.share-button {
-		margin-top: 12px;
+	.channel-intro p {
+		margin: 5px 0 0;
+		color: #665b60;
+	}
+	.channel-intro .eyebrow {
+		margin: 0 0 4px;
+		color: var(--accent);
+	}
+	.channel-intro button {
+		white-space: nowrap;
+	}
+	.copy-status {
+		color: #285736;
+		font-size: 14px;
+	}
+	.share-link {
+		margin-top: 8px;
+	}
+	.join-prompt {
+		margin-top: 24px;
+		padding: 24px;
+		background: #fbf5f7;
+		border: 1px solid #eadfe3;
+		border-radius: 12px;
+	}
+	.join-prompt h4 {
+		margin: 0;
+		font-size: 19px;
+	}
+	.join-prompt p {
+		color: #65585d;
+	}
+	.confirm-dialog {
+		width: min(420px, calc(100vw - 32px));
+		padding: 24px;
+		border: 1px solid #decfd4;
+		border-radius: 16px;
+		box-shadow: 0 20px 60px rgb(32 13 22 / 24%);
+	}
+	.confirm-dialog::backdrop {
+		background: rgb(31 18 24 / 55%);
+	}
+	.confirm-dialog h2 {
+		font-size: 24px;
+	}
+	.confirm-dialog p {
+		color: #65585d;
+	}
+	.confirm-dialog .destructive {
+		background: #a31630;
+		border-color: #a31630;
+		color: white;
 	}
 	.row {
 		display: flex;
@@ -817,7 +1202,28 @@
 	}
 	.empty span {
 		font-size: 50px;
-		color: #df3150;
+		color: var(--accent);
+	}
+	@media (max-width: 1050px) {
+		.workspace {
+			grid-template-columns: 180px minmax(0, 1fr);
+		}
+		.content {
+			padding: 24px;
+		}
+	}
+	@media (max-width: 850px) {
+		.workspace {
+			display: block;
+		}
+		.channel-rail {
+			border-right: 0;
+			border-bottom: 1px solid #eadfe3;
+			border-radius: 14px 14px 0 0;
+		}
+		.channel-intro {
+			flex-wrap: wrap;
+		}
 	}
 	@media (max-width: 740px) {
 		main {
@@ -829,6 +1235,15 @@
 		}
 		.content {
 			padding: 28px 22px;
+		}
+		.title {
+			flex-wrap: wrap;
+		}
+		.tabs {
+			overflow-x: auto;
+		}
+		.workspace-main {
+			padding: 14px;
 		}
 	}
 </style>
