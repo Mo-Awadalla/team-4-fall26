@@ -33,17 +33,55 @@ def test_guest_creation_requires_csrf_and_keeps_ownership_in_session():
         ).status_code
         == 200
     )
+    channel = guest.post(
+        f"/communities/{community_id}/channels", {"name": "exams"}, HTTP_X_CSRFTOKEN=token
+    )
+    assert channel.status_code == 201
+    invite = guest.post(f"/communities/{community_id}/invites", {}, HTTP_X_CSRFTOKEN=token)
+    assert invite.status_code == 201
+    visitor = APIClient(enforce_csrf_checks=True)
+    visitor.get("/communities")
+    visitor_token = visitor.cookies["csrftoken"].value
+    assert visitor.get(f"/communities/{community_id}").data["role"] == "visitor"
     assert (
-        guest.post(
-            f"/communities/{community_id}/channels", {"name": "exams"}, HTTP_X_CSRFTOKEN=token
+        visitor.post(
+            f"/communities/{community_id}/join", HTTP_X_CSRFTOKEN=visitor_token
         ).status_code
-        == 201
+        == 200
+    )
+    assert visitor.get(f"/communities/{community_id}").data["role"] == "member"
+    assert visitor.get(f"/communities/{community_id}").data["member_count"] == 2
+    assert visitor.get("/communities?mine=true").data["items"][0]["id"] == community_id
+    assert (
+        visitor.delete(
+            f"/communities/{community_id}/channels/{channel.data['id']}",
+            HTTP_X_CSRFTOKEN=visitor_token,
+        ).status_code
+        == 401
     )
     assert (
-        guest.post(f"/communities/{community_id}/invites", {}, HTTP_X_CSRFTOKEN=token).status_code
-        == 201
+        visitor.post(
+            f"/communities/{community_id}/leave", HTTP_X_CSRFTOKEN=visitor_token
+        ).status_code
+        == 200
     )
-    assert client_for().get(f"/communities/{community_id}").data["role"] == "visitor"
+    assert visitor.get(f"/communities/{community_id}").data["member_count"] == 1
+    assert (
+        visitor.post(
+            f"/communities/invites/{invite.data['token']}/redeem", HTTP_X_CSRFTOKEN=visitor_token
+        ).status_code
+        == 200
+    )
+    student = get_user_model().objects.create_user(username="student", password="test-password")
+    assert client_for(student).post(f"/communities/{community_id}/join").status_code == 200
+    assert visitor.get(f"/communities/{community_id}").data["member_count"] == 3
+    assert (
+        guest.delete(
+            f"/communities/{community_id}/channels/{channel.data['id']}", HTTP_X_CSRFTOKEN=token
+        ).status_code
+        == 204
+    )
+    assert not Channel.objects.filter(pk=channel.data["id"]).exists()
 
 
 def test_auth0_account_can_create_and_manage_community(settings, monkeypatch):

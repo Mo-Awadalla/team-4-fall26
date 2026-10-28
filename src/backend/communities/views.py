@@ -1,11 +1,14 @@
 """Public discovery and session-backed community management."""
 
+import secrets
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Count, Q
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied
@@ -16,8 +19,8 @@ from rest_framework.views import APIView
 from accounts.authentication import Auth0Authentication
 
 from . import services
-from .models import Ban, Channel, Community, Invite, Membership, ModerationEvent
-from .permissions import Action, GuestOwner, require, role_for
+from .models import Ban, Channel, Community, GuestMembership, Invite, Membership, ModerationEvent
+from .permissions import Action, GuestMember, GuestOwner, require, role_for
 from .serializers import (
     ChannelSerializer,
     ChannelWriteSerializer,
@@ -51,9 +54,41 @@ def actor(request: Request):
     return request.user
 
 
+def guest_id(request: Request) -> str | None:
+    return request.session.get("community_guest_id")
+
+
+def ensure_guest_id(request: Request) -> str:
+    value = guest_id(request)
+    if value is None:
+        value = secrets.token_hex(16)
+        request.session["community_guest_id"] = value
+    return value
+
+
+def counted_communities():
+    return Community.objects.annotate(
+        member_count=Count("memberships", distinct=True)
+        + Count(
+            "guest_memberships",
+            filter=Q(guest_memberships__expires_at__gt=timezone.now()),
+            distinct=True,
+        )
+    )
+
+
 def viewer(request: Request, community: Community):
     if community.owner_id is None and community.pk in request.session.get("guest_communities", []):
         return GuestOwner(community.pk)
+    if not getattr(request.user, "is_authenticated", False):
+        identity = guest_id(request)
+        if (
+            identity
+            and GuestMembership.objects.filter(
+                community=community, guest_id=identity, expires_at__gt=timezone.now()
+            ).exists()
+        ):
+            return GuestMember(community.pk)
     return request.user
 
 
@@ -100,19 +135,26 @@ class CommunityList(CommunityView):
         mine = request.query_params.get("mine")
         if mine not in {None, "true", "false"}:
             raise serializers.ValidationError({"mine": "Use true or false."})
-        communities = Community.objects.annotate(member_count=Count("memberships"))
+        communities = counted_communities()
         if query:
             communities = communities.filter(
                 Q(name__icontains=query) | Q(school__icontains=query) | Q(course__icontains=query)
             )
         guest_ids = request.session.get("guest_communities", [])
+        identity = guest_id(request)
         if mine == "true":
-            if getattr(request.user, "is_authenticated", False):
-                communities = communities.filter(
-                    Q(memberships__user=request.user) | Q(pk__in=guest_ids, owner__isnull=True)
+            owned_or_joined = Q(pk__in=guest_ids, owner__isnull=True)
+            if identity:
+                owned_or_joined |= Q(
+                    pk__in=GuestMembership.objects.filter(
+                        guest_id=identity, expires_at__gt=timezone.now()
+                    ).values("community_id")
                 )
-            else:
-                communities = communities.filter(pk__in=guest_ids, owner__isnull=True)
+            if getattr(request.user, "is_authenticated", False):
+                owned_or_joined |= Q(
+                    pk__in=Membership.objects.filter(user=request.user).values("community_id")
+                )
+            communities = communities.filter(owned_or_joined)
         found = list(communities[offset : offset + limit + 1])
         roles = {}
         if request.user and request.user.is_authenticated:
@@ -120,6 +162,15 @@ class CommunityList(CommunityView):
                 Membership.objects.filter(
                     user=request.user, community__in=found[:limit]
                 ).values_list("community_id", "role")
+            )
+        guest_roles = set()
+        if identity and not getattr(request.user, "is_authenticated", False):
+            guest_roles = set(
+                GuestMembership.objects.filter(
+                    guest_id=identity,
+                    community__in=found[:limit],
+                    expires_at__gt=timezone.now(),
+                ).values_list("community_id", flat=True)
             )
         return Response(
             {
@@ -133,7 +184,7 @@ class CommunityList(CommunityView):
                             and item.owner_id == getattr(request.user, "pk", None)
                         )
                         or (item.owner_id is None and item.pk in guest_ids)
-                        else roles.get(item.pk, "visitor"),
+                        else roles.get(item.pk, "member" if item.pk in guest_roles else "visitor"),
                     )
                     for item in found[:limit]
                 ],
@@ -155,17 +206,19 @@ class CommunityList(CommunityView):
             )
             if len(owned) >= services.MAX_OWNED:
                 raise serializers.ValidationError("You own the maximum number of communities.")
-            created = services.create_guest_community(parsed.validated_data)
+            created = services.create_guest_community(
+                parsed.validated_data,
+                ensure_guest_id(request),
+                request.session.get_expiry_date(),
+            )
             request.session["guest_communities"] = [*owned, created.pk]
-            created.member_count = 0
+            created.member_count = 1
         return Response(summary(created, viewer(request, created)), status=201)
 
 
 class CommunityDetail(CommunityView):
     def get(self, request: Request, community_id: int) -> Response:
-        community = get_object_or_404(
-            Community.objects.annotate(member_count=Count("memberships")), pk=community_id
-        )
+        community = get_object_or_404(counted_communities(), pk=community_id)
         return Response(
             {
                 **summary(community, viewer(request, community)),
@@ -184,7 +237,7 @@ class CommunityDetail(CommunityView):
                 setattr(community, field, value)
             if parsed.validated_data:
                 community.save(update_fields=list(parsed.validated_data))
-        community.member_count = community.memberships.count()
+        community.member_count = services.member_count(community)
         return Response(summary(community, user))
 
     def delete(self, request: Request, community_id: int) -> Response:
@@ -198,13 +251,28 @@ class CommunityDetail(CommunityView):
 
 class Join(CommunityView):
     def post(self, request: Request, community_id: int) -> Response:
-        services.join(community_for(community_id), actor(request))
+        community = community_for(community_id)
+        if getattr(request.user, "is_authenticated", False):
+            services.join(community, actor(request), guest_id(request))
+        else:
+            identity = ensure_guest_id(request)
+            services.join_guest(community, identity, request.session.get_expiry_date())
         return Response({"joined": True})
 
 
 class Leave(CommunityView):
     def post(self, request: Request, community_id: int) -> Response:
-        services.leave(community_for(community_id), actor(request))
+        community = community_for(community_id)
+        if getattr(request.user, "is_authenticated", False):
+            services.leave(community, actor(request))
+        else:
+            if community.owner_id is None and community.pk in request.session.get(
+                "guest_communities", []
+            ):
+                raise PermissionDenied("Transfer ownership or delete the community before leaving.")
+            identity = guest_id(request)
+            if identity:
+                services.leave_guest(community, identity)
         return Response({"joined": False})
 
 
@@ -221,6 +289,9 @@ class Members(CommunityView):
             {
                 "items": MemberSerializer(found[:limit], many=True).data,
                 "has_more": len(found) > limit,
+                "guest_count": GuestMembership.objects.filter(
+                    community=community, expires_at__gt=timezone.now()
+                ).count(),
             }
         )
 
@@ -276,6 +347,17 @@ class Channels(CommunityView):
 
 
 class ChannelDetail(CommunityView):
+    def delete(self, request: Request, community_id: int, channel_id: int) -> Response:
+        with transaction.atomic():
+            community = get_object_or_404(Community.objects.select_for_update(), pk=community_id)
+            require(community, principal(request, community), Action.MANAGE)
+            get_object_or_404(Channel, pk=channel_id, community=community).delete()
+            remaining = list(Channel.objects.filter(community=community).order_by("position", "id"))
+            for index, channel in enumerate(remaining):
+                channel.position = index
+            Channel.objects.bulk_update(remaining, ["position"])
+        return Response(status=204)
+
     def patch(self, request: Request, community_id: int, channel_id: int) -> Response:
         class Update(serializers.Serializer):
             name = serializers.RegexField(r"^[a-z0-9][a-z0-9-]{0,49}$", required=False)
@@ -357,7 +439,14 @@ class InviteDetail(CommunityView):
 
 class Redeem(CommunityView):
     def post(self, request: Request, token: str) -> Response:
-        community = services.redeem(token, actor(request))
+        if getattr(request.user, "is_authenticated", False):
+            community = services.redeem(token, actor(request))
+        else:
+            community = services.redeem(
+                token,
+                guest_id=ensure_guest_id(request),
+                expires_at=request.session.get_expiry_date(),
+            )
         return Response({"community_id": community.pk})
 
 

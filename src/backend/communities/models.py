@@ -40,6 +40,24 @@ class Membership(models.Model):
         return f"{self.user_id} in {self.community_id}"
 
 
+class GuestMembership(models.Model):
+    community = models.ForeignKey(
+        Community, on_delete=models.CASCADE, related_name="guest_memberships"
+    )
+    guest_id = models.CharField(max_length=32)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["community", "guest_id"], name="guest_member_once")
+        ]
+        indexes = [models.Index(fields=["expires_at"], name="guest_membership_expiry")]
+
+    def __str__(self) -> str:
+        return f"Guest in {self.community_id}"
+
+
 class Channel(models.Model):
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="channels")
     name = models.CharField(max_length=50)

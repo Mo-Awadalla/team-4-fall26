@@ -9,6 +9,7 @@
 	let selected = $state<Community | null>(null);
 	let members = $state<Member[]>([]);
 	let hasMoreMembers = $state(false);
+	let guestCount = $state(0);
 	let invites = $state<Invite[]>([]);
 	let bannedIds = $state<(string | number)[]>([]);
 	let moderationEvents = $state<
@@ -66,6 +67,7 @@
 			school = selected.school;
 			course = selected.course;
 			members = [];
+			guestCount = 0;
 			invites = [];
 			tab = 'about';
 			history.replaceState(null, '', `?id=${id}`);
@@ -124,11 +126,14 @@
 		if (!selected) return;
 		tab = 'members';
 		try {
-			const result = await communityRequest<{ items: Member[]; has_more: boolean }>(
-				`/communities/${selected.id}/members?limit=50&offset=${more ? members.length : 0}`
-			);
+			const result = await communityRequest<{
+				items: Member[];
+				has_more: boolean;
+				guest_count: number;
+			}>(`/communities/${selected.id}/members?limit=50&offset=${more ? members.length : 0}`);
 			members = more ? [...members, ...result.items] : result.items;
 			hasMoreMembers = result.has_more;
+			guestCount = result.guest_count;
 		} catch (cause) {
 			error = message(cause);
 		}
@@ -298,6 +303,7 @@
 					<p class="muted">Channel conversations are coming in a later update.</p>
 				{:else if tab === 'members'}
 					<h3>Members</h3>
+					{#if guestCount}<p class="muted">{guestCount} people joined without an account.</p>{/if}
 					{#each members as member (member.user_id)}<div class="row">
 							<span
 								>Member #{member.user_id}
@@ -454,6 +460,14 @@
 											'PATCH',
 											{ archived: !channel.archived }
 										)}>{channel.archived ? 'Restore' : 'Archive'}</button
+								><button
+									onclick={() => {
+										if (confirm(`Remove #${channel.name}?`))
+											void action(
+												`/communities/${activeCommunityId()}/channels/${channel.id}`,
+												'DELETE'
+											);
+									}}>Remove</button
 								>
 							</div>{/each}
 						<button class="danger" onclick={() => void deleteCommunity()}>Delete community</button>

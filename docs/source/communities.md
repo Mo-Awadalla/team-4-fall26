@@ -2,29 +2,29 @@
 
 The static `/communities` page discovers public groups through the Django API. Anyone can create a community without signing in. A group has an owner, members, text-channel names, optional school and course, and shareable invitations. Channel discussions, direct messages, live delivery, and message search are deferred.
 
-All community paths have no trailing slash. Public `GET /communities?q=&limit=&offset=`, `GET /communities/{id}`, `GET /communities/{id}/members`, and `GET /communities/{id}/channels` need no account. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` shows account memberships and communities owned in this browser session.
+All community paths have no trailing slash. Public `GET /communities?q=&limit=&offset=`, `GET /communities/{id}`, `GET /communities/{id}/members`, and `GET /communities/{id}/channels` need no account. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` shows communities joined or owned by the current account or browser session. Member listings include account members and a separate `guest_count`.
 
-Community creation and management use browser sessions for guest owners and Auth0 bearer tokens for signed-in accounts. The public list request sets a CSRF cookie; guest writes send it back. Visitors own up to five communities through their browser session. Clearing site cookies loses guest management access; a future claim flow can transfer guest communities to an account before that happens. Guest communities have no account owner or initial member; their owner can manage channels, invitations and moderation through the same permissions policy. Auth0 authentication supplies `request.user` for account actions; foreign keys use `settings.AUTH_USER_MODEL`. StudySpot admins must be marked `is_staff` by that implementation. No client-supplied actor or role is trusted. Local development can use `python manage.py createsuperuser` and sign in at `http://localhost:7501/admin/` for Django session-based account-only actions.
+Community creation, joining, leaving, and invite redemption work without an account. Browser sessions identify guest owners and members; the public list request sets a CSRF cookie for guest writes. Guest memberships expire with their session and stop counting after expiry. Visitors can own up to five communities and join up to 100 in one session. Clearing site cookies loses guest ownership and membership; a future claim flow can transfer them to an account. Guest creators manage channels, invitations and moderation through the same permission policy as account owners. Auth0 bearer tokens supply `request.user` for signed-in account actions; foreign keys use `settings.AUTH_USER_MODEL`. StudySpot admins must be marked `is_staff`. No client-supplied actor or role is trusted.
 
 | Route | Method | Rule |
 |---|---|---|
-| `/communities` | POST | Create a group and `general` channel; account owners also get a membership. |
+| `/communities` | POST | Create a group, owner membership and `general` channel. |
 | `/communities/{id}` | PATCH, DELETE | Owner edits or deletes. |
-| `/communities/{id}/join`, `/leave` | POST | Join once or leave; owners transfer first. |
+| `/communities/{id}/join`, `/leave` | POST | Join or leave with an account or browser session; owners transfer or delete first. |
 | `/communities/{id}/members/{user_id}` | PATCH, DELETE | Owner appoints moderators; owner or moderator kicks eligible members. |
 | `/communities/{id}/transfer` | POST | Owner transfers to a current member. |
 | `/communities/{id}/channels` | POST | Owner creates a channel. |
-| `/communities/{id}/channels/{channel_id}` | PATCH | Owner renames, reorders, archives or restores a channel. |
+| `/communities/{id}/channels/{channel_id}` | PATCH, DELETE | Owner renames, reorders, archives, restores or removes a channel. |
 | `/communities/{id}/invites` | GET, POST | Owner or moderator lists or creates links. |
 | `/communities/{id}/invites/{invite_id}` | DELETE | Owner or moderator revokes a link. |
 | `/communities/invites/{token}/redeem` | POST | Join through a valid link. |
 | `/communities/{id}/moderation` | GET, POST | Owner or moderator reads events and bans, or kicks, bans and unbans. |
 | `/communities/{id}/admin` | DELETE | StudySpot admin removes a group. |
 
-The owner is stored on the community; membership records store `member` or `moderator`. A moderator cannot act against an owner or another moderator. A ban prevents joining, including through an invite, while public content remains readable. Invitation tokens are returned once at creation; only their SHA-256 hashes are stored. A maximum-use link increments only for a newly joined user.
+Account owners are stored on the community; guest ownership is in the browser session. Account membership records store `member` or `moderator`; guest memberships have no moderator role. A moderator cannot act against an owner or another moderator. Account bans prevent joining, including through an invite, while public content remains readable. Guest membership cannot be banned reliably because clearing cookies creates a new identity. Invitation tokens are returned once at creation; only their SHA-256 hashes are stored. A maximum-use link increments only for a newly joined account or guest.
 
-The current limits are five owned and 100 joined communities per account, 1,000 members, 20 channels and ten active invites per community. Channel names are lowercase letters, digits and hyphens. Invites may expire after one to 720 hours and may cap successful joins at 1,000. These limits live in `communities/services.py` and serializers.
+The current limits are five owned and 100 joined communities per account or browser session, 1,000 active members, 20 channels and ten active invites per community. Channel names are lowercase letters, digits and hyphens. Invites may expire after one to 720 hours and may cap successful joins at 1,000. These limits live in `communities/services.py` and serializers.
 
 Community creation, membership changes, invite redemption, moderation, and ownership transfers use database transactions. The account implementation should choose its `AUTH_USER_MODEL` before applying these migrations. Owners must transfer or delete their communities before account deletion. Other account deletion does not depend on historical invite or moderation actor rows.
 
-On AWS, session-authenticated writes require the public CloudFront origin in Terraform's `django_csrf_trusted_origins`. The distribution domain is known only after the first apply, so set this variable to its printed `https://...cloudfront.net` origin before enabling community writes. The current deployment has no account flow or session UI; this step belongs to the account integration.
+On AWS, session-authenticated writes require the public CloudFront origin in Terraform's `django_csrf_trusted_origins`. Set this variable to the distribution's printed `https://...cloudfront.net` origin before enabling guest writes.

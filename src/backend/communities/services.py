@@ -2,7 +2,7 @@
 
 import hashlib
 import secrets
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
@@ -10,7 +10,7 @@ from django.db.models import F
 from django.utils import timezone
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
-from .models import Ban, Channel, Community, Invite, Membership, ModerationEvent
+from .models import Ban, Channel, Community, GuestMembership, Invite, Membership, ModerationEvent
 from .permissions import Action, GuestOwner, require, role_for
 
 MAX_OWNED = 5
@@ -18,6 +18,13 @@ MAX_JOINED = 100
 MAX_MEMBERS = 1000
 MAX_CHANNELS = 20
 MAX_INVITES = 10
+
+
+def member_count(community: Community) -> int:
+    return (
+        Membership.objects.filter(community=community).count()
+        + GuestMembership.objects.filter(community=community, expires_at__gt=timezone.now()).count()
+    )
 
 
 def _lock_user(user_id: object) -> None:
@@ -32,7 +39,7 @@ def _join(community: Community, user: object) -> Membership:
         return existing
     if Membership.objects.filter(user=user).count() >= MAX_JOINED:
         raise ValidationError("You have joined the maximum number of communities.")
-    if Membership.objects.filter(community=community).count() >= MAX_MEMBERS:
+    if member_count(community) >= MAX_MEMBERS:
         raise ValidationError("This community has the maximum number of members.")
     return Membership.objects.create(community=community, user=user)
 
@@ -51,19 +58,46 @@ def create_community(user: object, data: dict) -> Community:
 
 
 @transaction.atomic
-def create_guest_community(data: dict) -> Community:
+def create_guest_community(data: dict, guest_id: str, expires_at: datetime) -> Community:
     community = Community.objects.create(**data)
+    GuestMembership.objects.create(community=community, guest_id=guest_id, expires_at=expires_at)
     Channel.objects.create(community=community, name="general")
     return community
 
 
 @transaction.atomic
-def join(community: Community, user: object) -> Membership:
+def join(community: Community, user: object, guest_id: str | None = None) -> Membership:
     community = Community.objects.select_for_update().get(pk=community.pk)
     if role_for(community, user) == "visitor":
         require(community, user, Action.JOIN)
     _lock_user(user.pk)
+    if guest_id:
+        GuestMembership.objects.filter(community=community, guest_id=guest_id).delete()
     return _join(community, user)
+
+
+@transaction.atomic
+def join_guest(community: Community, guest_id: str, expires_at: datetime) -> None:
+    community = Community.objects.select_for_update().get(pk=community.pk)
+    existing = GuestMembership.objects.filter(community=community, guest_id=guest_id).first()
+    if existing:
+        existing.expires_at = expires_at
+        existing.save(update_fields=["expires_at"])
+        return
+    if (
+        GuestMembership.objects.filter(guest_id=guest_id, expires_at__gt=timezone.now()).count()
+        >= MAX_JOINED
+    ):
+        raise ValidationError("You have joined the maximum number of communities.")
+    if member_count(community) >= MAX_MEMBERS:
+        raise ValidationError("This community has the maximum number of members.")
+    GuestMembership.objects.create(community=community, guest_id=guest_id, expires_at=expires_at)
+
+
+@transaction.atomic
+def leave_guest(community: Community, guest_id: str) -> None:
+    community = Community.objects.select_for_update().get(pk=community.pk)
+    GuestMembership.objects.filter(community=community, guest_id=guest_id).delete()
 
 
 @transaction.atomic
@@ -113,7 +147,12 @@ def create_invite(community: Community, user: object, data: dict) -> tuple[Invit
 
 
 @transaction.atomic
-def redeem(token: str, user: object) -> Community:
+def redeem(
+    token: str,
+    user: object | None = None,
+    guest_id: str | None = None,
+    expires_at: datetime | None = None,
+) -> Community:
     digest = hashlib.sha256(token.encode()).hexdigest()
     community_id = (
         Invite.objects.filter(token_hash=digest).values_list("community_id", flat=True).first()
@@ -130,11 +169,19 @@ def redeem(token: str, user: object) -> Community:
         raise NotFound("Invite not found or expired.")
     if invite.max_uses is not None and invite.uses >= invite.max_uses:
         raise NotFound("Invite has reached its use limit.")
-    if role_for(invite.community, user) == "visitor":
-        require(invite.community, user, Action.JOIN)
-    _lock_user(user.pk)
-    was_member = Membership.objects.filter(community=invite.community, user=user).exists()
-    _join(invite.community, user)
+    if user is None:
+        if guest_id is None or expires_at is None:
+            raise ValueError("Guest identity and expiry are required.")
+        was_member = GuestMembership.objects.filter(
+            community=invite.community, guest_id=guest_id, expires_at__gt=timezone.now()
+        ).exists()
+        join_guest(invite.community, guest_id, expires_at)
+    else:
+        if role_for(invite.community, user) == "visitor":
+            require(invite.community, user, Action.JOIN)
+        _lock_user(user.pk)
+        was_member = Membership.objects.filter(community=invite.community, user=user).exists()
+        _join(invite.community, user)
     if not was_member:
         invite.uses += 1
         invite.save(update_fields=["uses"])
