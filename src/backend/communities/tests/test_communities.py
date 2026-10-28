@@ -4,6 +4,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
+from accounts.authentication import Identity
 from communities import services
 from communities.models import Ban, Channel, Community, Membership
 
@@ -22,16 +23,38 @@ def test_guest_creation_requires_csrf_and_keeps_ownership_in_session():
     assert guest.post("/communities", {"name": "Physics"}, format="json").status_code == 403
     guest.get("/communities")
     token = guest.cookies["csrftoken"].value
-    created = guest.post(
-        "/communities", {"name": "Physics"}, format="json", HTTP_X_CSRFTOKEN=token
-    )
+    created = guest.post("/communities", {"name": "Physics"}, format="json", HTTP_X_CSRFTOKEN=token)
     assert created.status_code == 201
     community_id = created.data["id"]
     assert guest.get(f"/communities/{community_id}").data["role"] == "owner"
-    assert guest.patch(
-        f"/communities/{community_id}", {"name": "Physics 1"}, HTTP_X_CSRFTOKEN=token
-    ).status_code == 200
+    assert (
+        guest.patch(
+            f"/communities/{community_id}", {"name": "Physics 1"}, HTTP_X_CSRFTOKEN=token
+        ).status_code
+        == 200
+    )
     assert client_for().get(f"/communities/{community_id}").data["role"] == "visitor"
+
+
+def test_auth0_account_can_create_and_manage_community(settings, monkeypatch):
+    settings.AUTH0_DOMAIN = "test.auth0.com"
+    settings.AUTH0_CLIENT_ID = "client"
+    settings.AUTH0_AUDIENCE = "studyspot"
+    monkeypatch.setattr(
+        "accounts.authentication.verify",
+        lambda token, _id_token=None: Identity(token, "", False, ""),
+    )
+    owner = APIClient()
+    owner.credentials(HTTP_AUTHORIZATION="Bearer auth0-owner")
+    created = owner.post("/communities", {"name": "Calculus"}, format="json")
+    assert created.status_code == 201
+    community_id = created.data["id"]
+    assert created.data["role"] == "owner"
+    assert owner.patch(f"/communities/{community_id}", {"name": "Calculus II"}).status_code == 200
+    assert owner.get("/communities?mine=true").data["items"][0]["name"] == "Calculus II"
+    stranger = APIClient()
+    stranger.credentials(HTTP_AUTHORIZATION="Bearer auth0-stranger")
+    assert stranger.patch(f"/communities/{community_id}", {"name": "Nope"}).status_code == 403
 
 
 def test_create_browse_join_and_owner_rules():
