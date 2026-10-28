@@ -287,9 +287,9 @@ class Members(CommunityView):
         community = community_for(community_id)
         limit, offset = page(request)
         found = list(
-            Membership.objects.filter(community=community).order_by("id")[
-                offset : offset + limit + 1
-            ]
+            Membership.objects.filter(community=community)
+            .select_related("user__account")
+            .order_by("id")[offset : offset + limit + 1]
         )
         return Response(
             {

@@ -28,7 +28,12 @@ export type Message = {
 	mine: boolean;
 	can_delete: boolean;
 };
-export type Member = { user_id: string; role: 'member' | 'moderator'; joined_at: string };
+export type Member = {
+	user_id: string;
+	display_name: string;
+	role: 'member' | 'moderator';
+	joined_at: string;
+};
 export type Invite = {
 	id: number;
 	created_at: string;

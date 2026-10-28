@@ -43,10 +43,15 @@ class ChannelWriteSerializer(serializers.Serializer):
 
 class MemberSerializer(serializers.ModelSerializer):
     user_id = serializers.CharField(read_only=True)
+    display_name = serializers.SerializerMethodField()
+
+    def get_display_name(self, member: Membership) -> str:
+        account = getattr(member.user, "account", None)
+        return account.username if account and account.username else member.user.get_username()
 
     class Meta:
         model = Membership
-        fields = ["user_id", "role", "joined_at"]
+        fields = ["user_id", "display_name", "role", "joined_at"]
 
 
 class InviteWriteSerializer(serializers.Serializer):
