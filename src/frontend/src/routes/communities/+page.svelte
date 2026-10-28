@@ -3,7 +3,13 @@
 	import { onMount } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
 	import ChannelChat from '$lib/ChannelChat.svelte';
-	import { communityRequest, type Community, type Invite, type Member } from '$lib/communities';
+	import {
+		communityRequest,
+		type Channel,
+		type Community,
+		type Invite,
+		type Member
+	} from '$lib/communities';
 	import { session } from '$lib/session.svelte';
 
 	let communities = $state<Community[]>([]);
@@ -29,6 +35,7 @@
 	let channelName = $state('');
 	let activeChannelId = $state<number | null>(null);
 	let inviteLink = $state('');
+	let shareLink = $state('');
 	let tab = $state<'about' | 'members' | 'settings'>('about');
 	let requestNumber = 0;
 	const activeCommunityId = () => selected?.id;
@@ -60,11 +67,15 @@
 		return cause instanceof Error ? cause.message : 'Something went wrong.';
 	}
 
-	async function choose(id: number) {
+	async function choose(id: number, channelId?: number | null) {
 		error = '';
 		try {
 			selected = await communityRequest<Community>(`/communities/${id}`);
-			activeChannelId = selected.channels?.[0]?.id ?? null;
+			shareLink = '';
+			activeChannelId =
+				selected.channels?.find((channel) => channel.id === channelId)?.id ??
+				selected.channels?.[0]?.id ??
+				null;
 			name = selected.name;
 			description = selected.description;
 			school = selected.school;
@@ -73,7 +84,11 @@
 			guestCount = 0;
 			invites = [];
 			tab = 'about';
-			history.replaceState(null, '', `?id=${id}`);
+			history.replaceState(
+				null,
+				'',
+				`?id=${id}${activeChannelId ? `&channel=${activeChannelId}` : ''}`
+			);
 		} catch (cause) {
 			error = message(cause);
 		}
@@ -86,7 +101,7 @@
 			const previousTab = tab;
 			const previousChannelId = activeChannelId;
 			if (selected) {
-				await choose(selected.id);
+				await choose(selected.id, previousChannelId);
 				if (selected?.channels?.some((channel) => channel.id === previousChannelId))
 					activeChannelId = previousChannelId;
 				if (previousTab === 'members') await loadMembers();
@@ -95,6 +110,37 @@
 			await browse();
 		} catch (cause) {
 			error = message(cause);
+		}
+	}
+
+	function selectChannel(channelId: number) {
+		activeChannelId = channelId;
+		shareLink = '';
+		if (selected) history.replaceState(null, '', `?id=${selected.id}&channel=${channelId}`);
+	}
+
+	async function createChannel() {
+		if (!selected) return;
+		try {
+			const created = await communityRequest<Channel>(
+				`/communities/${selected.id}/channels`,
+				'POST',
+				{ name: channelName }
+			);
+			channelName = '';
+			await choose(selected.id, created.id);
+		} catch (cause) {
+			error = message(cause);
+		}
+	}
+
+	async function shareChannel() {
+		if (!selected || !activeChannelId) return;
+		shareLink = `${location.origin}${resolve('/communities')}?id=${selected.id}&channel=${activeChannelId}`;
+		try {
+			await navigator.clipboard.writeText(shareLink);
+		} catch {
+			/* The visible link can be copied manually. */
 		}
 	}
 
@@ -188,18 +234,20 @@
 
 	onMount(() => {
 		void session.start().then(() => {
-			if (selected) void choose(selected.id);
+			if (selected) void choose(selected.id, activeChannelId);
 		});
 		const url = new URL(location.href);
 		const id = Number(url.searchParams.get('id'));
-		if (Number.isSafeInteger(id) && id > 0) void choose(id);
+		const channelId = Number(url.searchParams.get('channel'));
+		const requestedChannel = Number.isSafeInteger(channelId) && channelId > 0 ? channelId : null;
+		if (Number.isSafeInteger(id) && id > 0) void choose(id, requestedChannel);
 		const token = url.searchParams.get('invite');
 		if (token) {
 			void communityRequest<{ community_id: number }>(
 				`/communities/invites/${encodeURIComponent(token)}/redeem`,
 				'POST'
 			)
-				.then((result) => choose(result.community_id))
+				.then((result) => choose(result.community_id, requestedChannel))
 				.catch((cause) => {
 					error = message(cause);
 				});
@@ -308,10 +356,40 @@
 					<div class="channel-list">
 						{#each selected.channels ?? [] as channel (channel.id)}<button
 								class:active={activeChannelId === channel.id}
-								onclick={() => (activeChannelId = channel.id)}
+								onclick={() => selectChannel(channel.id)}
 								># {channel.name}{channel.archived ? ' · Archived' : ''}</button
 							>{/each}
 					</div>
+					{#if selected.role === 'owner'}
+						<form
+							class="channel-create"
+							onsubmit={(event) => {
+								event.preventDefault();
+								void createChannel();
+							}}
+						>
+							<input
+								required
+								pattern="[a-z0-9][a-z0-9-]*"
+								maxlength="50"
+								bind:value={channelName}
+								placeholder="New channel name, e.g. exam-prep"
+								aria-label="New channel name"
+							/>
+							<button>Add channel</button>
+						</form>
+					{/if}
+					{#if activeChannelId}
+						<button class="share-button" onclick={() => void shareChannel()}
+							>Copy channel invite link</button
+						>
+						{#if shareLink}<input
+								readonly
+								aria-label="Channel invite link"
+								value={shareLink}
+								onclick={(event) => event.currentTarget.select()}
+							/>{/if}
+					{/if}
 					{#if selected.role === 'visitor'}
 						<p class="muted">Join this community to read and send channel messages.</p>
 					{:else if activeChannelId}
@@ -427,23 +505,6 @@
 							><button>Save details</button>
 						</form>
 						<h3>Channels</h3>
-						<form
-							onsubmit={(event) => {
-								event.preventDefault();
-								void action(`/communities/${activeCommunityId()}/channels`, 'POST', {
-									name: channelName
-								}).then(() => (channelName = ''));
-							}}
-						>
-							<input
-								required
-								pattern="[a-z0-9][a-z0-9-]*"
-								maxlength="50"
-								bind:value={channelName}
-								placeholder="exam-prep"
-								aria-label="New channel name"
-							/><button>Add channel</button>
-						</form>
 						{#each selected.channels ?? [] as channel (channel.id)}<div class="row">
 								<span># {channel.name}</span><button
 									onclick={() => {
@@ -651,6 +712,17 @@
 	.channel-list button.active {
 		background: #ffe9ed;
 		border-color: #df3150;
+	}
+	.channel-create {
+		display: flex;
+		gap: 8px;
+		margin-top: 12px;
+	}
+	.channel-create input {
+		flex: 1;
+	}
+	.share-button {
+		margin-top: 12px;
 	}
 	.row {
 		display: flex;
