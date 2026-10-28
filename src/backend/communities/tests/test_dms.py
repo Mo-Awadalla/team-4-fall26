@@ -48,3 +48,23 @@ def test_guest_can_start_dm_with_account_member():
     assert started.status_code == 201
     assert account.get("/dms").data["items"][0]["id"] == started.data["id"]
     assert account.post(f"/dms/{started.data['id']}/messages", {"content": "Hi"}).status_code == 201
+
+
+def test_member_list_includes_guests_and_can_start_private_conversation():
+    owner = APIClient()
+    community_id = owner.post("/communities", {"name": "Chemistry"}).data["id"]
+    second = APIClient()
+    assert second.post(f"/communities/{community_id}/join").status_code == 200
+
+    listed = owner.get(f"/communities/{community_id}/members").data
+    assert listed["guest_count"] == 2
+    assert len(listed["guest_items"]) == 2
+    first_page = owner.get(f"/communities/{community_id}/members?limit=1").data
+    second_page = owner.get(f"/communities/{community_id}/members?limit=1&offset=1").data
+    assert first_page["guest_has_more"]
+    assert first_page["guest_items"][0]["id"] != second_page["guest_items"][0]["id"]
+    other = next(item for item in listed["guest_items"] if not item["is_me"])
+    assert other["display_name"].startswith("Guest ")
+    started = owner.post(f"/communities/{community_id}/dms", {"guest_member_id": other["id"]})
+    assert started.status_code == 201
+    assert second.get("/dms").data["items"][0]["id"] == started.data["id"]

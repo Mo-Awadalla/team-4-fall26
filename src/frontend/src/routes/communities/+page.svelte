@@ -10,6 +10,7 @@
 		type Channel,
 		type Community,
 		type DirectConversation,
+		type GuestMember,
 		type Invite,
 		type Member
 	} from '$lib/communities';
@@ -20,7 +21,11 @@
 	let directConversations = $state<DirectConversation[]>([]);
 	let selectedDM = $state<DirectConversation | null>(null);
 	let members = $state<Member[]>([]);
+	let guestMembers = $state<GuestMember[]>([]);
+	let memberOffset = 0;
+	let memberRequest = 0;
 	let hasMoreMembers = $state(false);
+	let membersLoading = $state(false);
 	let guestCount = $state(0);
 	let invites = $state<Invite[]>([]);
 	let bannedIds = $state<(string | number)[]>([]);
@@ -74,6 +79,9 @@
 			...popularCourses
 		])
 	]);
+	let transferableMembers = $derived(
+		members.filter((member) => member.user_id !== String(selected?.owner_id))
+	);
 	let channelName = $state('');
 	let channelCreateOpen = $state(false);
 	let channelMenuOpen = $state<number | null>(null);
@@ -87,7 +95,7 @@
 	let inviteLink = $state('');
 	let shareLink = $state('');
 	let copyStatus = $state('');
-	let tab = $state<'about' | 'members' | 'settings'>('about');
+	let tab = $state<'main' | 'members' | 'settings'>('main');
 	let requestNumber = 0;
 	const activeCommunityId = () => selected?.id;
 
@@ -149,14 +157,18 @@
 			school = selected.school;
 			course = selected.course;
 			members = [];
+			guestMembers = [];
+			memberOffset = 0;
+			hasMoreMembers = false;
 			guestCount = 0;
 			invites = [];
-			tab = 'about';
+			tab = 'main';
 			history.replaceState(
 				null,
 				'',
 				`?id=${id}${activeChannelId ? `&channel=${activeChannelId}` : ''}`
 			);
+			void loadMembers();
 		} catch (cause) {
 			error = message(cause);
 		}
@@ -180,12 +192,38 @@
 		void loadDMs();
 	}
 
+	function goHome() {
+		selected = null;
+		selectedDM = null;
+		creating = false;
+		history.replaceState(null, '', resolve('/communities'));
+	}
+
+	function showCreate() {
+		goHome();
+		creating = true;
+		name = description = school = course = '';
+	}
+
 	async function startMemberDM(userId: string) {
 		if (!selected) return;
 		try {
 			openDM(
 				await communityRequest<DirectConversation>(`/communities/${selected.id}/dms`, 'POST', {
 					user_id: userId
+				})
+			);
+		} catch (cause) {
+			error = message(cause);
+		}
+	}
+
+	async function startGuestDM(guestMemberId: number) {
+		if (!selected) return;
+		try {
+			openDM(
+				await communityRequest<DirectConversation>(`/communities/${selected.id}/dms`, 'POST', {
+					guest_member_id: guestMemberId
 				})
 			);
 		} catch (cause) {
@@ -203,7 +241,10 @@
 				await choose(selected.id, previousChannelId);
 				if (selected?.channels?.some((channel) => channel.id === previousChannelId))
 					activeChannelId = previousChannelId;
-				if (previousTab === 'members') await loadMembers();
+				if (previousTab === 'members') {
+					tab = 'members';
+					await loadMembers();
+				}
 				if (previousTab === 'settings') await loadSettings();
 			}
 			await browse();
@@ -215,6 +256,7 @@
 	function selectChannel(channelId: number) {
 		activeChannelId = channelId;
 		channelMenuOpen = null;
+		editingChannelId = null;
 		shareLink = '';
 		copyStatus = '';
 		if (selected) history.replaceState(null, '', `?id=${selected.id}&channel=${channelId}`);
@@ -259,7 +301,7 @@
 	}
 
 	async function startChannelRename(channel: Channel) {
-		channelMenuOpen = null;
+		selectChannel(channel.id);
 		editingChannelId = channel.id;
 		renameValue = channel.name;
 		await tick();
@@ -269,7 +311,10 @@
 	async function cancelChannelRename(channelId: number) {
 		editingChannelId = null;
 		await tick();
-		document.getElementById(`channel-trigger-${channelId}`)?.focus();
+		(
+			document.getElementById(`edit-channel-${channelId}`) ??
+			document.getElementById(`channel-trigger-${channelId}`)
+		)?.focus();
 	}
 
 	async function renameChannel(channel: Channel) {
@@ -280,7 +325,7 @@
 			});
 			await choose(selected.id, activeChannelId);
 			await tick();
-			document.getElementById(`channel-trigger-${channel.id}`)?.focus();
+			document.getElementById(`edit-channel-${channel.id}`)?.focus();
 		} catch (cause) {
 			error = message(cause);
 		}
@@ -369,18 +414,30 @@
 
 	async function loadMembers(more = false) {
 		if (!selected) return;
-		tab = 'members';
+		if (more && membersLoading) return;
+		const current = ++memberRequest;
+		const communityId = selected.id;
+		const offset = more ? memberOffset : 0;
+		membersLoading = true;
 		try {
 			const result = await communityRequest<{
 				items: Member[];
 				has_more: boolean;
+				guest_items: GuestMember[];
+				guest_has_more: boolean;
 				guest_count: number;
-			}>(`/communities/${selected.id}/members?limit=50&offset=${more ? members.length : 0}`);
+			}>(`/communities/${communityId}/members?limit=50&offset=${offset}`);
+			if (selected?.id !== communityId || current !== memberRequest) return;
 			members = more ? [...members, ...result.items] : result.items;
-			hasMoreMembers = result.has_more;
+			guestMembers = more ? [...guestMembers, ...result.guest_items] : result.guest_items;
+			memberOffset = offset + 50;
+			hasMoreMembers = result.has_more || result.guest_has_more;
 			guestCount = result.guest_count;
+			error = '';
 		} catch (cause) {
-			error = message(cause);
+			if (selected?.id === communityId && current === memberRequest) error = message(cause);
+		} finally {
+			if (selected?.id === communityId && current === memberRequest) membersLoading = false;
 		}
 	}
 
@@ -483,7 +540,7 @@
 	</dialog>
 	<main>
 		<aside class="sidebar">
-			<h1>Find your people.</h1>
+			<h1><button class="home-link" onclick={goHome}>Communities</button></h1>
 			<p>Public study communities for courses, schools, and neighborhoods.</p>
 			<label for="community-search">Search communities</label>
 			<div class="tabs">
@@ -494,16 +551,7 @@
 				>
 			</div>
 			<input id="community-search" bind:value={query} placeholder="Math 51A, NYU, Brooklyn…" />
-			<button
-				class="primary"
-				onclick={() => {
-					creating = !creating;
-					selected = null;
-					selectedDM = null;
-					if (creating) name = description = school = course = '';
-					history.replaceState(null, '', resolve('/communities'));
-				}}>+ Create community</button
-			>
+			<button class="primary" onclick={showCreate}>+ Create community</button>
 			{#if loading}<p class="muted">Loading…</p>{/if}
 			<div class="list">
 				{#each communities as community (community.id)}
@@ -515,7 +563,7 @@
 						<strong>{community.name}</strong>
 						<span
 							>{community.course || community.school || 'Study community'} · {community.member_count}
-							members</span
+							{community.member_count === 1 ? 'member' : 'members'}</span
 						>
 					</button>
 				{/each}
@@ -572,14 +620,21 @@
 						placeholder="Search courses or enter a code"
 						help="Course codes vary by school; you can enter yours."
 					/>
-					<button class="primary">Create community</button>
+					<div class="form-actions">
+						<button class="primary">Create community</button><button type="button" onclick={goHome}
+							>Cancel</button
+						>
+					</div>
 				</form>
 			{:else if selectedDM}
 				<DirectMessages conversation={selectedDM} />
 			{:else if selected}
 				<div class="title">
 					<div>
-						<p class="eyebrow">Public community · {selected.member_count} members</p>
+						<p class="eyebrow">
+							Public community · {selected.member_count}
+							{selected.member_count === 1 ? 'member' : 'members'}
+						</p>
 						<h2>{selected.name}</h2>
 						<p>{[selected.school, selected.course].filter(Boolean).join(' · ')}</p>
 					</div>
@@ -597,29 +652,35 @@
 				</div>
 				<div class="tabs">
 					<button
-						class:chosen={tab === 'about'}
-						aria-pressed={tab === 'about'}
-						onclick={() => (tab = 'about')}>About</button
+						class:chosen={tab === 'main'}
+						aria-pressed={tab === 'main'}
+						onclick={() => (tab = 'main')}>Main</button
 					><button
 						class:chosen={tab === 'members'}
 						aria-pressed={tab === 'members'}
-						onclick={() => void loadMembers()}>Members</button
+						onclick={() => {
+							tab = 'members';
+							void loadMembers();
+						}}>Members ({selected.member_count})</button
 					>{#if selected.role === 'owner' || selected.role === 'moderator'}<button
 							class:chosen={tab === 'settings'}
 							aria-pressed={tab === 'settings'}
 							onclick={() => void loadSettings()}>Manage</button
 						>{/if}
 				</div>
-				{#if tab === 'about'}
+				{#if tab === 'main'}
 					<div class="workspace">
 						<nav class="channel-rail" aria-label={`Channels in ${selected.name}`}>
 							<div class="rail-heading">
-								<h3>Channels</h3>
+								<h3>Channels <span>{selected.channels?.length ?? 0}/20</span></h3>
 								{#if selected.role === 'owner'}<button
 										class="icon-button"
 										id="add-channel-button"
 										aria-label="Add channel"
-										title="Add channel"
+										title={(selected.channels?.length ?? 0) >= 20
+											? 'Channel limit reached'
+											: 'Add channel'}
+										disabled={(selected.channels?.length ?? 0) >= 20}
 										onclick={() => void openChannelCreate()}>+</button
 									>{/if}
 							</div>
@@ -704,82 +765,161 @@
 												>
 											</div>
 										{/if}
-										{#if editingChannelId === channel.id}
-											<form
-												class="channel-form"
-												onsubmit={(event) => {
-													event.preventDefault();
-													void renameChannel(channel);
-												}}
-											>
-												<label for={`rename-channel-${channel.id}`}>Rename #{channel.name}</label>
-												<input
-													id={`rename-channel-${channel.id}`}
-													bind:this={renameInput}
-													required
-													pattern="[a-z0-9][a-z0-9-]*"
-													maxlength="50"
-													bind:value={renameValue}
-												/>
-												<div class="form-actions">
-													<button class="primary">Save</button><button
-														type="button"
-														onclick={() => void cancelChannelRename(channel.id)}>Cancel</button
-													>
-												</div>
-											</form>
-										{/if}
 									</li>
 								{/each}
 							</ul>
+							{#if selected.role !== 'owner'}<p class="rail-note">
+									The community owner manages channels.
+								</p>{/if}
 						</nav>
 						<div class="workspace-main">
 							{#each selected.channels?.filter((channel) => channel.id === activeChannelId) ?? [] as channel (channel.id)}
-								<div class="channel-intro">
-									<div>
-										<p class="eyebrow">Text channel</p>
-										<h3># {channel.name}</h3>
-										<p>{selected.description || 'A place to study together.'}</p>
+								<div class="channel-pane">
+									<div class="channel-intro">
+										<div>
+											<p class="eyebrow">Text channel</p>
+											<h3># {channel.name}</h3>
+											<p>
+												{channel.archived
+													? 'Archived · Read only'
+													: selected.description || 'A place to study together.'}
+											</p>
+										</div>
+										<div class="channel-actions">
+											{#if selected.role === 'owner'}<button
+													id={`edit-channel-${channel.id}`}
+													onclick={() => void startChannelRename(channel)}>Edit channel</button
+												>{/if}
+											<button onclick={() => void shareChannel()}>Share channel</button>
+										</div>
 									</div>
-									<button onclick={() => void shareChannel()}>Share channel</button>
-								</div>
-								{#if copyStatus}<p class="copy-status" role="status">{copyStatus}</p>{/if}
-								{#if shareLink}<input
-										class="share-link"
-										readonly
-										aria-label="Channel invite link"
-										value={shareLink}
-										onclick={(event) => event.currentTarget.select()}
-									/>{/if}
-								{#if selected.role === 'visitor'}<div class="join-prompt">
-										<h4>Join to take part</h4>
-										<p>Join this public community to read and send messages in #{channel.name}.</p>
-										<button
-											class="primary"
-											onclick={() => void action(`/communities/${activeCommunityId()}/join`)}
-											>Join community</button
+									{#if editingChannelId === channel.id}
+										<form
+											class="channel-edit"
+											onsubmit={(event) => {
+												event.preventDefault();
+												void renameChannel(channel);
+											}}
 										>
-									</div>
-								{:else}<ChannelChat
-										communityId={selected.id}
-										{channel}
-										role={selected.role}
-										onDirectMessage={openDM}
-									/>{/if}
+											<label for={`rename-channel-${channel.id}`}>Channel name</label>
+											<input
+												id={`rename-channel-${channel.id}`}
+												bind:this={renameInput}
+												required
+												pattern="[a-z0-9][a-z0-9-]*"
+												maxlength="50"
+												bind:value={renameValue}
+											/>
+											<div class="form-actions">
+												<button class="primary">Save name</button>
+												<button type="button" onclick={() => void cancelChannelRename(channel.id)}
+													>Cancel</button
+												>
+												<button
+													type="button"
+													onclick={() =>
+														void updateChannel(channel.id, { archived: !channel.archived })}
+													>{channel.archived ? 'Restore channel' : 'Archive channel'}</button
+												>
+												<button
+													type="button"
+													class="destructive"
+													onclick={() => void confirmChannelDelete(channel)}>Delete channel</button
+												>
+											</div>
+										</form>
+									{/if}
+									{#if copyStatus}<p class="copy-status" role="status">{copyStatus}</p>{/if}
+									{#if shareLink}<input
+											class="share-link"
+											readonly
+											aria-label="Channel invite link"
+											value={shareLink}
+											onclick={(event) => event.currentTarget.select()}
+										/>{/if}
+									{#if selected.role === 'visitor'}<div class="join-prompt">
+											<h4>Join to take part</h4>
+											<p>
+												Join this public community to read and send messages in #{channel.name}.
+											</p>
+											<button
+												class="primary"
+												onclick={() => void action(`/communities/${activeCommunityId()}/join`)}
+												>Join community</button
+											>
+										</div>
+									{:else}<ChannelChat
+											communityId={selected.id}
+											{channel}
+											role={selected.role}
+											onDirectMessage={openDM}
+										/>{/if}
+								</div>
+							{:else}
+								<div class="channel-empty">
+									<h3>No channels yet</h3>
+									<p>Create a channel to start organizing conversations.</p>
+									{#if selected.role === 'owner'}<button
+											class="primary"
+											onclick={() => void openChannelCreate()}>Add channel</button
+										>{/if}
+								</div>
 							{/each}
 						</div>
+						<aside class="member-rail" aria-label={`Members of ${selected.name}`}>
+							<button
+								class="member-heading"
+								onclick={() => {
+									tab = 'members';
+									void loadMembers();
+								}}>Members <span>{selected.member_count}</span></button
+							>
+							{#if membersLoading && !members.length && !guestMembers.length}<p class="muted">
+									Loading members…
+								</p>{/if}
+							{#each members as member (member.user_id)}
+								<div class="member-mini">
+									<strong>{member.is_me ? 'You' : member.display_name}</strong><span
+										>{member.user_id === String(selected.owner_id) ? 'Owner' : member.role}</span
+									>
+									{#if !member.is_me && selected.role !== 'visitor'}<button
+											onclick={() => void startMemberDM(member.user_id)}>Message</button
+										>{/if}
+								</div>
+							{/each}
+							{#each guestMembers as guest (guest.id)}
+								<div class="member-mini">
+									<strong>{guest.is_me ? 'You' : guest.display_name}</strong><span
+										>{guest.role === 'owner' ? 'Owner' : 'Guest member'}</span
+									>
+									{#if !guest.is_me && selected.role !== 'visitor'}<button
+											onclick={() => void startGuestDM(guest.id)}>Message</button
+										>{/if}
+								</div>
+							{/each}
+							{#if hasMoreMembers}<button
+									class="more-members"
+									onclick={() => void loadMembers(true)}>Show more members</button
+								>{/if}
+						</aside>
 					</div>
 				{:else if tab === 'members'}
-					<h3>Members</h3>
-					{#if guestCount}<p class="muted">{guestCount} people joined without an account.</p>{/if}
+					<h3>Members · {selected.member_count}</h3>
+					<p class="muted">
+						Everyone in this community, including {guestCount}
+						{guestCount === 1 ? 'guest member' : 'guest members'}.
+					</p>
+					{#if membersLoading && !members.length && !guestMembers.length}<p class="muted">
+							Loading members…
+						</p>{/if}
 					{#each members as member (member.user_id)}<div class="row">
 							<span
-								>{member.display_name}
+								>{member.is_me ? 'You' : member.display_name}
 								{member.user_id === String(selected.owner_id)
 									? '· Owner'
 									: `· ${member.role}`}</span
 							>
-							{#if member.user_id !== String(selected.owner_id) || selected.role !== 'owner'}<button
+							{#if !member.is_me && selected.role !== 'visitor'}<button
 									onclick={() => void startMemberDM(member.user_id)}>Message privately</button
 								>{/if}
 							{#if selected.role === 'owner' && member.user_id !== String(selected.owner_id)}<button
@@ -804,23 +944,40 @@
 										})}>Ban</button
 								>{/if}
 						</div>{/each}
+					{#each guestMembers as guest (guest.id)}
+						<div class="row">
+							<span
+								>{guest.is_me ? 'You' : guest.display_name} · {guest.role === 'owner'
+									? 'Owner'
+									: 'Guest member'}</span
+							>
+							{#if !guest.is_me && selected.role !== 'visitor'}<button
+									onclick={() => void startGuestDM(guest.id)}>Message privately</button
+								>{/if}
+						</div>
+					{/each}
 					{#if hasMoreMembers}<button onclick={() => void loadMembers(true)}
 							>Show more members</button
 						>{/if}
-					{#if selected.role === 'owner'}<p class="muted">
-							To transfer ownership, choose a member ID:
+					{#if selected.role === 'owner' && transferableMembers.length}<p class="muted">
+							Transfer ownership to an account member:
 						</p>
 						<form
 							onsubmit={(event) => {
 								event.preventDefault();
-								const input = event.currentTarget.querySelector('input');
-								if (input)
+								const target = event.currentTarget.querySelector('select');
+								if (target)
 									void action(`/communities/${activeCommunityId()}/transfer`, 'POST', {
-										user_id: input.value
+										user_id: target.value
 									});
 							}}
 						>
-							<input required aria-label="New owner member ID" /><button>Transfer ownership</button>
+							<select required aria-label="New owner">
+								<option value="" disabled selected>Choose a member</option>
+								{#each transferableMembers as member (member.user_id)}<option value={member.user_id}
+										>{member.display_name}</option
+									>{/each}
+							</select><button>Transfer ownership</button>
 						</form>{/if}
 				{:else}
 					<h3>Invites</h3>
@@ -898,10 +1055,46 @@
 					{/if}
 				{/if}
 			{:else}
-				<div class="empty">
-					<span>✳</span>
-					<h2>Study better together.</h2>
-					<p>Choose a community to see its channels and members, or create one for your class.</p>
+				<div class="landing">
+					<p class="eyebrow">StudySpot communities</p>
+					<h2>Find your people. Make progress together.</h2>
+					<p class="landing-lead">
+						Join a public study group, pick a channel, and start talking. Or make a space for the
+						course you are working through.
+					</p>
+					<div class="landing-actions">
+						<button class="primary" onclick={showCreate}>Create a community</button><button
+							onclick={() => document.getElementById('community-search')?.focus()}
+							>Search communities</button
+						>
+					</div>
+					<div class="landing-feature">
+						<span aria-hidden="true">#</span>
+						<div>
+							<strong>One place for every conversation</strong>
+							<p>
+								Keep homework, exam prep, and plans in separate channels. Share a link so classmates
+								can join.
+							</p>
+						</div>
+					</div>
+					<h3>Explore communities</h3>
+					<div class="community-grid">
+						{#each communities.slice(0, 6) as community (community.id)}
+							<button onclick={() => void choose(community.id)}>
+								<span class="community-mark" aria-hidden="true">#</span>
+								<strong>{community.name}</strong>
+								<span
+									>{[community.school, community.course].filter(Boolean).join(' · ') ||
+										'Open study community'}</span
+								>
+								<small
+									>{community.member_count}
+									{community.member_count === 1 ? 'member' : 'members'} · Public</small
+								>
+							</button>
+						{:else}<p class="muted">No communities match yet. Start one for your class.</p>{/each}
+					</div>
 				</div>
 			{/if}
 		</section>
@@ -917,7 +1110,8 @@
 	}
 	main {
 		max-width: 1440px;
-		min-height: calc(100vh - 76px);
+		height: calc(100vh - 76px);
+		min-height: 620px;
 		margin: auto;
 		display: grid;
 		grid-template-columns: 280px minmax(0, 1fr);
@@ -930,12 +1124,22 @@
 		background: #fcf7f8;
 		padding: 32px 22px;
 		border-right: 1px solid #eadfe3;
+		overflow-y: auto;
 	}
 	h1 {
 		font-size: 29px;
 		line-height: 1.1;
 		letter-spacing: -0.05em;
 		margin: 0 0 12px;
+	}
+	.home-link {
+		border: 0;
+		background: transparent;
+		padding: 0;
+		min-height: 0;
+		font: inherit;
+		letter-spacing: inherit;
+		text-align: left;
 	}
 	h2 {
 		font-size: 33px;
@@ -963,7 +1167,8 @@
 		margin: 18px 0 8px;
 	}
 	input,
-	textarea {
+	textarea,
+	select {
 		width: 100%;
 		border: 1px solid #d8cdd0;
 		background: white;
@@ -990,7 +1195,8 @@
 	}
 	button:focus-visible,
 	input:focus-visible,
-	textarea:focus-visible {
+	textarea:focus-visible,
+	select:focus-visible {
 		outline: 3px solid #2458a6;
 		outline-offset: 2px;
 	}
@@ -1009,6 +1215,9 @@
 	.sidebar > .primary {
 		width: 100%;
 		margin: 14px 0 20px;
+		white-space: nowrap;
+		font-size: 14px;
+		padding-inline: 8px;
 	}
 	.list {
 		display: grid;
@@ -1032,8 +1241,12 @@
 		font-weight: 400;
 	}
 	.content {
+		display: flex;
+		flex-direction: column;
 		padding: 36px;
 		min-width: 0;
+		min-height: 0;
+		overflow-y: auto;
 	}
 	.title {
 		display: flex;
@@ -1066,11 +1279,12 @@
 	}
 	.workspace {
 		display: grid;
-		grid-template-columns: 210px minmax(0, 1fr);
+		grid-template-columns: 190px minmax(0, 1fr) 190px;
+		flex: 1;
+		min-height: 0;
 		margin-top: 24px;
 		border: 1px solid #eadfe3;
 		border-radius: 14px;
-		min-height: 510px;
 	}
 	.channel-rail {
 		min-width: 0;
@@ -1086,11 +1300,19 @@
 		padding: 0 7px;
 	}
 	.rail-heading h3 {
-		font-size: 14px;
+		display: flex;
+		gap: 4px;
+		white-space: nowrap;
+		font-size: 12px;
 		margin: 0;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		letter-spacing: 0.03em;
 		color: #56464e;
+	}
+	.rail-heading h3 span {
+		font-weight: 500;
+		font-size: 11px;
+		color: #82727a;
 	}
 	.icon-button {
 		display: inline-grid;
@@ -1106,6 +1328,11 @@
 		gap: 4px;
 		margin: 12px 0 0;
 		padding: 0;
+	}
+	.rail-note {
+		padding: 0 8px;
+		color: #746c70;
+		font-size: 12px;
 	}
 	.channel-item {
 		position: relative;
@@ -1123,13 +1350,14 @@
 	.channel-select {
 		flex: 1;
 		display: flex;
-		gap: 8px;
+		gap: 6px;
 		align-items: center;
 		min-width: 0;
 		text-align: left;
 		background: transparent;
 		border: 0;
 		font-weight: 600;
+		font-size: 14px;
 	}
 	.channel-select span:last-child {
 		overflow-wrap: anywhere;
@@ -1192,8 +1420,25 @@
 		margin-top: 12px;
 	}
 	.workspace-main {
+		display: flex;
+		flex-direction: column;
 		min-width: 0;
-		padding: 20px;
+		min-height: 0;
+		padding: 16px;
+		overflow-y: auto;
+	}
+	.channel-pane {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+	.channel-empty {
+		margin: auto;
+		text-align: center;
+	}
+	.channel-empty p {
+		color: #65585d;
 	}
 	.channel-intro {
 		display: flex;
@@ -1215,6 +1460,65 @@
 	}
 	.channel-intro button {
 		white-space: nowrap;
+	}
+	.channel-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.channel-edit {
+		padding: 12px;
+		margin-top: 12px;
+		background: #fff9fa;
+		border: 1px solid #e8d7dd;
+		border-radius: 10px;
+	}
+	.channel-edit label {
+		margin-top: 0;
+	}
+	.member-rail {
+		min-width: 0;
+		padding: 16px 12px;
+		overflow-y: auto;
+		border-left: 1px solid #eadfe3;
+		background: #fcfafb;
+		border-radius: 0 14px 14px 0;
+	}
+	.member-heading {
+		width: 100%;
+		padding: 4px;
+		border: 0;
+		background: transparent;
+		text-align: left;
+		text-transform: uppercase;
+		font-size: 13px;
+		letter-spacing: 0.06em;
+	}
+	.member-heading span {
+		color: #746c70;
+	}
+	.member-mini {
+		display: grid;
+		gap: 4px;
+		padding: 12px 4px;
+		border-bottom: 1px solid #eee4e7;
+		font-size: 13px;
+	}
+	.member-mini strong {
+		overflow-wrap: anywhere;
+	}
+	.member-mini span {
+		color: #746c70;
+	}
+	.member-mini button,
+	.more-members {
+		justify-self: start;
+		min-height: 32px;
+		padding: 4px 8px;
+		font-size: 12px;
+	}
+	.more-members {
+		margin-top: 10px;
 	}
 	.copy-status {
 		color: #285736;
@@ -1279,26 +1583,94 @@
 		background: #fff0f1;
 		color: #a31630;
 	}
-	.empty {
-		margin: 15vh auto;
-		max-width: 420px;
-		text-align: center;
+	.landing {
+		max-width: 960px;
+		margin: auto 0;
 	}
-	.empty span {
-		font-size: 50px;
+	.landing h2 {
+		max-width: 690px;
+		font-size: clamp(38px, 5vw, 62px);
+		line-height: 1.05;
+	}
+	.landing-lead {
+		max-width: 620px;
+		color: #65585d;
+		font-size: 17px;
+	}
+	.landing-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin: 22px 0;
+	}
+	.landing-feature {
+		display: flex;
+		gap: 16px;
+		padding: 18px;
+		background: #fbf4f6;
+		border: 1px solid #eadfe3;
+		border-radius: 12px;
+	}
+	.landing-feature > span {
 		color: var(--accent);
+		font-size: 32px;
+	}
+	.landing-feature p {
+		margin: 4px 0 0;
+		color: #65585d;
+	}
+	.community-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px;
+	}
+	.community-grid button {
+		display: grid;
+		gap: 6px;
+		text-align: left;
+		padding: 16px;
+	}
+	.community-grid button:hover {
+		background: #fff7f9;
+	}
+	.community-mark {
+		color: var(--accent);
+		font-size: 25px;
+	}
+	.community-grid button span:not(.community-mark),
+	.community-grid small {
+		color: #65585d;
+		font-size: 13px;
+	}
+	@media (max-width: 1200px) {
+		main {
+			grid-template-columns: 240px minmax(0, 1fr);
+		}
+		.workspace {
+			grid-template-columns: 165px minmax(0, 1fr) 160px;
+		}
 	}
 	@media (max-width: 1050px) {
-		.workspace {
-			grid-template-columns: 180px minmax(0, 1fr);
-		}
 		.content {
 			padding: 24px;
 		}
 	}
+	@media (max-width: 980px) {
+		.workspace {
+			grid-template-columns: 180px minmax(0, 1fr);
+		}
+		.member-rail {
+			display: none;
+		}
+	}
 	@media (max-width: 850px) {
+		main {
+			height: auto;
+		}
 		.workspace {
 			display: block;
+			flex: none;
+			min-height: 480px;
 		}
 		.channel-rail {
 			border-right: 0;
@@ -1307,6 +1679,9 @@
 		}
 		.channel-intro {
 			flex-wrap: wrap;
+		}
+		.workspace-main {
+			min-height: 400px;
 		}
 	}
 	@media (max-width: 740px) {
@@ -1328,6 +1703,9 @@
 		}
 		.workspace-main {
 			padding: 14px;
+		}
+		.community-grid {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

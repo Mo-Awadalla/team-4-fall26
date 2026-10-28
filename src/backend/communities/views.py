@@ -1,5 +1,6 @@
 """Public discovery and session-backed community management."""
 
+import hashlib
 import secrets
 from datetime import datetime
 
@@ -286,15 +287,36 @@ class Members(CommunityView):
     def get(self, request: Request, community_id: int) -> Response:
         community = community_for(community_id)
         limit, offset = page(request)
-        found = list(
+        found_accounts = list(
             Membership.objects.filter(community=community)
             .select_related("user__account")
             .order_by("id")[offset : offset + limit + 1]
         )
+        found_guests = list(
+            GuestMembership.objects.filter(
+                community=community, expires_at__gt=timezone.now()
+            ).order_by("joined_at", "id")[offset : offset + limit + 1]
+        )
+        current_guest = guest_id(request)
+        owns_as_guest = community_id in request.session.get("guest_communities", [])
         return Response(
             {
-                "items": MemberSerializer(found[:limit], many=True).data,
-                "has_more": len(found) > limit,
+                "items": MemberSerializer(
+                    found_accounts[:limit], many=True, context={"request": request}
+                ).data,
+                "has_more": len(found_accounts) > limit,
+                "guest_items": [
+                    {
+                        "id": guest.pk,
+                        "display_name": f"Guest {hashlib.sha256(guest.guest_id.encode()).hexdigest()[:6]}",
+                        "role": "owner"
+                        if owns_as_guest and guest.guest_id == current_guest
+                        else "member",
+                        "is_me": guest.guest_id == current_guest,
+                    }
+                    for guest in found_guests[:limit]
+                ],
+                "guest_has_more": len(found_guests) > limit,
                 "guest_count": GuestMembership.objects.filter(
                     community=community, expires_at__gt=timezone.now()
                 ).count(),

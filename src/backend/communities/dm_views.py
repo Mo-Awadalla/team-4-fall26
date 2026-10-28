@@ -121,10 +121,26 @@ class StartFromMember(CommunityView):
             raise PermissionDenied("Join this community to use direct messages.")
 
         class Target(serializers.Serializer):
-            user_id = serializers.CharField(max_length=64)
+            user_id = serializers.CharField(max_length=64, required=False)
+            guest_member_id = serializers.IntegerField(min_value=1, required=False)
+
+            def validate(self, attrs):
+                if len(attrs) != 1:
+                    raise serializers.ValidationError("Choose one community member.")
+                return attrs
 
         parsed = Target(data=request.data)
         parsed.is_valid(raise_exception=True)
+        if "guest_member_id" in parsed.validated_data:
+            guest = GuestMembership.objects.filter(
+                pk=parsed.validated_data["guest_member_id"],
+                community=community,
+                expires_at__gt=timezone.now(),
+            ).first()
+            if guest is None:
+                raise NotFound("Community member not found.")
+            target_name = f"Guest {hashlib.sha256(guest.guest_id.encode()).hexdigest()[:6]}"
+            return start(request, f"g:{guest.guest_id}", target_name)
         user_id = user_id_for(parsed.validated_data["user_id"])
         if (
             community.owner_id != user_id

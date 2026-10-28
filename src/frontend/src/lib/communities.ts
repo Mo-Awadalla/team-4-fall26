@@ -31,8 +31,15 @@ export type Message = {
 export type Member = {
 	user_id: string;
 	display_name: string;
+	is_me: boolean;
 	role: 'member' | 'moderator';
 	joined_at: string;
+};
+export type GuestMember = {
+	id: number;
+	display_name: string;
+	is_me: boolean;
+	role: 'owner' | 'member';
 };
 export type Invite = {
 	id: number;
