@@ -23,7 +23,7 @@ Authenticated routes use Django sessions and CSRF cookies. The account implement
 
 The owner is stored on the community; membership records store `member` or `moderator`. A moderator cannot act against an owner or another moderator. A ban prevents joining, including through an invite, while public content remains readable. Invitation tokens are returned once at creation; only their SHA-256 hashes are stored. A maximum-use link increments only for a newly joined user.
 
-The current limits are five owned and 100 joined communities per account, 20 channels and ten active invites per community. Channel names are lowercase letters, digits and hyphens. Invites may expire after one to 720 hours and may cap successful joins at 1,000. These limits live in `communities/services.py` and serializers.
+The current limits are five owned and 100 joined communities per account, 1,000 members, 20 channels and ten active invites per community. Channel names are lowercase letters, digits and hyphens. Invites may expire after one to 720 hours and may cap successful joins at 1,000. These limits live in `communities/services.py` and serializers.
 
 Community creation, membership changes, invite redemption, moderation, and ownership transfers use database transactions. The account implementation should choose its `AUTH_USER_MODEL` before applying these migrations. Owners must transfer or delete their communities before account deletion. Other account deletion does not depend on historical invite or moderation actor rows.
 
