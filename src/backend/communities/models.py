@@ -129,6 +129,44 @@ class Reaction(models.Model):
         return f"{self.emoji} on {self.message_id}"
 
 
+class DirectConversation(models.Model):
+    pair_key = models.CharField(max_length=64, unique=True)
+    first_key = models.CharField(max_length=128)
+    second_key = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=150)
+    second_name = models.CharField(max_length=150)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["first_key", "-updated_at"], name="dm_first_recent"),
+            models.Index(fields=["second_key", "-updated_at"], name="dm_second_recent"),
+        ]
+
+    def __str__(self) -> str:
+        return f"Direct conversation {self.pk}"
+
+
+class DirectMessage(models.Model):
+    conversation = models.ForeignKey(
+        DirectConversation, on_delete=models.CASCADE, related_name="messages"
+    )
+    sender_key = models.CharField(max_length=128)
+    author_name = models.CharField(max_length=150)
+    content = models.TextField(max_length=2000)
+    reply_to = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["conversation", "id"], name="dm_message_page")]
+
+    def __str__(self) -> str:
+        return f"Direct message {self.pk}"
+
+
 class Ban(models.Model):
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="bans")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
