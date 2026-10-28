@@ -33,6 +33,16 @@ def test_guest_creation_requires_csrf_and_keeps_ownership_in_session():
         ).status_code
         == 200
     )
+    assert (
+        guest.post(
+            f"/communities/{community_id}/channels", {"name": "exams"}, HTTP_X_CSRFTOKEN=token
+        ).status_code
+        == 201
+    )
+    assert (
+        guest.post(f"/communities/{community_id}/invites", {}, HTTP_X_CSRFTOKEN=token).status_code
+        == 201
+    )
     assert client_for().get(f"/communities/{community_id}").data["role"] == "visitor"
 
 
