@@ -4,7 +4,7 @@
 
 **Live at <https://d1ulyrfyi06kwp.cloudfront.net>**
 
-StudySpot is an open-source search demo for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data and OpenStreetMap.
+StudySpot is an open-source app for discovering cafés and other third places across New York City. The goal is to make finding a useful place feel immediate: search by a name, category, or neighborhood and get a small, consistent set of results derived from NYC Open Data and OpenStreetMap.
 
 Public study communities are available at `/communities`. Anyone can create and join a group without signing in. Owners manage channels and members; members can share channel links, chat, search messages, and start private conversations. Guest ownership and membership are tied to the browser session.
 
@@ -82,6 +82,8 @@ PG_BIN="$(brew --prefix postgresql@17)/bin"
 ```
 
 From the repository root, run `just setup` and `just migrate`, then run `just dev-backend` and `just dev-frontend` in separate terminals. Open <http://localhost:7500/communities>. The development connection defaults to `postgresql://studyspot:studyspot@localhost:5432/studyspot`. No account is required for community creation or joining.
+
+To populate sample communities and channel conversations, run `cd src/backend && DJANGO_DEBUG=true uv run python manage.py seed_sample_communities`. Add `--guest-community ID` to include two private conversations for the sole active guest in a guest-owned community. The command is repeatable and only runs with `DJANGO_DEBUG=true`.
 
 The container alternative requires Git and Docker Compose 2.23 or newer:
 

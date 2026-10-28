@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
 	import ChannelChat from '$lib/ChannelChat.svelte';
@@ -36,6 +36,15 @@
 	let description = $state('');
 	let school = $state('');
 	let course = $state('');
+	let schools = $state<string[]>([]);
+	let schoolsRequested = false;
+	let schoolChoices = $derived(
+		school.trim().length < 2
+			? []
+			: schools
+					.filter((name) => name.toLocaleLowerCase().includes(school.trim().toLocaleLowerCase()))
+					.slice(0, 30)
+	);
 	let channelName = $state('');
 	let channelCreateOpen = $state(false);
 	let channelMenuOpen = $state<number | null>(null);
@@ -52,6 +61,18 @@
 	let tab = $state<'about' | 'members' | 'settings'>('about');
 	let requestNumber = 0;
 	const activeCommunityId = () => selected?.id;
+
+	async function loadSchools() {
+		if (schoolsRequested) return;
+		schoolsRequested = true;
+		try {
+			const response = await fetch(`${base}/schools.json`);
+			if (!response.ok) throw new Error('School suggestions are unavailable.');
+			schools = await response.json();
+		} catch {
+			schoolsRequested = false;
+		}
+	}
 
 	async function browse(search = query, more = false, mine = viewMine) {
 		const current = ++requestNumber;
@@ -411,6 +432,9 @@
 
 <div class="shell">
 	<SiteHeader />
+	<datalist id="us-schools">
+		{#each schoolChoices as schoolName (schoolName)}<option value={schoolName}></option>{/each}
+	</datalist>
 	<dialog
 		bind:this={deleteDialog}
 		class="confirm-dialog"
@@ -450,6 +474,8 @@
 					creating = !creating;
 					selected = null;
 					selectedDM = null;
+					if (creating) name = description = school = course = '';
+					history.replaceState(null, '', resolve('/communities'));
 				}}>+ Create community</button
 			>
 			{#if loading}<p class="muted">Loading…</p>{/if}
@@ -501,8 +527,18 @@
 						/></label
 					>
 					<label>Description<textarea maxlength="1000" bind:value={description}></textarea></label>
-					<label>School<input maxlength="100" bind:value={school} placeholder="NYU" /></label>
+					<label
+						>School<input
+							maxlength="100"
+							list="us-schools"
+							onfocus={() => void loadSchools()}
+							bind:value={school}
+							placeholder="Search US schools"
+						/></label
+					>
+					<p class="field-help">Search US colleges and trade schools, or type another school.</p>
 					<label>Course<input maxlength="100" bind:value={course} placeholder="MATH 51A" /></label>
+					<p class="field-help">Enter your school's course code or course name.</p>
 					<button class="primary">Create community</button>
 				</form>
 			{:else if selectedDM}
@@ -705,7 +741,7 @@
 					{#if guestCount}<p class="muted">{guestCount} people joined without an account.</p>{/if}
 					{#each members as member (member.user_id)}<div class="row">
 							<span
-								>Member #{member.user_id}
+								>{member.display_name}
 								{member.user_id === String(selected.owner_id)
 									? '· Owner'
 									: `· ${member.role}`}</span
@@ -806,9 +842,16 @@
 						>
 							<label>Name<input required maxlength="100" bind:value={name} /></label><label
 								>Description<textarea maxlength="1000" bind:value={description}></textarea></label
-							><label>School<input maxlength="100" bind:value={school} /></label><label
-								>Course<input maxlength="100" bind:value={course} /></label
-							><button>Save details</button>
+							><label
+								>School<input
+									maxlength="100"
+									list="us-schools"
+									onfocus={() => void loadSchools()}
+									bind:value={school}
+								/></label
+							><label>Course<input maxlength="100" bind:value={course} /></label><button
+								>Save details</button
+							>
 						</form>
 						<button class="danger" onclick={() => void deleteCommunity()}>Delete community</button>
 					{/if}
@@ -877,6 +920,11 @@
 		font-size: 13px;
 		font-weight: 700;
 		margin: 18px 0 8px;
+	}
+	.field-help {
+		margin: 4px 0 0;
+		color: #65585d;
+		font-size: 12px;
 	}
 	input,
 	textarea {
