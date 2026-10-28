@@ -109,10 +109,10 @@ class CommunityList(CommunityView):
         if mine == "true":
             if getattr(request.user, "is_authenticated", False):
                 communities = communities.filter(
-                    Q(memberships__user=request.user) | Q(pk__in=guest_ids)
+                    Q(memberships__user=request.user) | Q(pk__in=guest_ids, owner__isnull=True)
                 )
             else:
-                communities = communities.filter(pk__in=guest_ids)
+                communities = communities.filter(pk__in=guest_ids, owner__isnull=True)
         found = list(communities[offset : offset + limit + 1])
         roles = {}
         if request.user and request.user.is_authenticated:
