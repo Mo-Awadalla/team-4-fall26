@@ -1,8 +1,22 @@
 <script lang="ts">
-	import { communityRequest, type Channel, type Message } from './communities';
+	import {
+		communityRequest,
+		type Channel,
+		type DirectConversation,
+		type Message
+	} from './communities';
 
-	let { communityId, channel, role }: { communityId: number; channel: Channel; role: string } =
-		$props();
+	let {
+		communityId,
+		channel,
+		role,
+		onDirectMessage
+	}: {
+		communityId: number;
+		channel: Channel;
+		role: string;
+		onDirectMessage: (conversation: DirectConversation) => void;
+	} = $props();
 	let messages = $state<Message[]>([]);
 	let hasOlder = $state(false);
 	let content = $state('');
@@ -146,6 +160,18 @@
 		}
 	}
 
+	async function startDM(message: Message) {
+		try {
+			const conversation = await communityRequest<DirectConversation>(
+				`${base()}/messages/${message.id}/dm`,
+				'POST'
+			);
+			onDirectMessage(conversation);
+		} catch (cause) {
+			error = problem(cause);
+		}
+	}
+
 	$effect(() => {
 		void communityId;
 		void channel.id;
@@ -226,6 +252,9 @@
 					{#if !message.deleted_at}
 						<div class="message-actions">
 							<button onclick={() => (replyTo = message)}>Reply</button>
+							{#if !message.mine}<button onclick={() => void startDM(message)}
+									>Message privately</button
+								>{/if}
 							{#each message.reactions as reaction (reaction.emoji)}
 								<button
 									class:mine={reaction.me}

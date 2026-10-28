@@ -37,6 +37,17 @@ export type Invite = {
 	uses: number;
 	revoked: boolean;
 };
+export type DirectConversation = { id: number; other_name: string; updated_at: string };
+export type DirectMessage = {
+	id: number;
+	author_name: string;
+	content: string;
+	reply_to: number | null;
+	created_at: string;
+	edited_at: string | null;
+	deleted_at: string | null;
+	mine: boolean;
+};
 
 function csrfToken(): string {
 	return (
