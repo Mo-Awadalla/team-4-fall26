@@ -38,6 +38,7 @@
 			if (current === requestNumber) {
 				communities = more ? [...communities, ...result.items] : result.items;
 				hasMore = result.has_more;
+				error = '';
 			}
 		} catch (cause) {
 			if (current === requestNumber) {
