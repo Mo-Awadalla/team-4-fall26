@@ -11,7 +11,7 @@ from django.utils import timezone
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from .models import Ban, Channel, Community, Invite, Membership, ModerationEvent
-from .permissions import Action, require, role_for
+from .permissions import Action, GuestOwner, require, role_for
 
 MAX_OWNED = 5
 MAX_JOINED = 100
@@ -46,6 +46,13 @@ def create_community(user: object, data: dict) -> Community:
         raise ValidationError("You have joined the maximum number of communities.")
     community = Community.objects.create(owner=user, **data)
     Membership.objects.create(community=community, user=user)
+    Channel.objects.create(community=community, name="general")
+    return community
+
+
+@transaction.atomic
+def create_guest_community(data: dict) -> Community:
+    community = Community.objects.create(**data)
     Channel.objects.create(community=community, name="general")
     return community
 
@@ -97,7 +104,7 @@ def create_invite(community: Community, user: object, data: dict) -> tuple[Invit
     hours = data.get("expires_in_hours")
     invite = Invite.objects.create(
         community=community,
-        created_by=user,
+        created_by=None if isinstance(user, GuestOwner) else user,
         token_hash=hashlib.sha256(token.encode()).hexdigest(),
         expires_at=timezone.now() + timedelta(hours=hours) if hours else None,
         max_uses=data.get("max_uses"),
@@ -146,7 +153,10 @@ def set_role(community: Community, actor: object, target_id: object, role: str) 
     member.role = role
     member.save(update_fields=["role"])
     ModerationEvent.objects.create(
-        community=community, actor=actor, target_id=target_id, action=f"role:{role}"
+        community=community,
+        actor=None if isinstance(actor, GuestOwner) else actor,
+        target_id=target_id,
+        action=f"role:{role}",
     )
 
 
@@ -157,7 +167,11 @@ def moderate(community: Community, actor: object, target_id: object, action: str
     if target_id == community.owner_id:
         raise PermissionDenied("The owner cannot be moderated.")
     member = Membership.objects.filter(community=community, user_id=target_id).first()
-    if member and member.role == Membership.Role.MODERATOR and community.owner_id != actor.pk:
+    if (
+        member
+        and member.role == Membership.Role.MODERATOR
+        and role_for(community, actor) != "owner"
+    ):
         raise PermissionDenied("Only the owner can moderate a moderator.")
     if action == "unban":
         Ban.objects.filter(community=community, user_id=target_id).delete()
@@ -169,7 +183,10 @@ def moderate(community: Community, actor: object, target_id: object, action: str
     else:
         raise ValidationError("Unknown moderation action.")
     ModerationEvent.objects.create(
-        community=community, actor=actor, target_id=target_id, action=action
+        community=community,
+        actor=None if isinstance(actor, GuestOwner) else actor,
+        target_id=target_id,
+        action=action,
     )
 
 
@@ -190,5 +207,8 @@ def transfer(community: Community, actor: object, target_id: object) -> None:
     member.role = Membership.Role.MEMBER
     member.save(update_fields=["role"])
     ModerationEvent.objects.create(
-        community=community, actor=actor, target_id=target_id, action="transfer"
+        community=community,
+        actor=None if isinstance(actor, GuestOwner) else actor,
+        target_id=target_id,
+        action="transfer",
     )

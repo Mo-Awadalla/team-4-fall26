@@ -1,5 +1,6 @@
 """One permission policy for community operations."""
 
+from dataclasses import dataclass
 from enum import StrEnum
 
 from rest_framework.exceptions import PermissionDenied
@@ -26,8 +27,22 @@ ROLE_ACTIONS = {
 }
 
 
+@dataclass(frozen=True)
+class GuestOwner:
+    community_id: int
+    pk: None = None
+    is_authenticated: bool = True
+    is_active: bool = True
+
+
 def role_for(community: Community, user: object) -> str:
     """Resolve ownership before membership; the owner field is authoritative."""
+    if isinstance(user, GuestOwner):
+        return (
+            "owner"
+            if community.owner_id is None and community.pk == user.community_id
+            else "visitor"
+        )
     if not getattr(user, "is_authenticated", False):
         return "visitor"
     if community.owner_id == user.pk:
