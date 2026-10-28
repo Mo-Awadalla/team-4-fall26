@@ -1,6 +1,6 @@
 # Communities
 
-The static `/communities` page discovers public groups through the Django API. Anyone can create a community without signing in. A group has an owner, members, text channels, optional school and course, and shareable invitations. Members can read and post channel messages, reply, react, edit their own messages, and delete their own messages. Owners and moderators can delete and pin messages. Search covers nondeleted messages in a community. Direct messages, attachments, voice/video, and bots are outside this release.
+The static `/communities` page discovers public groups through the Django API. Anyone can create a community without signing in. A group has an owner, members, text channels, optional school and course, and shareable invitations. Members can read and post channel messages, reply, react, edit their own messages, and delete their own messages. Owners and moderators can delete and pin messages. Search covers nondeleted messages in a community. Community members can also start private one-to-one conversations from a member or channel message. Attachments, voice/video, and bots are outside this release.
 
 All community paths have no trailing slash. Public `GET /communities?q=&limit=&offset=`, `GET /communities/{id}`, `GET /communities/{id}/members`, and `GET /communities/{id}/channels` need no account. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` shows communities joined or owned by the current account or browser session. Member listings include account members and a separate `guest_count`.
 
@@ -22,6 +22,11 @@ Community creation, joining, leaving, and invite redemption work without an acco
 | `/communities/{id}/channels/{channel_id}/messages/{message_id}/pin` | POST, DELETE | Owner or moderator pins or unpins. |
 | `/communities/{id}/channels/{channel_id}/pins` | GET | Members list the latest 50 pins. |
 | `/communities/{id}/messages/search?q=` | GET | Members search community messages with Postgres full-text search. |
+| `/communities/{id}/channels/{channel_id}/messages/{message_id}/dm` | POST | Start a private conversation with a current community member who posted the message. |
+| `/communities/{id}/dms` | POST | Start a private conversation with an account member by `user_id`. |
+| `/dms` | GET | List the current account's or guest session's latest 50 private conversations. |
+| `/dms/{id}/messages` | GET, POST | Either participant reads paged history or posts a private message. |
+| `/dms/{id}/messages/{message_id}` | PATCH, DELETE | The author edits or deletes their private message. |
 | `/communities/{id}/invites` | GET, POST | Owner or moderator lists or creates links. |
 | `/communities/{id}/invites/{invite_id}` | DELETE | Owner or moderator revokes a link. |
 | `/communities/invites/{token}/redeem` | POST | Join through a valid link. |
@@ -33,6 +38,8 @@ Account owners are stored on the community; guest ownership is in the browser se
 The current limits are five owned and 100 joined communities per account or browser session, 1,000 active members, 20 channels and ten active invites per community. Channel names are lowercase letters, digits and hyphens. Invites may expire after one to 720 hours and may cap successful joins at 1,000. These limits live in `communities/services.py` and serializers.
 
 The browser fetches up to 50 channel messages at a time and refreshes the latest 50 every three seconds while the page is visible. This picks up posts, edits, deletions, pins, and reactions without a separate socket service on the current Lambda deployment. Archived channels remain readable and reject new messages. Guest messages remain after the browser session expires, but the guest can no longer edit them once its membership expires. Clearing cookies loses the ability to manage a guest-created community or its messages.
+
+Owners can add a channel next to the channel list. The channel invite button copies a URL containing the community and channel IDs; because communities are public, recipients join from that page and then land in the chosen channel. Private conversations are accessible only to their two participants, and a new conversation can be started only with a current member of a shared community. A guest can be messaged from one of their channel posts. Guest DMs are bound to the browser session, so clearing cookies loses access to them.
 
 Community creation, membership changes, invite redemption, moderation, and ownership transfers use database transactions. The account implementation should choose its `AUTH_USER_MODEL` before applying these migrations. Owners must transfer or delete their communities before account deletion. Other account deletion does not depend on historical invite or moderation actor rows.
 

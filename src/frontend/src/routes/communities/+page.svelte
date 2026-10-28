@@ -3,10 +3,12 @@
 	import { onMount } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
 	import ChannelChat from '$lib/ChannelChat.svelte';
+	import DirectMessages from '$lib/DirectMessages.svelte';
 	import {
 		communityRequest,
 		type Channel,
 		type Community,
+		type DirectConversation,
 		type Invite,
 		type Member
 	} from '$lib/communities';
@@ -14,6 +16,8 @@
 
 	let communities = $state<Community[]>([]);
 	let selected = $state<Community | null>(null);
+	let directConversations = $state<DirectConversation[]>([]);
+	let selectedDM = $state<DirectConversation | null>(null);
 	let members = $state<Member[]>([]);
 	let hasMoreMembers = $state(false);
 	let guestCount = $state(0);
@@ -71,6 +75,7 @@
 		error = '';
 		try {
 			selected = await communityRequest<Community>(`/communities/${id}`);
+			selectedDM = null;
 			shareLink = '';
 			activeChannelId =
 				selected.channels?.find((channel) => channel.id === channelId)?.id ??
@@ -88,6 +93,37 @@
 				null,
 				'',
 				`?id=${id}${activeChannelId ? `&channel=${activeChannelId}` : ''}`
+			);
+		} catch (cause) {
+			error = message(cause);
+		}
+	}
+
+	async function loadDMs(): Promise<DirectConversation[]> {
+		try {
+			directConversations = (await communityRequest<{ items: DirectConversation[] }>('/dms')).items;
+			return directConversations;
+		} catch (cause) {
+			error = message(cause);
+			return [];
+		}
+	}
+
+	function openDM(conversation: DirectConversation) {
+		selectedDM = conversation;
+		selected = null;
+		creating = false;
+		history.replaceState(null, '', `?dm=${conversation.id}`);
+		void loadDMs();
+	}
+
+	async function startMemberDM(userId: string) {
+		if (!selected) return;
+		try {
+			openDM(
+				await communityRequest<DirectConversation>(`/communities/${selected.id}/dms`, 'POST', {
+					user_id: userId
+				})
 			);
 		} catch (cause) {
 			error = message(cause);
@@ -233,8 +269,12 @@
 	});
 
 	onMount(() => {
-		void session.start().then(() => {
+		const dmId = Number(new URL(location.href).searchParams.get('dm'));
+		void session.start().then(async () => {
 			if (selected) void choose(selected.id, activeChannelId);
+			const items = await loadDMs();
+			const conversation = items.find((item) => item.id === dmId);
+			if (conversation) openDM(conversation);
 		});
 		const url = new URL(location.href);
 		const id = Number(url.searchParams.get('id'));
@@ -279,6 +319,7 @@
 				onclick={() => {
 					creating = !creating;
 					selected = null;
+					selectedDM = null;
 				}}>+ Create community</button
 			>
 			{#if loading}<p class="muted">Loading…</p>{/if}
@@ -297,6 +338,16 @@
 				{/each}
 			</div>
 			{#if hasMore}<button onclick={() => void browse(query, true)}>Show more</button>{/if}
+			<h2 class="dm-heading">Direct messages</h2>
+			<div class="list">
+				{#each directConversations as conversation (conversation.id)}
+					<button
+						class:active={selectedDM?.id === conversation.id}
+						onclick={() => openDM(conversation)}
+						><strong>{conversation.other_name}</strong><span>Private conversation</span></button
+					>
+				{:else}<p class="muted">Message a community member to start.</p>{/each}
+			</div>
 		</aside>
 		<section class="content">
 			{#if error}<p class="error" role="alert">{error}</p>{/if}
@@ -322,6 +373,8 @@
 					<label>Course<input maxlength="100" bind:value={course} placeholder="MATH 51A" /></label>
 					<button class="primary">Create community</button>
 				</form>
+			{:else if selectedDM}
+				<DirectMessages conversation={selectedDM} />
 			{:else if selected}
 				<div class="title">
 					<div>
@@ -394,7 +447,12 @@
 						<p class="muted">Join this community to read and send channel messages.</p>
 					{:else if activeChannelId}
 						{#each selected.channels?.filter((channel) => channel.id === activeChannelId) ?? [] as channel (channel.id)}
-							<ChannelChat communityId={selected.id} {channel} role={selected.role} />
+							<ChannelChat
+								communityId={selected.id}
+								{channel}
+								role={selected.role}
+								onDirectMessage={openDM}
+							/>
 						{/each}
 					{/if}
 				{:else if tab === 'members'}
@@ -407,6 +465,9 @@
 									? '· Owner'
 									: `· ${member.role}`}</span
 							>
+							{#if member.user_id !== String(selected.owner_id) || selected.role !== 'owner'}<button
+									onclick={() => void startMemberDM(member.user_id)}>Message privately</button
+								>{/if}
 							{#if selected.role === 'owner' && member.user_id !== String(selected.owner_id)}<button
 									onclick={() =>
 										void action(
@@ -595,6 +656,10 @@
 		font-size: 33px;
 		letter-spacing: -0.05em;
 		margin: 0 0 8px;
+	}
+	.dm-heading {
+		font-size: 18px;
+		margin: 30px 0 12px;
 	}
 	h3 {
 		margin: 28px 0 12px;
