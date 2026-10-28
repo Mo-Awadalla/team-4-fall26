@@ -40,12 +40,15 @@
 		polling = true;
 		const current = generation;
 		try {
-			const after = messages.at(-1)?.id ?? 0;
 			const page = await communityRequest<{ items: Message[]; has_more: boolean }>(
-				`${base()}/messages?after=${after}`
+				`${base()}/messages`
 			);
-			if (current === generation && page.items.length) {
-				messages = [...messages, ...page.items];
+			if (current === generation) {
+				const first = page.items[0]?.id;
+				const retained = first ? messages.filter((item) => item.id < first) : [];
+				const older = retained.slice(-200);
+				messages = [...older, ...page.items];
+				hasOlder ||= retained.length > older.length;
 			}
 		} catch (cause) {
 			if (current === generation) error = problem(cause);
