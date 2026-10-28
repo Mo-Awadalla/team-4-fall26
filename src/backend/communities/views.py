@@ -134,6 +134,7 @@ def page(request: Request) -> tuple[int, int]:
 
 class CommunityList(CommunityView):
     def get(self, request: Request) -> Response:
+        actor(request)
         get_token(request._request)
         limit, offset = page(request)
         query = request.query_params.get("q", "").strip()
@@ -200,26 +201,11 @@ class CommunityList(CommunityView):
         )
 
     def post(self, request: Request) -> Response:
+        user = actor(request)
         parsed = CommunityWriteSerializer(data=request.data)
         parsed.is_valid(raise_exception=True)
-        if getattr(request.user, "is_authenticated", False):
-            created = services.create_community(actor(request), parsed.validated_data)
-            created.member_count = 1
-        else:
-            owned = list(
-                Community.objects.filter(
-                    pk__in=request.session.get("guest_communities", []), owner__isnull=True
-                ).values_list("pk", flat=True)
-            )
-            if len(owned) >= services.MAX_OWNED:
-                raise serializers.ValidationError("You own the maximum number of communities.")
-            created = services.create_guest_community(
-                parsed.validated_data,
-                ensure_guest_id(request),
-                guest_expiry(request),
-            )
-            request.session["guest_communities"] = [*owned, created.pk]
-            created.member_count = 1
+        created = services.create_community(user, parsed.validated_data)
+        created.member_count = 1
         return Response(summary(created, viewer(request, created)), status=201)
 
 
