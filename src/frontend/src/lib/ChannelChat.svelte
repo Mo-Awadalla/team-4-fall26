@@ -7,6 +7,9 @@
 	let hasOlder = $state(false);
 	let content = $state('');
 	let replyTo = $state<Message | null>(null);
+	let editingId = $state<number | null>(null);
+	let draft = $state('');
+	let reactionFor = $state<number | null>(null);
 	let search = $state('');
 	let results = $state<Message[] | null>(null);
 	let pins = $state<Message[] | null>(null);
@@ -14,6 +17,7 @@
 	let sending = $state(false);
 	let polling = false;
 	let generation = 0;
+	const emojiChoices = ['👍', '❤️', '😂', '🎉', '😮'];
 
 	const base = () => `/communities/${communityId}/channels/${channel.id}`;
 	const displayTime = (value: string) => new Date(value).toLocaleString();
@@ -111,6 +115,8 @@
 			} else {
 				messages = messages.map((item) => (item.id === changed.id ? changed : item));
 			}
+			if (method === 'PATCH') editingId = null;
+			reactionFor = null;
 			error = '';
 		} catch (cause) {
 			error = problem(cause);
@@ -200,11 +206,23 @@
 						>{#if message.pinned_at}<span>📌 Pinned</span>{/if}
 					</div>
 					{#if message.reply_to}<p class="reply">↳ Reply to message #{message.reply_to}</p>{/if}
-					<p class="body">
-						{message.deleted_at ? 'Message deleted' : message.content}{message.edited_at
-							? ' (edited)'
-							: ''}
-					</p>
+					{#if editingId === message.id}
+						<form
+							class="edit-form"
+							onsubmit={(event) => {
+								event.preventDefault();
+								void change(message, 'PATCH', '', { content: draft });
+							}}
+						>
+							<input aria-label="Edit message" maxlength="2000" bind:value={draft} />
+							<button disabled={!draft.trim()}>Save</button>
+							<button type="button" onclick={() => (editingId = null)}>Cancel</button>
+						</form>
+					{:else}<p class="body">
+							{message.deleted_at ? 'Message deleted' : message.content}{message.edited_at
+								? ' (edited)'
+								: ''}
+						</p>{/if}
 					{#if !message.deleted_at}
 						<div class="message-actions">
 							<button onclick={() => (replyTo = message)}>Reply</button>
@@ -220,16 +238,13 @@
 										)}>{reaction.emoji} {reaction.count}</button
 								>
 							{/each}
-							<button
-								onclick={() => {
-									const emoji = prompt('Emoji reaction');
-									if (emoji) void change(message, 'POST', '/reactions', { emoji });
-								}}>+ React</button
+							<button onclick={() => (reactionFor = reactionFor === message.id ? null : message.id)}
+								>+ React</button
 							>
 							{#if message.mine}<button
 									onclick={() => {
-										const next = prompt('Edit message', message.content);
-										if (next?.trim()) void change(message, 'PATCH', '', { content: next });
+										editingId = message.id;
+										draft = message.content;
 									}}>Edit</button
 								>{/if}
 							{#if role === 'owner' || role === 'moderator'}<button
@@ -243,6 +258,15 @@
 									}}>Delete</button
 								>{/if}
 						</div>
+						{#if reactionFor === message.id}<div
+								class="reaction-picker"
+								aria-label="Choose a reaction"
+							>
+								{#each emojiChoices as emoji (emoji)}<button
+										onclick={() => void change(message, 'POST', '/reactions', { emoji })}
+										>{emoji}</button
+									>{/each}
+							</div>{/if}
 					{/if}
 				</article>
 			{:else}<p class="muted">No messages yet. Start the conversation.</p>{/each}
@@ -328,6 +352,15 @@
 	}
 	.message-actions .mine {
 		background: #ffe4e8;
+	}
+	.edit-form,
+	.reaction-picker {
+		display: flex;
+		gap: 6px;
+		margin: 8px 0;
+	}
+	.edit-form input {
+		flex: 1;
 	}
 	.replying {
 		padding: 0 16px;
