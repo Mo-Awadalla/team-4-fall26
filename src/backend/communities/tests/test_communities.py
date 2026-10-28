@@ -4,6 +4,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
+from communities import services
 from communities.models import Ban, Channel, Community, Membership
 
 pytestmark = pytest.mark.django_db
@@ -150,3 +151,15 @@ def test_session_requires_csrf_and_staff_action_is_separate():
         == 403
     )
     assert client_for(staff).delete(f"/communities/{community_id}/admin").status_code == 204
+
+
+def test_member_cap_is_enforced(monkeypatch):
+    monkeypatch.setattr(services, "MAX_MEMBERS", 2)
+    users = get_user_model().objects
+    owner = users.create_user(username="owner", password="test-password")
+    community = Community.objects.create(owner=owner, name="Full group")
+    Membership.objects.create(community=community, user=owner)
+    first = users.create_user(username="first", password="test-password")
+    second = users.create_user(username="second", password="test-password")
+    assert client_for(first).post(f"/communities/{community.pk}/join").status_code == 200
+    assert client_for(second).post(f"/communities/{community.pk}/join").status_code == 422

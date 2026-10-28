@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
+from django.db.models import F
 from django.utils import timezone
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
@@ -14,6 +15,7 @@ from .permissions import Action, require, role_for
 
 MAX_OWNED = 5
 MAX_JOINED = 100
+MAX_MEMBERS = 1000
 MAX_CHANNELS = 20
 MAX_INVITES = 10
 
@@ -30,6 +32,8 @@ def _join(community: Community, user: object) -> Membership:
         return existing
     if Membership.objects.filter(user=user).count() >= MAX_JOINED:
         raise ValidationError("You have joined the maximum number of communities.")
+    if Membership.objects.filter(community=community).count() >= MAX_MEMBERS:
+        raise ValidationError("This community has the maximum number of members.")
     return Membership.objects.create(community=community, user=user)
 
 
@@ -84,6 +88,7 @@ def create_invite(community: Community, user: object, data: dict) -> tuple[Invit
     if (
         Invite.objects.filter(community=community, revoked=False)
         .filter(models.Q(expires_at__isnull=True) | models.Q(expires_at__gt=timezone.now()))
+        .filter(models.Q(max_uses__isnull=True) | models.Q(uses__lt=F("max_uses")))
         .count()
         >= MAX_INVITES
     ):

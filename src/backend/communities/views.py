@@ -72,13 +72,18 @@ def page(request: Request) -> tuple[int, int]:
 class CommunityList(CommunityView):
     def get(self, request: Request) -> Response:
         limit, offset = page(request)
-        query = request.query_params.get("q", "").strip()[:100]
+        query = request.query_params.get("q", "").strip()
+        if len(query) > 100:
+            raise serializers.ValidationError({"q": "Search must be at most 100 characters."})
+        mine = request.query_params.get("mine")
+        if mine not in {None, "true", "false"}:
+            raise serializers.ValidationError({"mine": "Use true or false."})
         communities = Community.objects.annotate(member_count=Count("memberships"))
         if query:
             communities = communities.filter(
                 Q(name__icontains=query) | Q(school__icontains=query) | Q(course__icontains=query)
             )
-        if request.query_params.get("mine") == "true":
+        if mine == "true":
             user = actor(request)
             communities = communities.filter(memberships__user=user)
         found = list(communities[offset : offset + limit + 1])
