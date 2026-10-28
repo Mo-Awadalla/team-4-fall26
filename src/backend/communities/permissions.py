@@ -35,6 +35,14 @@ class GuestOwner:
     is_active: bool = True
 
 
+@dataclass(frozen=True)
+class GuestMember:
+    community_id: int
+    pk: None = None
+    is_authenticated: bool = True
+    is_active: bool = True
+
+
 def role_for(community: Community, user: object) -> str:
     """Resolve ownership before membership; the owner field is authoritative."""
     if isinstance(user, GuestOwner):
@@ -43,6 +51,8 @@ def role_for(community: Community, user: object) -> str:
             if community.owner_id is None and community.pk == user.community_id
             else "visitor"
         )
+    if isinstance(user, GuestMember):
+        return "member" if community.pk == user.community_id else "visitor"
     if not getattr(user, "is_authenticated", False):
         return "visitor"
     if community.owner_id == user.pk:
