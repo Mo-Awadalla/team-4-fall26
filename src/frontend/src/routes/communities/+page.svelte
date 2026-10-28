@@ -280,7 +280,10 @@
 							onclick={() => void action(`/communities/${activeCommunityId()}/join`)}
 							>Join community</button
 						>
-					{:else if selected.role !== 'owner'}<button
+					{:else if selected.role === 'owner'}<span class="muted"
+							>Joined · You own this community</span
+						>
+					{:else}<span class="muted">Joined</span><button
 							onclick={() => void action(`/communities/${activeCommunityId()}/leave`)}>Leave</button
 						>{/if}
 				</div>
@@ -300,7 +303,7 @@
 							# {channel.name}
 							{channel.archived ? '· Archived' : ''}
 						</p>{/each}
-					<p class="muted">Channel conversations are coming in a later update.</p>
+					<p class="muted">Channels are part of this community. Conversations are coming later.</p>
 				{:else if tab === 'members'}
 					<h3>Members</h3>
 					{#if guestCount}<p class="muted">{guestCount} people joined without an account.</p>{/if}
