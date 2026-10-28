@@ -1,6 +1,6 @@
 # Communities
 
-The static `/communities` page discovers public groups through the Django API. Anyone can create a community without signing in. A group has an owner, members, text-channel names, optional school and course, and shareable invitations. Channel discussions, direct messages, live delivery, and message search are deferred.
+The static `/communities` page discovers public groups through the Django API. Anyone can create a community without signing in. A group has an owner, members, text channels, optional school and course, and shareable invitations. Members can read and post channel messages, reply, react, edit their own messages, and delete their own messages. Owners and moderators can delete and pin messages. Search covers nondeleted messages in a community. Direct messages, attachments, voice/video, and bots are outside this release.
 
 All community paths have no trailing slash. Public `GET /communities?q=&limit=&offset=`, `GET /communities/{id}`, `GET /communities/{id}/members`, and `GET /communities/{id}/channels` need no account. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` shows communities joined or owned by the current account or browser session. Member listings include account members and a separate `guest_count`.
 
@@ -15,6 +15,13 @@ Community creation, joining, leaving, and invite redemption work without an acco
 | `/communities/{id}/transfer` | POST | Owner transfers to a current member. |
 | `/communities/{id}/channels` | POST | Owner creates a channel. |
 | `/communities/{id}/channels/{channel_id}` | PATCH, DELETE | Owner renames, reorders, archives, restores or removes a channel. |
+| `/communities/{id}/channels/{channel_id}/messages` | GET, POST | Members read pages of up to 50 messages or post up to 2,000 characters. `before` loads older messages; `after` loads newer ones. |
+| `/communities/{id}/channels/{channel_id}/messages/{message_id}` | PATCH, DELETE | Author edits; author or moderator deletes. Deleted messages remain as empty tombstones for replies. |
+| `/communities/{id}/channels/{channel_id}/messages/{message_id}/reactions` | POST | Add a reaction once per member. |
+| `/communities/{id}/channels/{channel_id}/messages/{message_id}/reactions/{emoji}` | DELETE | Remove your reaction. |
+| `/communities/{id}/channels/{channel_id}/messages/{message_id}/pin` | POST, DELETE | Owner or moderator pins or unpins. |
+| `/communities/{id}/channels/{channel_id}/pins` | GET | Members list the latest 50 pins. |
+| `/communities/{id}/messages/search?q=` | GET | Members search community messages with Postgres full-text search. |
 | `/communities/{id}/invites` | GET, POST | Owner or moderator lists or creates links. |
 | `/communities/{id}/invites/{invite_id}` | DELETE | Owner or moderator revokes a link. |
 | `/communities/invites/{token}/redeem` | POST | Join through a valid link. |
@@ -24,6 +31,8 @@ Community creation, joining, leaving, and invite redemption work without an acco
 Account owners are stored on the community; guest ownership is in the browser session. Account membership records store `member` or `moderator`; guest memberships have no moderator role. A moderator cannot act against an owner or another moderator. Account bans prevent joining, including through an invite, while public content remains readable. Guest membership cannot be banned reliably because clearing cookies creates a new identity. Invitation tokens are returned once at creation; only their SHA-256 hashes are stored. A maximum-use link increments only for a newly joined account or guest.
 
 The current limits are five owned and 100 joined communities per account or browser session, 1,000 active members, 20 channels and ten active invites per community. Channel names are lowercase letters, digits and hyphens. Invites may expire after one to 720 hours and may cap successful joins at 1,000. These limits live in `communities/services.py` and serializers.
+
+The browser fetches up to 50 channel messages at a time and asks for newer messages every three seconds while the page is visible. This works with the current Lambda API and Postgres deployment without a separate socket service. Archived channels remain readable and reject new messages. Guest messages remain after the browser session expires, but the guest can no longer edit them once its membership expires. Clearing cookies loses the ability to manage a guest-created community or its messages.
 
 Community creation, membership changes, invite redemption, moderation, and ownership transfers use database transactions. The account implementation should choose its `AUTH_USER_MODEL` before applying these migrations. Owners must transfer or delete their communities before account deletion. Other account deletion does not depend on historical invite or moderation actor rows.
 

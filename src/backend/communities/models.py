@@ -1,6 +1,8 @@
 """Public communities and their membership boundaries."""
 
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models.functions import Lower
 
@@ -72,6 +74,59 @@ class Channel(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}"
+
+
+class Message(models.Model):
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="messages")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    guest_id = models.CharField(max_length=32, blank=True)
+    author_name = models.CharField(max_length=150)
+    content = models.TextField(max_length=2000)
+    reply_to = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    pinned_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["channel", "id"], name="message_channel_id"),
+            GinIndex(SearchVector("content", config="english"), name="message_content_fts"),
+        ]
+
+    def __str__(self) -> str:
+        return f"Message {self.pk} in {self.channel_id}"
+
+
+class Reaction(models.Model):
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="reactions")
+    emoji = models.CharField(max_length=32)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
+    guest_id = models.CharField(max_length=32, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["message", "emoji", "user"],
+                condition=models.Q(user__isnull=False),
+                name="reaction_once_per_user",
+            ),
+            models.UniqueConstraint(
+                fields=["message", "emoji", "guest_id"],
+                condition=~models.Q(guest_id=""),
+                name="reaction_once_per_guest",
+            ),
+            models.CheckConstraint(
+                condition=(models.Q(user__isnull=False) & models.Q(guest_id=""))
+                | (models.Q(user__isnull=True) & ~models.Q(guest_id="")),
+                name="reaction_one_actor",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.emoji} on {self.message_id}"
 
 
 class Ban(models.Model):
