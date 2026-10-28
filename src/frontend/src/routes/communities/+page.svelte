@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
+	import ChannelChat from '$lib/ChannelChat.svelte';
 	import { communityRequest, type Community, type Invite, type Member } from '$lib/communities';
 	import { session } from '$lib/session.svelte';
 
@@ -26,6 +27,7 @@
 	let school = $state('');
 	let course = $state('');
 	let channelName = $state('');
+	let activeChannelId = $state<number | null>(null);
 	let inviteLink = $state('');
 	let tab = $state<'about' | 'members' | 'settings'>('about');
 	let requestNumber = 0;
@@ -62,6 +64,7 @@
 		error = '';
 		try {
 			selected = await communityRequest<Community>(`/communities/${id}`);
+			activeChannelId = selected.channels?.[0]?.id ?? null;
 			name = selected.name;
 			description = selected.description;
 			school = selected.school;
@@ -81,8 +84,11 @@
 		try {
 			await communityRequest(path, method, body);
 			const previousTab = tab;
+			const previousChannelId = activeChannelId;
 			if (selected) {
 				await choose(selected.id);
+				if (selected?.channels?.some((channel) => channel.id === previousChannelId))
+					activeChannelId = previousChannelId;
 				if (previousTab === 'members') await loadMembers();
 				if (previousTab === 'settings') await loadSettings();
 			}
@@ -299,11 +305,20 @@
 				{#if tab === 'about'}
 					<p class="description">{selected.description || 'A place to study together.'}</p>
 					<h3>Channels</h3>
-					{#each selected.channels ?? [] as channel (channel.id)}<p class="channel">
-							# {channel.name}
-							{channel.archived ? '· Archived' : ''}
-						</p>{/each}
-					<p class="muted">Channels are part of this community. Conversations are coming later.</p>
+					<div class="channel-list">
+						{#each selected.channels ?? [] as channel (channel.id)}<button
+								class:active={activeChannelId === channel.id}
+								onclick={() => (activeChannelId = channel.id)}
+								># {channel.name}{channel.archived ? ' · Archived' : ''}</button
+							>{/each}
+					</div>
+					{#if selected.role === 'visitor'}
+						<p class="muted">Join this community to read and send channel messages.</p>
+					{:else if activeChannelId}
+						{#each selected.channels?.filter((channel) => channel.id === activeChannelId) ?? [] as channel (channel.id)}
+							<ChannelChat communityId={selected.id} {channel} role={selected.role} />
+						{/each}
+					{/if}
 				{:else if tab === 'members'}
 					<h3>Members</h3>
 					{#if guestCount}<p class="muted">{guestCount} people joined without an account.</p>{/if}
@@ -628,11 +643,14 @@
 		margin-top: 28px;
 		white-space: pre-wrap;
 	}
-	.channel {
-		background: #f8f7f6;
-		border-radius: 8px;
-		padding: 13px;
-		font-weight: 650;
+	.channel-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.channel-list button.active {
+		background: #ffe9ed;
+		border-color: #df3150;
 	}
 	.row {
 		display: flex;

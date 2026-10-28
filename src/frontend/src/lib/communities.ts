@@ -14,6 +14,20 @@ export type Community = {
 };
 
 export type Channel = { id: number; name: string; position: number; archived: boolean };
+export type Message = {
+	id: number;
+	channel_id: number;
+	author_name: string;
+	content: string;
+	reply_to: number | null;
+	created_at: string;
+	edited_at: string | null;
+	deleted_at: string | null;
+	pinned_at: string | null;
+	reactions: { emoji: string; count: number; me: boolean }[];
+	mine: boolean;
+	can_delete: boolean;
+};
 export type Member = { user_id: string; role: 'member' | 'moderator'; joined_at: string };
 export type Invite = {
 	id: number;
