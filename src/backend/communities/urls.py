@@ -1,8 +1,14 @@
 from django.urls import path
 
-from . import message_views, views
+from . import dm_views, message_views, views
 
 urlpatterns = [
+    path("dms", dm_views.DirectConversations.as_view()),
+    path("dms/<int:conversation_id>/messages", dm_views.DirectMessages.as_view()),
+    path(
+        "dms/<int:conversation_id>/messages/<int:message_id>",
+        dm_views.DirectMessageDetail.as_view(),
+    ),
     path("communities", views.CommunityList.as_view()),
     path("communities/<int:community_id>", views.CommunityDetail.as_view()),
     path("communities/<int:community_id>/join", views.Join.as_view()),
@@ -30,6 +36,10 @@ urlpatterns = [
         message_views.MessagePin.as_view(),
     ),
     path(
+        "communities/<int:community_id>/channels/<int:channel_id>/messages/<int:message_id>/dm",
+        dm_views.StartFromMessage.as_view(),
+    ),
+    path(
         "communities/<int:community_id>/channels/<int:channel_id>/messages/<int:message_id>/reactions",
         message_views.MessageReactions.as_view(),
     ),
@@ -41,5 +51,6 @@ urlpatterns = [
     path("communities/<int:community_id>/invites/<int:invite_id>", views.InviteDetail.as_view()),
     path("communities/invites/<str:token>/redeem", views.Redeem.as_view()),
     path("communities/<int:community_id>/moderation", views.Moderation.as_view()),
+    path("communities/<int:community_id>/dms", dm_views.StartFromMember.as_view()),
     path("communities/<int:community_id>/admin", views.AdminCommunity.as_view()),
 ]
