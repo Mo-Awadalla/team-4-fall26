@@ -1,6 +1,7 @@
 """Public discovery and session-backed community management."""
 
 import secrets
+from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -64,6 +65,11 @@ def ensure_guest_id(request: Request) -> str:
         value = secrets.token_hex(16)
         request.session["community_guest_id"] = value
     return value
+
+
+def guest_expiry(request: Request) -> datetime:
+    request.session.set_expiry(request.session.get_session_cookie_age())
+    return request.session.get_expiry_date()
 
 
 def counted_communities():
@@ -209,7 +215,7 @@ class CommunityList(CommunityView):
             created = services.create_guest_community(
                 parsed.validated_data,
                 ensure_guest_id(request),
-                request.session.get_expiry_date(),
+                guest_expiry(request),
             )
             request.session["guest_communities"] = [*owned, created.pk]
             created.member_count = 1
@@ -256,7 +262,7 @@ class Join(CommunityView):
             services.join(community, actor(request), guest_id(request))
         else:
             identity = ensure_guest_id(request)
-            services.join_guest(community, identity, request.session.get_expiry_date())
+            services.join_guest(community, identity, guest_expiry(request))
         return Response({"joined": True})
 
 
@@ -445,7 +451,7 @@ class Redeem(CommunityView):
             community = services.redeem(
                 token,
                 guest_id=ensure_guest_id(request),
-                expires_at=request.session.get_expiry_date(),
+                expires_at=guest_expiry(request),
             )
         return Response({"community_id": community.pk})
 
