@@ -44,14 +44,21 @@ class ChannelWriteSerializer(serializers.Serializer):
 class MemberSerializer(serializers.ModelSerializer):
     user_id = serializers.CharField(read_only=True)
     display_name = serializers.SerializerMethodField()
+    is_me = serializers.SerializerMethodField()
 
     def get_display_name(self, member: Membership) -> str:
         account = getattr(member.user, "account", None)
         return account.username if account and account.username else member.user.get_username()
 
+    def get_is_me(self, member: Membership) -> bool:
+        request = self.context["request"]
+        return bool(
+            getattr(request.user, "is_authenticated", False) and request.user.pk == member.user_id
+        )
+
     class Meta:
         model = Membership
-        fields = ["user_id", "display_name", "role", "joined_at"]
+        fields = ["user_id", "display_name", "is_me", "role", "joined_at"]
 
 
 class InviteWriteSerializer(serializers.Serializer):

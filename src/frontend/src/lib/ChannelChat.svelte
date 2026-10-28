@@ -324,6 +324,10 @@
 
 <style>
 	.chat {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 250px;
 		border: 1px solid #eee1e4;
 		border-radius: 12px;
 		overflow: hidden;
@@ -348,7 +352,8 @@
 		width: 170px;
 	}
 	.messages {
-		height: clamp(120px, 18vh, 200px);
+		flex: 1;
+		min-height: 0;
 		overflow-y: auto;
 		padding: 16px;
 	}
@@ -402,8 +407,9 @@
 		flex: 1;
 	}
 	.results {
+		flex: 1;
+		min-height: 0;
 		padding: 16px;
-		max-height: 500px;
 		overflow-y: auto;
 	}
 	.results p {

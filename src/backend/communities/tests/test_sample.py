@@ -25,6 +25,7 @@ def test_sample_seed_is_repeatable_and_guest_can_read_direct_messages():
     )
     assert DirectConversation.objects.count() == 2
     assert DirectMessage.objects.count() == 2
+    assert len(guest.get(f"/communities/{community_id}/members").data["items"]) == 2
     assert {item["other_name"] for item in guest.get("/dms").data["items"]} == {
         "Maya",
         "Jordan",
