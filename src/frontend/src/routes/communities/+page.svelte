@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
+	import SiteHeader from '$lib/SiteHeader.svelte';
 	import { communityRequest, type Community, type Invite, type Member } from '$lib/communities';
+	import { session } from '$lib/session.svelte';
 
 	let communities = $state<Community[]>([]);
 	let selected = $state<Community | null>(null);
@@ -169,10 +171,14 @@
 	}
 
 	$effect(() => {
+		void session.status;
 		void browse(query, false, viewMine);
 	});
 
 	onMount(() => {
+		void session.start().then(() => {
+			if (selected) void choose(selected.id);
+		});
 		const url = new URL(location.href);
 		const id = Number(url.searchParams.get('id'));
 		if (Number.isSafeInteger(id) && id > 0) void choose(id);
@@ -196,14 +202,7 @@
 </svelte:head>
 
 <div class="shell">
-	<header>
-		<a class="brand" href={resolve('/')}>StudySpot</a>
-		<nav>
-			<a href={resolve('/')}>Explore spots</a><a class="current" href={resolve('/communities')}
-				>Communities</a
-			>
-		</nav>
-	</header>
+	<SiteHeader />
 	<main>
 		<aside class="sidebar">
 			<h1>Find your people.</h1>
@@ -212,7 +211,7 @@
 			<div class="tabs">
 				<button class:chosen={!viewMine} onclick={() => (viewMine = false)}>All</button><button
 					class:chosen={viewMine}
-					onclick={() => (viewMine = true)}>Joined</button
+					onclick={() => (viewMine = true)}>Mine</button
 				>
 			</div>
 			<input id="community-search" bind:value={query} placeholder="Math 51A, NYU, Brooklyn…" />
@@ -244,7 +243,7 @@
 			{#if error}<p class="error" role="alert">{error}</p>{/if}
 			{#if creating}
 				<h2>Create a community</h2>
-				<p class="muted">Everyone can discover and read public communities.</p>
+				<p class="muted">Anyone can create a public community without signing in.</p>
 				<form
 					onsubmit={(event) => {
 						event.preventDefault();
@@ -477,32 +476,9 @@
 		background: #faf9f7;
 		color: #262526;
 	}
-	header {
-		max-width: 1220px;
-		margin: auto;
-		height: 72px;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0 24px;
-	}
-	.brand {
-		color: #df3150;
-		font-size: 22px;
-		font-weight: 800;
-		letter-spacing: -0.04em;
-	}
-	nav {
-		display: flex;
-		gap: 24px;
-		font-weight: 600;
-	}
-	.current {
-		color: #df3150;
-	}
 	main {
 		max-width: 1220px;
-		min-height: calc(100vh - 72px);
+		min-height: calc(100vh - 76px);
 		margin: auto;
 		display: grid;
 		grid-template-columns: 320px 1fr;
@@ -681,9 +657,6 @@
 		}
 		.content {
 			padding: 28px 22px;
-		}
-		header {
-			gap: 12px;
 		}
 	}
 </style>

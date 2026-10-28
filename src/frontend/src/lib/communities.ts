@@ -1,11 +1,13 @@
 /** Browser contract for the public community API. */
+import { session } from './session.svelte';
+
 export type Community = {
 	id: number;
 	name: string;
 	description: string;
 	school: string;
 	course: string;
-	owner_id: string | number;
+	owner_id: string | number | null;
 	member_count: number;
 	role: 'visitor' | 'member' | 'moderator' | 'owner';
 	channels?: Channel[];
@@ -32,11 +34,14 @@ function csrfToken(): string {
 }
 
 export async function communityRequest<T>(path: string, method = 'GET', body?: object): Promise<T> {
+	const credentials = await session.communityCredentials();
 	const response = await fetch(`/api${path}`, {
 		method,
 		credentials: 'same-origin',
 		headers: {
 			accept: 'application/json',
+			...(credentials ? { authorization: `Bearer ${credentials.access}` } : {}),
+			...(credentials?.id ? { 'x-id-token': credentials.id } : {}),
 			...(body ? { 'content-type': 'application/json' } : {}),
 			...(method !== 'GET' ? { 'x-csrftoken': csrfToken() } : {})
 		},

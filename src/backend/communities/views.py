@@ -13,6 +13,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.authentication import Auth0Authentication
+
 from . import services
 from .models import Ban, Channel, Community, Invite, Membership, ModerationEvent
 from .permissions import Action, GuestOwner, require, role_for
@@ -40,7 +42,7 @@ class CommunitySessionAuthentication(SessionAuthentication):
 
 
 class CommunityView(APIView):
-    authentication_classes = [CommunitySessionAuthentication]
+    authentication_classes = [Auth0Authentication, CommunitySessionAuthentication]
 
 
 def actor(request: Request):
@@ -103,8 +105,8 @@ class CommunityList(CommunityView):
             communities = communities.filter(
                 Q(name__icontains=query) | Q(school__icontains=query) | Q(course__icontains=query)
             )
+        guest_ids = request.session.get("guest_communities", [])
         if mine == "true":
-            guest_ids = request.session.get("guest_communities", [])
             if getattr(request.user, "is_authenticated", False):
                 communities = communities.filter(
                     Q(memberships__user=request.user) | Q(pk__in=guest_ids)
@@ -124,8 +126,14 @@ class CommunityList(CommunityView):
                 "items": [
                     summary(
                         item,
-                        viewer(request, item),
-                        roles.get(item.pk, role_for(item, viewer(request, item))),
+                        request.user,
+                        "owner"
+                        if (
+                            item.owner_id is not None
+                            and item.owner_id == getattr(request.user, "pk", None)
+                        )
+                        or (item.owner_id is None and item.pk in guest_ids)
+                        else roles.get(item.pk, "visitor"),
                     )
                     for item in found[:limit]
                 ],

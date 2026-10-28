@@ -46,6 +46,10 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql://studyspot:studyspot@postgres:5432/studyspot}
       DJANGO_DEBUG: "true"
       DJANGO_CSRF_TRUSTED_ORIGINS: http://localhost:7500
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN:-}
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID:-}
+      AUTH0_AUDIENCE: ${AUTH0_AUDIENCE:-}
+      AUTH0_JWKS: ${AUTH0_JWKS:-}
     ports:
       - "127.0.0.1:7501:8000"
     # Migrations run before the server so that `docker compose up` on a fresh
@@ -80,6 +84,9 @@ services:
         - action: sync
           path: ./src/backend/communities
           target: /app/communities
+        - action: sync
+          path: ./src/backend/accounts
+          target: /app/accounts
         - action: rebuild
           path: ./src/backend/pyproject.toml
         - action: rebuild
