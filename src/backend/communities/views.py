@@ -1,9 +1,10 @@
-"""Public discovery and authenticated community management."""
+"""Public discovery and session-backed community management."""
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.db.models import Count, Q
+from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication
@@ -14,7 +15,7 @@ from rest_framework.views import APIView
 
 from . import services
 from .models import Ban, Channel, Community, Invite, Membership, ModerationEvent
-from .permissions import Action, require, role_for
+from .permissions import Action, GuestOwner, require, role_for
 from .serializers import (
     ChannelSerializer,
     ChannelWriteSerializer,
@@ -27,6 +28,13 @@ from .serializers import (
 
 
 class CommunitySessionAuthentication(SessionAuthentication):
+    def authenticate(self, request: Request):
+        if request.method not in {"GET", "HEAD", "OPTIONS"} and not getattr(
+            request._request.user, "is_authenticated", False
+        ):
+            self.enforce_csrf(request)
+        return super().authenticate(request)
+
     def authenticate_header(self, request: Request) -> str:
         return "Session"
 
@@ -39,6 +47,17 @@ def actor(request: Request):
     if not request.user or not request.user.is_authenticated or not request.user.is_active:
         raise NotAuthenticated("Sign in with an active account to continue.")
     return request.user
+
+
+def viewer(request: Request, community: Community):
+    if community.owner_id is None and community.pk in request.session.get("guest_communities", []):
+        return GuestOwner(community.pk)
+    return request.user
+
+
+def principal(request: Request, community: Community):
+    user = viewer(request, community)
+    return user if isinstance(user, GuestOwner) else actor(request)
 
 
 def community_for(community_id: int) -> Community:
@@ -71,6 +90,7 @@ def page(request: Request) -> tuple[int, int]:
 
 class CommunityList(CommunityView):
     def get(self, request: Request) -> Response:
+        get_token(request._request)
         limit, offset = page(request)
         query = request.query_params.get("q", "").strip()
         if len(query) > 100:
@@ -84,8 +104,13 @@ class CommunityList(CommunityView):
                 Q(name__icontains=query) | Q(school__icontains=query) | Q(course__icontains=query)
             )
         if mine == "true":
-            user = actor(request)
-            communities = communities.filter(memberships__user=user)
+            guest_ids = request.session.get("guest_communities", [])
+            if getattr(request.user, "is_authenticated", False):
+                communities = communities.filter(
+                    Q(memberships__user=request.user) | Q(pk__in=guest_ids)
+                )
+            else:
+                communities = communities.filter(pk__in=guest_ids)
         found = list(communities[offset : offset + limit + 1])
         roles = {}
         if request.user and request.user.is_authenticated:
@@ -99,10 +124,8 @@ class CommunityList(CommunityView):
                 "items": [
                     summary(
                         item,
-                        request.user,
-                        "owner"
-                        if item.owner_id == getattr(request.user, "pk", None)
-                        else roles.get(item.pk, "visitor"),
+                        viewer(request, item),
+                        roles.get(item.pk, role_for(item, viewer(request, item))),
                     )
                     for item in found[:limit]
                 ],
@@ -111,12 +134,23 @@ class CommunityList(CommunityView):
         )
 
     def post(self, request: Request) -> Response:
-        user = actor(request)
         parsed = CommunityWriteSerializer(data=request.data)
         parsed.is_valid(raise_exception=True)
-        created = services.create_community(user, parsed.validated_data)
-        created.member_count = 1
-        return Response(summary(created, user), status=201)
+        if getattr(request.user, "is_authenticated", False):
+            created = services.create_community(actor(request), parsed.validated_data)
+            created.member_count = 1
+        else:
+            owned = list(
+                Community.objects.filter(
+                    pk__in=request.session.get("guest_communities", []), owner__isnull=True
+                ).values_list("pk", flat=True)
+            )
+            if len(owned) >= services.MAX_OWNED:
+                raise serializers.ValidationError("You own the maximum number of communities.")
+            created = services.create_guest_community(parsed.validated_data)
+            request.session["guest_communities"] = [*owned, created.pk]
+            created.member_count = 0
+        return Response(summary(created, viewer(request, created)), status=201)
 
 
 class CommunityDetail(CommunityView):
@@ -126,17 +160,17 @@ class CommunityDetail(CommunityView):
         )
         return Response(
             {
-                **summary(community, request.user),
+                **summary(community, viewer(request, community)),
                 "channels": ChannelSerializer(community.channels.all(), many=True).data,
             }
         )
 
     def patch(self, request: Request, community_id: int) -> Response:
-        user = actor(request)
         parsed = CommunityWriteSerializer(data=request.data, partial=True)
         parsed.is_valid(raise_exception=True)
         with transaction.atomic():
             community = get_object_or_404(Community.objects.select_for_update(), pk=community_id)
+            user = principal(request, community)
             require(community, user, Action.MANAGE)
             for field, value in parsed.validated_data.items():
                 setattr(community, field, value)
@@ -146,9 +180,9 @@ class CommunityDetail(CommunityView):
         return Response(summary(community, user))
 
     def delete(self, request: Request, community_id: int) -> Response:
-        user = actor(request)
         with transaction.atomic():
             community = get_object_or_404(Community.objects.select_for_update(), pk=community_id)
+            user = principal(request, community)
             require(community, user, Action.DELETE)
             community.delete()
         return Response(status=204)
@@ -187,16 +221,18 @@ class MemberDetail(CommunityView):
     def patch(self, request: Request, community_id: int, user_id: str) -> Response:
         parsed = RoleWriteSerializer(data=request.data)
         parsed.is_valid(raise_exception=True)
+        community = community_for(community_id)
         services.set_role(
-            community_for(community_id),
-            actor(request),
+            community,
+            principal(request, community),
             user_id_for(user_id),
             parsed.validated_data["role"],
         )
         return Response({"role": parsed.validated_data["role"]})
 
     def delete(self, request: Request, community_id: int, user_id: str) -> Response:
-        services.moderate(community_for(community_id), actor(request), user_id_for(user_id), "kick")
+        community = community_for(community_id)
+        services.moderate(community, principal(request, community), user_id_for(user_id), "kick")
         return Response(status=204)
 
 
@@ -207,9 +243,10 @@ class Transfer(CommunityView):
 
         parsed = Target(data=request.data)
         parsed.is_valid(raise_exception=True)
+        community = community_for(community_id)
         services.transfer(
-            community_for(community_id),
-            actor(request),
+            community,
+            principal(request, community),
             user_id_for(parsed.validated_data["user_id"]),
         )
         return Response({"owner_id": parsed.validated_data["user_id"]})
@@ -223,16 +260,15 @@ class Channels(CommunityView):
     def post(self, request: Request, community_id: int) -> Response:
         parsed = ChannelWriteSerializer(data=request.data)
         parsed.is_valid(raise_exception=True)
+        community = community_for(community_id)
         channel = services.create_channel(
-            community_for(community_id), actor(request), parsed.validated_data["name"]
+            community, principal(request, community), parsed.validated_data["name"]
         )
         return Response(ChannelSerializer(channel).data, status=201)
 
 
 class ChannelDetail(CommunityView):
     def patch(self, request: Request, community_id: int, channel_id: int) -> Response:
-        user = actor(request)
-
         class Update(serializers.Serializer):
             name = serializers.RegexField(r"^[a-z0-9][a-z0-9-]{0,49}$", required=False)
             position = serializers.IntegerField(min_value=0, max_value=19, required=False)
@@ -242,6 +278,7 @@ class ChannelDetail(CommunityView):
         parsed.is_valid(raise_exception=True)
         with transaction.atomic():
             community = get_object_or_404(Community.objects.select_for_update(), pk=community_id)
+            user = principal(request, community)
             require(community, user, Action.MANAGE)
             channel = get_object_or_404(Channel, pk=channel_id, community=community)
             name = parsed.validated_data.get("name")
@@ -272,7 +309,7 @@ class ChannelDetail(CommunityView):
 class Invites(CommunityView):
     def get(self, request: Request, community_id: int) -> Response:
         community = community_for(community_id)
-        require(community, actor(request), Action.INVITE)
+        require(community, principal(request, community), Action.INVITE)
         return Response(
             list(
                 Invite.objects.filter(community=community)
@@ -284,8 +321,9 @@ class Invites(CommunityView):
     def post(self, request: Request, community_id: int) -> Response:
         parsed = InviteWriteSerializer(data=request.data)
         parsed.is_valid(raise_exception=True)
+        community = community_for(community_id)
         invite, token = services.create_invite(
-            community_for(community_id), actor(request), parsed.validated_data
+            community, principal(request, community), parsed.validated_data
         )
         return Response(
             {
@@ -302,7 +340,7 @@ class InviteDetail(CommunityView):
     def delete(self, request: Request, community_id: int, invite_id: int) -> Response:
         with transaction.atomic():
             community = get_object_or_404(Community.objects.select_for_update(), pk=community_id)
-            require(community, actor(request), Action.INVITE)
+            require(community, principal(request, community), Action.INVITE)
             invite = get_object_or_404(Invite, pk=invite_id, community=community)
             invite.revoked = True
             invite.save(update_fields=["revoked"])
@@ -318,7 +356,7 @@ class Redeem(CommunityView):
 class Moderation(CommunityView):
     def get(self, request: Request, community_id: int) -> Response:
         community = community_for(community_id)
-        require(community, actor(request), Action.MODERATE)
+        require(community, principal(request, community), Action.MODERATE)
         return Response(
             {
                 "events": list(
@@ -342,8 +380,9 @@ class Moderation(CommunityView):
         target_id = user_id_for(parsed.validated_data["user_id"])
         if not get_user_model().objects.filter(pk=target_id).exists():
             raise NotFound("User not found.")
+        community = community_for(community_id)
         services.moderate(
-            community_for(community_id), actor(request), target_id, parsed.validated_data["action"]
+            community, principal(request, community), target_id, parsed.validated_data["action"]
         )
         return Response({"action": parsed.validated_data["action"]})
 

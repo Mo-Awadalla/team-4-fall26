@@ -10,7 +10,9 @@ class Community(models.Model):
     description = models.TextField(max_length=1000, blank=True)
     school = models.CharField(max_length=100, blank=True)
     course = models.CharField(max_length=100, blank=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

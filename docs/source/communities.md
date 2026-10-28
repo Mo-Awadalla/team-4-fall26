@@ -1,14 +1,14 @@
 # Communities
 
-The static `/communities` page discovers public groups through the Django API. A group has an owner, members, text-channel names, optional school and course, and shareable invitations. Channel discussions, direct messages, live delivery, and message search are deferred.
+The static `/communities` page discovers public groups through the Django API. Anyone can create a community without signing in. A group has an owner, members, text-channel names, optional school and course, and shareable invitations. Channel discussions, direct messages, live delivery, and message search are deferred.
 
-All community paths have no trailing slash. Public `GET /communities?q=&limit=&offset=`, `GET /communities/{id}`, `GET /communities/{id}/members`, and `GET /communities/{id}/channels` need no account. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` filters to the authenticated user's memberships.
+All community paths have no trailing slash. Public `GET /communities?q=&limit=&offset=`, `GET /communities/{id}`, `GET /communities/{id}/members`, and `GET /communities/{id}/channels` need no account. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` shows account memberships and communities owned in this browser session.
 
-Authenticated routes use Django sessions and CSRF cookies. The account implementation supplies `request.user`; foreign keys use `settings.AUTH_USER_MODEL`. StudySpot admins must be marked `is_staff` by that implementation. No client-supplied actor or role is trusted. Local development can use `python manage.py createsuperuser` and sign in at `http://localhost:7501/admin/` before visiting `http://localhost:7500/communities`.
+Community creation and management use Django sessions and CSRF cookies. The public list request sets the CSRF cookie; subsequent writes send it back. Visitors own up to five communities through their browser session. Clearing cookies or signing out loses guest management access, so the future account flow should claim guest communities before ending the session. Guest communities have no account owner or initial member; their owner can manage channels, invitations and moderation through the same permissions policy. The account implementation supplies `request.user`; foreign keys use `settings.AUTH_USER_MODEL`. StudySpot admins must be marked `is_staff` by that implementation. No client-supplied actor or role is trusted. Local development can use `python manage.py createsuperuser` and sign in at `http://localhost:7501/admin/` for account-only actions.
 
 | Route | Method | Rule |
 |---|---|---|
-| `/communities` | POST | Create a group, owner membership and `general` channel together. |
+| `/communities` | POST | Create a group and `general` channel; account owners also get a membership. |
 | `/communities/{id}` | PATCH, DELETE | Owner edits or deletes. |
 | `/communities/{id}/join`, `/leave` | POST | Join once or leave; owners transfer first. |
 | `/communities/{id}/members/{user_id}` | PATCH, DELETE | Owner appoints moderators; owner or moderator kicks eligible members. |

@@ -17,12 +17,35 @@ def client_for(user=None):
     return client
 
 
+def test_guest_creation_requires_csrf_and_keeps_ownership_in_session():
+    guest = APIClient(enforce_csrf_checks=True)
+    assert guest.post("/communities", {"name": "Physics"}, format="json").status_code == 403
+    guest.get("/communities")
+    token = guest.cookies["csrftoken"].value
+    created = guest.post(
+        "/communities", {"name": "Physics"}, format="json", HTTP_X_CSRFTOKEN=token
+    )
+    assert created.status_code == 201
+    community_id = created.data["id"]
+    assert guest.get(f"/communities/{community_id}").data["role"] == "owner"
+    assert guest.patch(
+        f"/communities/{community_id}", {"name": "Physics 1"}, HTTP_X_CSRFTOKEN=token
+    ).status_code == 200
+    assert client_for().get(f"/communities/{community_id}").data["role"] == "visitor"
+
+
 def test_create_browse_join_and_owner_rules():
     users = get_user_model().objects
     owner = users.create_user(username="owner", password="test-password")
     member = users.create_user(username="member", password="test-password")
     anonymous = client_for()
-    assert anonymous.post("/communities", {"name": "Math 51A"}).status_code == 401
+    guest_created = anonymous.post("/communities", {"name": "Guest group"}, format="json")
+    assert guest_created.status_code == 201
+    guest_id = guest_created.data["id"]
+    assert guest_created.data["role"] == "owner"
+    assert anonymous.patch(f"/communities/{guest_id}", {"name": "Renamed"}).status_code == 200
+    assert client_for().patch(f"/communities/{guest_id}", {"name": "Nope"}).status_code == 401
+    assert anonymous.get("/communities?mine=true").data["items"][0]["name"] == "Renamed"
 
     created = client_for(owner).post(
         "/communities", {"name": "Math 51A", "course": "MATH 51A"}, format="json"
