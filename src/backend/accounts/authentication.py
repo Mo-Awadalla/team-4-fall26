@@ -22,7 +22,7 @@ from typing import Any
 import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.request import Request
@@ -33,13 +33,21 @@ from .models import Account
 #: Naming the one algorithm accepted is what stops a token from choosing its own.
 ALGORITHMS = ["RS256"]
 
+#: Where the browser sends the ID token from the same log-in, if it has one.
+#: ``X-ID-Token`` on the wire.
+ID_TOKEN_HEADER = "HTTP_X_ID_TOKEN"
+
 #: Tolerated clock difference between Auth0 and the Lambda host, in seconds.
 LEEWAY = 30
 
 
 @dataclass(frozen=True)
 class Identity:
-    """What a verified token says about who sent it."""
+    """What a verified token says about who sent it.
+
+    ``email`` is blank when nothing the request carried said what it is, which
+    is different from saying it changed: the stored address is then kept.
+    """
 
     subject: str
     email: str
@@ -81,11 +89,16 @@ def signing_key(token: str) -> Any:
     return _key_client(settings.AUTH0_DOMAIN).get_signing_key_from_jwt(token).key
 
 
-def verify(token: str) -> Identity:
+def verify(token: str, id_token: str | None = None) -> Identity:
     """Check ``token`` and read the identity out of it.
 
     Raises :class:`jwt.InvalidTokenError` (or a subclass) for anything wrong
     with it, and :class:`jwt.PyJWKClientError` when the keys cannot be fetched.
+
+    ``id_token`` is the ID token from the same log-in, which carries the email
+    and whether Auth0 has verified it. It only ever adds those two facts: one
+    that does not verify, or belongs to someone else, is ignored rather than
+    trusted, and never fails a request the access token alone would pass.
     """
     claims = jwt.decode(
         token,
@@ -97,16 +110,43 @@ def verify(token: str) -> Identity:
         options={"require": ["exp", "iat", "sub"]},
     )
 
-    # Auth0 leaves the email out of an access token. The post-login Action in
-    # docs/source/accounts.md adds it, with the verification flag and the
-    # username, under a namespace.
+    # Auth0 leaves the email out of an access token. An optional post-login
+    # Action can add it under a namespace (docs/source/accounts.md); without
+    # one, it comes from the ID token instead.
     namespace = settings.AUTH0_CLAIM_NAMESPACE
+    email = str(claims.get(f"{namespace}email") or "").strip().lower()
+    email_verified = claims.get(f"{namespace}email_verified") is True
+
+    if not email and id_token:
+        profile = _id_token_claims(id_token, subject=claims["sub"])
+        if profile is not None:
+            email = str(profile.get("email") or "").strip().lower()
+            email_verified = profile.get("email_verified") is True
+
     return Identity(
         subject=claims["sub"],
-        email=str(claims.get(f"{namespace}email") or "").strip().lower(),
-        email_verified=claims.get(f"{namespace}email_verified") is True,
+        email=email,
+        email_verified=email_verified and bool(email),
         username=str(claims.get(f"{namespace}username") or "").strip(),
     )
+
+
+def _id_token_claims(id_token: str, subject: str) -> dict[str, Any] | None:
+    """The claims of ``id_token`` if it is genuine and about ``subject``."""
+    try:
+        claims = jwt.decode(
+            id_token,
+            signing_key(id_token),
+            algorithms=ALGORITHMS,
+            # An ID token is issued to the application, not to the API.
+            audience=settings.AUTH0_CLIENT_ID,
+            issuer=issuer(),
+            leeway=LEEWAY,
+            options={"require": ["exp", "iat", "sub"]},
+        )
+    except (jwt.InvalidTokenError, jwt.PyJWKClientError):
+        return None
+    return claims if claims["sub"] == subject else None
 
 
 def account_for(identity: Identity) -> Account:
@@ -123,16 +163,31 @@ def account_for(identity: Identity) -> Account:
         )
 
         if not created:
-            current = {
-                "email": identity.email,
-                "email_verified": identity.email_verified,
-                "username": identity.username,
-            }
+            current: dict[str, Any] = {}
+            # Nothing said what the email is, which is not news that it changed.
+            if identity.email:
+                current["email"] = identity.email
+                current["email_verified"] = identity.email_verified
+            # A token with no username leaves alone the one chosen on StudySpot.
+            if identity.username:
+                current["username"] = identity.username
             changed = [name for name, value in current.items() if getattr(account, name) != value]
             if changed:
                 for name in changed:
                     setattr(account, name, current[name])
-                account.save(update_fields=[*changed, "updated_at"])
+                try:
+                    with transaction.atomic():
+                        account.save(update_fields=[*changed, "updated_at"])
+                except IntegrityError:
+                    # Auth0's username clashes with one a student chose here.
+                    # The account keeps its own rather than refusing the log-in.
+                    account.refresh_from_db()
+                    if "username" in changed:
+                        changed.remove("username")
+                    for name in changed:
+                        setattr(account, name, current[name])
+                    if changed:
+                        account.save(update_fields=[*changed, "updated_at"])
 
     return account
 
@@ -154,7 +209,7 @@ class Auth0Authentication(BaseAuthentication):
             raise AuthenticationFailed("Accounts are not configured on this server.")
 
         try:
-            identity = verify(header[1].decode("ascii"))
+            identity = verify(header[1].decode("ascii"), request.META.get(ID_TOKEN_HEADER))
         except (UnicodeDecodeError, jwt.InvalidTokenError) as error:
             raise AuthenticationFailed("The access token is not valid.") from error
         except jwt.PyJWKClientError as error:

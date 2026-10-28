@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from './api';
-import { completeSignUp, displayName, fetchAccount, fetchAuthConfig } from './accounts';
+import {
+	checkUsername,
+	completeSignUp,
+	displayName,
+	fetchAccount,
+	fetchAuthConfig
+} from './accounts';
 import type { Account } from './contract';
 
 const ACCOUNT: Account = {
@@ -43,9 +49,19 @@ describe('fetchAccount', () => {
 	it('sends the access token as a bearer token', async () => {
 		const { calls, fetcher } = recording(() => json(ACCOUNT));
 
-		expect(await fetchAccount('t0k3n', fetcher)).toEqual(ACCOUNT);
+		expect(await fetchAccount({ access: 't0k3n' }, fetcher)).toEqual(ACCOUNT);
 		expect(calls[0].path).toBe('/api/account');
 		expect(new Headers(calls[0].init.headers).get('authorization')).toBe('Bearer t0k3n');
+	});
+
+	it('sends the ID token alongside, when there is one', async () => {
+		const { calls, fetcher } = recording(() => json(ACCOUNT));
+
+		await fetchAccount({ access: 'a', id: 'i' }, fetcher);
+		await fetchAccount({ access: 'a' }, fetcher);
+
+		expect(new Headers(calls[0].init.headers).get('x-id-token')).toBe('i');
+		expect(new Headers(calls[1].init.headers).has('x-id-token')).toBe(false);
 	});
 
 	it('reports a refused token in the API’s own words', async () => {
@@ -56,7 +72,7 @@ describe('fetchAccount', () => {
 			)
 		);
 
-		await expect(fetchAccount('bad', fetcher)).rejects.toMatchObject({
+		await expect(fetchAccount({ access: 'bad' }, fetcher)).rejects.toMatchObject({
 			code: 'unauthorized',
 			status: 401,
 			message: 'The access token is not valid.'
@@ -68,7 +84,9 @@ describe('fetchAccount', () => {
 			throw new TypeError('Failed to fetch');
 		}) as typeof globalThis.fetch;
 
-		await expect(fetchAccount('t', fetcher)).rejects.toMatchObject({ code: 'network_error' });
+		await expect(fetchAccount({ access: 't' }, fetcher)).rejects.toMatchObject({
+			code: 'network_error'
+		});
 	});
 });
 
@@ -76,7 +94,7 @@ describe('completeSignUp', () => {
 	it('posts the choice as JSON', async () => {
 		const { calls, fetcher } = recording(() => json({ ...ACCOUNT, account_type: 'student' }, 201));
 
-		const account = await completeSignUp('t', { account_type: 'student' }, fetcher);
+		const account = await completeSignUp({ access: 't' }, { account_type: 'student' }, fetcher);
 
 		expect(account.account_type).toBe('student');
 		expect(calls[0].init.method).toBe('POST');
@@ -96,9 +114,11 @@ describe('completeSignUp', () => {
 			json({ error: { code: 'validation_error', message: 'Invalid.', details } }, 422)
 		);
 
-		const failure = await completeSignUp('t', { account_type: 'student' }, fetcher).catch(
-			(error: unknown) => error
-		);
+		const failure = await completeSignUp(
+			{ access: 't' },
+			{ account_type: 'student' },
+			fetcher
+		).catch((error: unknown) => error);
 
 		expect(failure).toBeInstanceOf(ApiError);
 		expect((failure as ApiError).details).toEqual(details);
@@ -110,5 +130,20 @@ describe('displayName', () => {
 		expect(displayName({ ...ACCOUNT, business_name: 'Grumpy' })).toBe('Grumpy');
 		expect(displayName(ACCOUNT)).toBe('ada');
 		expect(displayName({ ...ACCOUNT, username: '' })).toBe('ada@nyu.edu');
+	});
+});
+
+describe('checkUsername', () => {
+	it('asks about the name, escaped', async () => {
+		const answer = {
+			username: 'a b',
+			available: false,
+			reason: 'invalid_username',
+			message: 'No.'
+		};
+		const { calls, fetcher } = recording(() => json(answer));
+
+		expect(await checkUsername('a b', fetcher)).toEqual(answer);
+		expect(calls[0].path).toBe('/api/usernames/a%20b');
 	});
 });

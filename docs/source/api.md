@@ -14,6 +14,7 @@ No route has a trailing slash, and the application does not redirect one onto th
 | `GET /auth/config` | The public Auth0 settings the browser logs in with. See [Accounts](accounts.md). |
 | `GET /account` | The logged-in person's account. Needs a bearer token. |
 | `POST /account` | Finishes sign-up as a student or a business. Needs a bearer token. |
+| `GET /usernames/{username}` | Whether a username is free to choose. |
 
 `GET /health/live` returns:
 

@@ -259,4 +259,15 @@ export type Account = {
 
 /** The body of `POST /account`, which finishes sign-up. */
 export type CompleteSignUp =
-	{ account_type: 'student' } | { account_type: 'business'; business_name: string };
+	/** `username` only when Auth0 supplied none, as with a Google log-in. */
+	| { account_type: 'student'; username?: string }
+	| { account_type: 'business'; business_name: string };
+
+/** The answer of `GET /usernames/{name}`. */
+export type UsernameCheck = {
+	username: string;
+	available: boolean;
+	/** Why not, machine-readable: `invalid_username` or `username_taken`. */
+	reason: string | null;
+	message: string | null;
+};

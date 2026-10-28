@@ -6,7 +6,7 @@
  */
 
 import { ApiError, isErrorEnvelope, type Fetcher } from './api';
-import type { Account, AuthConfig, CompleteSignUp } from './contract';
+import type { Account, AuthConfig, CompleteSignUp, UsernameCheck } from './contract';
 
 async function request<T>(path: string, init: RequestInit, fetcher: Fetcher): Promise<T> {
 	let response: Response;
@@ -51,22 +51,34 @@ export function fetchAuthConfig(fetcher: Fetcher = globalThis.fetch): Promise<Au
 }
 
 /**
- * The account behind `token`.
+ * What proves who is asking: the access token, and the ID token from the same
+ * log-in when there is one. The API reads the email and whether Auth0 has
+ * verified it from the ID token, which an access token does not carry.
+ */
+export type Credentials = { access: string; id?: string };
+
+function authorization(credentials: Credentials): Record<string, string> {
+	const headers: Record<string, string> = { authorization: `Bearer ${credentials.access}` };
+	if (credentials.id) headers['x-id-token'] = credentials.id;
+	return headers;
+}
+
+/**
+ * The account behind `credentials`.
  *
  * The first call after an Auth0 sign-up is also what creates it, so there is
  * no separate registration request to forget.
  */
-export function fetchAccount(token: string, fetcher: Fetcher = globalThis.fetch): Promise<Account> {
-	return request<Account>(
-		'/api/account',
-		{ headers: { authorization: `Bearer ${token}` } },
-		fetcher
-	);
+export function fetchAccount(
+	credentials: Credentials,
+	fetcher: Fetcher = globalThis.fetch
+): Promise<Account> {
+	return request<Account>('/api/account', { headers: authorization(credentials) }, fetcher);
 }
 
 /** Finish sign-up by saying which kind of account this is. Allowed once. */
 export function completeSignUp(
-	token: string,
+	credentials: Credentials,
 	choice: CompleteSignUp,
 	fetcher: Fetcher = globalThis.fetch
 ): Promise<Account> {
@@ -74,11 +86,19 @@ export function completeSignUp(
 		'/api/account',
 		{
 			method: 'POST',
-			headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+			headers: { ...authorization(credentials), 'content-type': 'application/json' },
 			body: JSON.stringify(choice)
 		},
 		fetcher
 	);
+}
+
+/** Whether a username is free, and if not, why, from `GET /usernames/{name}`. */
+export function checkUsername(
+	username: string,
+	fetcher: Fetcher = globalThis.fetch
+): Promise<UsernameCheck> {
+	return request<UsernameCheck>(`/api/usernames/${encodeURIComponent(username)}`, {}, fetcher);
 }
 
 /** How an account is named in the header: the name its owner chose. */

@@ -10,8 +10,9 @@ from __future__ import annotations
 from typing import Any
 
 from django.conf import settings
+from django.db import IntegrityError, transaction
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -19,7 +20,7 @@ from rest_framework.views import APIView
 
 from .authentication import Auth0Authentication, configured
 from .models import Account
-from .serializers import AccountSerializer, CompleteSignUpSerializer
+from .serializers import AccountSerializer, CompleteSignUpSerializer, username_problem
 
 
 class SignUpAlreadyComplete(APIException):
@@ -72,9 +73,43 @@ class AccountView(APIView):
 
         account.account_type = data["account_type"]
         account.business_name = data["business_name"]
-        account.save(update_fields=["account_type", "business_name", "updated_at"])
+        account.username = data["username"]
+        try:
+            with transaction.atomic():
+                account.save(
+                    update_fields=["account_type", "business_name", "username", "updated_at"]
+                )
+        except IntegrityError as error:
+            # Someone else took the name between the check and the save.
+            raise ValidationError(
+                {"username": "That username is taken."}, code="username_taken"
+            ) from error
         return Response(AccountSerializer(account).data, status=status.HTTP_201_CREATED)
 
     @staticmethod
     def _account(request: Request) -> Account:
         return request.user.account
+
+
+class UsernameView(APIView):
+    """Whether a username can still be chosen, for the sign-up form to say so.
+
+    Public, like the sign-up form that asks: it answers before anyone has an
+    account. It says only whether a name is free, which submitting the form
+    would reveal anyway.
+    """
+
+    authentication_classes: list[type] = []
+    permission_classes: list[type] = []
+
+    def get(self, request: Request, username: str) -> Response:
+        problem = username_problem(username.strip())
+        code, message = problem if problem is not None else (None, None)
+        return Response(
+            {
+                "username": username,
+                "available": problem is None,
+                "reason": code,
+                "message": message,
+            }
+        )

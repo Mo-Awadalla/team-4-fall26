@@ -80,6 +80,9 @@ services:
         - action: sync
           path: ./src/backend/spots
           target: /app/spots
+        - action: sync
+          path: ./src/backend/accounts
+          target: /app/accounts
         - action: rebuild
           path: ./src/backend/pyproject.toml
         - action: rebuild

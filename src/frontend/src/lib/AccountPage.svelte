@@ -1,23 +1,15 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import SiteHeader from './SiteHeader.svelte';
-	import { ApiError } from './api';
-	import type { AccountType } from './contract';
+	import SignUpForm from './SignUpForm.svelte';
+	import type { CompleteSignUp } from './contract';
 	import { session as shared, type Session } from './session.svelte';
 
 	/** Replaceable so a test can render the page in any state. */
 	let { session = shared }: { session?: Session } = $props();
 
 	const account = $derived(session.account);
-
-	let choice = $state<AccountType>('student');
-	let businessName = $state('');
-	let submitting = $state(false);
 	let refreshing = $state(false);
-
-	/** The form's own problem, and each field's, in the API's words. */
-	let formError = $state('');
-	let fieldErrors = $state<Record<string, string>>({});
 
 	const joined = $derived(
 		account
@@ -28,36 +20,17 @@
 			: ''
 	);
 
-	async function finish(event: SubmitEvent): Promise<void> {
-		event.preventDefault();
-		if (submitting) return;
+	/** What the sign-up page chose, said back while the email is unverified. */
+	const pendingSummary = $derived.by(() => {
+		const pending = session.pending;
+		if (!pending) return '';
+		if (pending.account_type === 'business')
+			return `a business account for ${pending.business_name}`;
+		return pending.username ? `a student account as ${pending.username}` : 'a student account';
+	});
 
-		submitting = true;
-		formError = '';
-		fieldErrors = {};
-
-		try {
-			await session.completeSignUp(
-				choice === 'business'
-					? { account_type: 'business', business_name: businessName.trim() }
-					: { account_type: 'student' }
-			);
-		} catch (error) {
-			if (error instanceof ApiError && error.details.length > 0) {
-				// "body.business_name" -> "business_name", to key the message
-				// to the control it is about.
-				fieldErrors = Object.fromEntries(
-					error.details.map((detail) => [
-						(detail.field ?? '').replace(/^body\./, ''),
-						detail.message
-					])
-				);
-			} else {
-				formError = error instanceof ApiError ? error.message : 'Something went wrong. Try again.';
-			}
-		} finally {
-			submitting = false;
-		}
+	async function finish(choice: CompleteSignUp): Promise<void> {
+		await session.completeSignUp(choice);
 	}
 
 	async function checkVerified(): Promise<void> {
@@ -86,7 +59,7 @@
 					listing for their space.
 				</p>
 				<div class="actions">
-					<button class="primary" type="button" onclick={() => session.signUp()}>Sign up</button>
+					<a class="primary" href={resolve('/signup')}>Sign up</a>
 					<button class="secondary" type="button" onclick={() => session.logIn('/account')}>
 						Log in
 					</button>
@@ -99,6 +72,9 @@
 				<h1 id="account-title">Verify your email.</h1>
 				<p class="lede">
 					We sent a link to <strong>{account.email}</strong>. Open it, then come back here.
+					{#if pendingSummary}
+						We’ll finish setting up {pendingSummary} as soon as it’s verified.
+					{/if}
 				</p>
 				<div class="actions">
 					<button class="primary" type="button" disabled={refreshing} onclick={checkVerified}>
@@ -112,65 +88,15 @@
 				<p class="eyebrow">One more step</p>
 				<h1 id="account-title">Who is this account for?</h1>
 
-				<form class="card" onsubmit={finish} novalidate>
-					<fieldset>
-						<legend>Account type</legend>
-
-						<label class="option" class:selected={choice === 'student'}>
-							<input type="radio" name="account_type" value="student" bind:group={choice} />
-							<span>
-								<span class="option-title">Student</span>
-								<span class="option-text">
-									Find study spots and study partners. Uses your university email, {account.email}.
-								</span>
-							</span>
-						</label>
-
-						<label class="option" class:selected={choice === 'business'}>
-							<input type="radio" name="account_type" value="business" bind:group={choice} />
-							<span>
-								<span class="option-title">Business owner</span>
-								<span class="option-text">Manage the listing for your study space.</span>
-							</span>
-						</label>
-					</fieldset>
-
-					{#if fieldErrors.email}
-						<p class="field-error" role="alert">{fieldErrors.email}</p>
-					{/if}
-					{#if fieldErrors.username}
-						<p class="field-error" role="alert">{fieldErrors.username}</p>
-					{/if}
-					{#if fieldErrors.account_type}
-						<p class="field-error" role="alert">{fieldErrors.account_type}</p>
-					{/if}
-
-					{#if choice === 'business'}
-						<label class="field">
-							<span class="label">Business name</span>
-							<input
-								type="text"
-								name="business_name"
-								autocomplete="organization"
-								maxlength="200"
-								required
-								bind:value={businessName}
-								aria-invalid={fieldErrors.business_name ? 'true' : undefined}
-							/>
-						</label>
-						{#if fieldErrors.business_name}
-							<p class="field-error" role="alert">{fieldErrors.business_name}</p>
-						{/if}
-					{/if}
-
-					{#if formError}
-						<p class="field-error" role="alert">{formError}</p>
-					{/if}
-
-					<button class="primary" type="submit" disabled={submitting}>
-						{submitting ? 'Saving…' : 'Finish sign-up'}
-					</button>
-				</form>
+				<SignUpForm
+					onSubmit={finish}
+					submitLabel="Finish sign-up"
+					askUsername={!account.username}
+					email={account.email}
+					initial={session.pending}
+					error={session.pendingError}
+					check={(name) => session.checkUsername(name)}
+				/>
 			</section>
 		{:else if account}
 			<section class="panel" aria-labelledby="account-title">
@@ -326,101 +252,6 @@
 		background: #fff;
 		box-shadow: 0 16px 44px rgb(34 34 34 / 9%);
 		text-align: left;
-	}
-
-	fieldset {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		margin: 0;
-		padding: 0;
-		border: 0;
-	}
-
-	legend {
-		margin-bottom: 10px;
-		padding: 0;
-		font-size: 13px;
-		font-weight: 700;
-	}
-
-	.option {
-		display: flex;
-		align-items: flex-start;
-		gap: 12px;
-		padding: 14px 16px;
-		border: 1px solid var(--color-border);
-		border-radius: 16px;
-		cursor: pointer;
-		transition:
-			border-color 150ms ease,
-			background-color 150ms ease;
-	}
-
-	.option:hover {
-		background: #fbf8f5;
-	}
-
-	.option.selected {
-		border-color: #222;
-		background: #fbf8f5;
-	}
-
-	.option input {
-		margin: 3px 0 0;
-		accent-color: var(--color-brand-hover);
-	}
-
-	.option-title {
-		display: block;
-		font-size: 15px;
-		font-weight: 700;
-	}
-
-	.option-text {
-		display: block;
-		margin-top: 2px;
-		color: var(--color-muted);
-		font-size: 14px;
-		line-height: 1.45;
-		overflow-wrap: anywhere;
-	}
-
-	.field {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-	}
-
-	.label {
-		font-size: 13px;
-		font-weight: 700;
-	}
-
-	.field input {
-		min-height: 48px;
-		padding: 0 16px;
-		border: 1px solid var(--color-border);
-		border-radius: 14px;
-		color: var(--color-text);
-		background: #fff;
-	}
-
-	.field input:focus-visible {
-		border-color: #222;
-		outline: 3px solid rgb(255 56 92 / 25%);
-		outline-offset: 0;
-	}
-
-	.field input[aria-invalid='true'] {
-		border-color: var(--color-brand-hover);
-	}
-
-	.field-error {
-		margin: 0;
-		color: var(--color-brand-hover);
-		font-size: 14px;
-		font-weight: 600;
 	}
 
 	dl.card {

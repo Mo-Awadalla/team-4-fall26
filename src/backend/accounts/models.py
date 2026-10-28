@@ -14,7 +14,18 @@ remains the one identifier Auth0 promises never to change.
 from __future__ import annotations
 
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.functions import Lower
+
+#: What a username a student picks on StudySpot may look like. Auth0 usernames
+#: are taken as Auth0 allows them; this applies only to the ones chosen here.
+USERNAME_PATTERN = r"^[A-Za-z0-9_.]{3,30}$"
+username_validator = RegexValidator(
+    USERNAME_PATTERN,
+    "Use 3 to 30 letters, numbers, dots or underscores.",
+    code="invalid_username",
+)
 
 
 class AccountType(models.TextChoices):
@@ -39,6 +50,10 @@ class Account(models.Model):
     # made in Auth0 without anyone having to sync them.
     email = models.EmailField(blank=True)
     email_verified = models.BooleanField(default=False)
+
+    #: From Auth0 when its database connection requires one. Otherwise -- a
+    #: connection without usernames, or a log-in with Google -- the student
+    #: chooses it when finishing sign-up, and the token never overwrites it.
     username = models.CharField(max_length=150, blank=True)
 
     business_name = models.CharField(max_length=200, blank=True)
@@ -48,6 +63,12 @@ class Account(models.Model):
 
     class Meta:
         constraints = [
+            # "Ada" and "ada" are one person to anyone reading them.
+            models.UniqueConstraint(
+                Lower("username"),
+                condition=~models.Q(username=""),
+                name="account_username_unique_ci",
+            ),
             # A business account is named; anything else is not.
             models.CheckConstraint(
                 condition=(

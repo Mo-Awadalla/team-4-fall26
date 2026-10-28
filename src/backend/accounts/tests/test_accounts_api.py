@@ -281,7 +281,72 @@ class TestCompleteSignUp:
         )
 
         assert response.status_code == 422
-        assert response.json()["error"]["details"][0]["field"] == "body.username"
+        [detail] = response.json()["error"]["details"]
+        assert detail["field"] == "body.username"
+        assert detail["type"] == "required"
+
+    def test_lets_a_student_without_one_choose_a_username(self, client: Any, token: Token) -> None:
+        # What a Google log-in, or a connection without usernames, looks like.
+        response = client.post(
+            "/account",
+            {"account_type": "student", "username": "  grace_h  "},
+            content_type="application/json",
+            **bearer(token(username="")),
+        )
+
+        assert response.status_code == 201
+        assert response.json()["username"] == "grace_h"
+
+    def test_keeps_a_chosen_username_when_the_token_has_none(
+        self, client: Any, token: Token
+    ) -> None:
+        client.post(
+            "/account",
+            {"account_type": "student", "username": "grace_h"},
+            content_type="application/json",
+            **bearer(token(username="")),
+        )
+
+        body = client.get("/account", **bearer(token(username=""))).json()
+
+        assert body["username"] == "grace_h"
+
+    @pytest.mark.parametrize("username", ["ab", "has space", "émile", "x" * 31, "a@b"])
+    def test_refuses_a_malformed_username(self, client: Any, token: Token, username: str) -> None:
+        response = client.post(
+            "/account",
+            {"account_type": "student", "username": username},
+            content_type="application/json",
+            **bearer(token(username="")),
+        )
+
+        assert response.status_code == 422
+        [detail] = response.json()["error"]["details"]
+        assert detail["field"] == "body.username"
+
+    def test_refuses_a_username_someone_has_in_any_case(self, client: Any, token: Token) -> None:
+        client.get("/account", **bearer(token(sub="auth0|first", username="Ada")))
+
+        response = client.post(
+            "/account",
+            {"account_type": "student", "username": "ada"},
+            content_type="application/json",
+            **bearer(token(sub="auth0|second", email="bea@nyu.edu", username="")),
+        )
+
+        assert response.status_code == 422
+        assert response.json()["error"]["details"][0]["type"] == "username_taken"
+
+    def test_will_not_rename_an_auth0_username(self, client: Any, token: Token) -> None:
+        response = client.post(
+            "/account",
+            {"account_type": "student", "username": "someone_else"},
+            content_type="application/json",
+            **bearer(token(username="ada")),
+        )
+
+        assert response.status_code == 422
+        assert Account.objects.get().account_type == ""
 
     def test_makes_a_business_account(self, client: Any, token: Token) -> None:
         response = client.post(
@@ -343,3 +408,151 @@ class TestCompleteSignUp:
         )
 
         assert response.status_code == 401
+
+
+@pytest.fixture
+def id_token(signing_key: rsa.RSAPrivateKey) -> Token:
+    """Sign an ID token, as Auth0 issues to the single-page application."""
+
+    def sign(
+        sub: str = "auth0|student",
+        email: str = "ada@nyu.edu",
+        email_verified: bool = True,
+        key: rsa.RSAPrivateKey | None = None,
+        **overrides: Any,
+    ) -> str:
+        now = int(time.time())
+        claims = {
+            "iss": f"https://{DOMAIN}/",
+            "aud": "spa-client-id",
+            "sub": sub,
+            "iat": now,
+            "exp": now + 3600,
+            "email": email,
+            "email_verified": email_verified,
+            **overrides,
+        }
+        return jwt.encode(claims, key or signing_key, algorithm="RS256", headers={"kid": KID})
+
+    return sign
+
+
+def with_id_token(access: str, identity: str) -> dict[str, str]:
+    return {**bearer(access), "HTTP_X_ID_TOKEN": identity}
+
+
+@pytest.mark.django_db
+class TestEmailFromIdToken:
+    """Without the optional Auth0 Action, the email comes from the ID token."""
+
+    def test_reads_the_email_and_its_verification(
+        self, client: Any, token: Token, id_token: Token
+    ) -> None:
+        access = token(email="", email_verified=False, username="")
+
+        body = client.get("/account", **with_id_token(access, id_token())).json()
+
+        assert body["email"] == "ada@nyu.edu"
+        assert body["email_verified"] is True
+
+    def test_lets_a_student_finish_sign_up(
+        self, client: Any, token: Token, id_token: Token
+    ) -> None:
+        access = token(email="", email_verified=False, username="")
+
+        response = client.post(
+            "/account",
+            {"account_type": "student", "username": "ada_l"},
+            content_type="application/json",
+            **with_id_token(access, id_token()),
+        )
+
+        assert response.status_code == 201
+
+    def test_ignores_an_id_token_for_someone_else(
+        self, client: Any, token: Token, id_token: Token
+    ) -> None:
+        access = token(email="", email_verified=False, username="")
+
+        body = client.get(
+            "/account", **with_id_token(access, id_token(sub="auth0|someone-else"))
+        ).json()
+
+        assert body["email"] == ""
+        assert body["email_verified"] is False
+
+    def test_ignores_a_forged_id_token(self, client: Any, token: Token, id_token: Token) -> None:
+        access = token(email="", email_verified=False, username="")
+
+        response = client.get("/account", **with_id_token(access, id_token(key=rsa_key())))
+
+        # The access token is still good, so the request is; the forgery just
+        # counts for nothing.
+        assert response.status_code == 200
+        assert response.json()["email_verified"] is False
+
+    def test_ignores_an_id_token_issued_to_another_application(
+        self, client: Any, token: Token, id_token: Token
+    ) -> None:
+        access = token(email="", email_verified=False, username="")
+
+        body = client.get("/account", **with_id_token(access, id_token(aud="another-app"))).json()
+
+        assert body["email_verified"] is False
+
+    def test_ignores_an_expired_id_token(self, client: Any, token: Token, id_token: Token) -> None:
+        access = token(email="", email_verified=False, username="")
+        past = int(time.time()) - 7200
+
+        body = client.get(
+            "/account", **with_id_token(access, id_token(iat=past, exp=past + 60))
+        ).json()
+
+        assert body["email_verified"] is False
+
+    def test_keeps_the_email_when_a_request_carries_none(
+        self, client: Any, token: Token, id_token: Token
+    ) -> None:
+        access = token(email="", email_verified=False, username="")
+        client.get("/account", **with_id_token(access, id_token()))
+
+        body = client.get("/account", **bearer(access)).json()
+
+        assert body["email"] == "ada@nyu.edu"
+        assert body["email_verified"] is True
+
+    def test_prefers_the_action_claims_when_present(
+        self, client: Any, token: Token, id_token: Token
+    ) -> None:
+        access = token(email="ada@nyu.edu", email_verified=True)
+
+        body = client.get(
+            "/account", **with_id_token(access, id_token(email="other@nyu.edu"))
+        ).json()
+
+        assert body["email"] == "ada@nyu.edu"
+
+
+@pytest.mark.django_db
+class TestUsernameAvailability:
+    def test_says_a_free_name_is_available(self, client: Any) -> None:
+        body = client.get("/usernames/grace_h").json()
+
+        assert body == {"username": "grace_h", "available": True, "reason": None, "message": None}
+
+    def test_says_a_taken_name_is_not_in_any_case(self, client: Any, token: Token) -> None:
+        client.get("/account", **bearer(token(username="Ada")))
+
+        body = client.get("/usernames/ada").json()
+
+        assert body["available"] is False
+        assert body["reason"] == "username_taken"
+
+    def test_explains_a_malformed_name(self, client: Any) -> None:
+        body = client.get("/usernames/ab").json()
+
+        assert body["available"] is False
+        assert body["reason"] == "invalid_username"
+
+    def test_needs_no_token(self, client: Any) -> None:
+        assert client.get("/usernames/anyone").status_code == 200

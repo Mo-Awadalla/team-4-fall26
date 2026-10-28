@@ -13,8 +13,14 @@
 
 import type { Auth0Client } from '@auth0/auth0-spa-js';
 import { ApiError, type Fetcher } from './api';
-import { completeSignUp, fetchAccount, fetchAuthConfig } from './accounts';
-import type { Account, AuthConfig, CompleteSignUp } from './contract';
+import {
+	checkUsername,
+	completeSignUp,
+	fetchAccount,
+	fetchAuthConfig,
+	type Credentials
+} from './accounts';
+import type { Account, AuthConfig, CompleteSignUp, UsernameCheck } from './contract';
 
 export type SessionStatus = 'loading' | 'disabled' | 'signed-out' | 'signed-in' | 'error';
 
@@ -24,6 +30,7 @@ export type AuthClient = Pick<
 	| 'checkSession'
 	| 'isAuthenticated'
 	| 'getTokenSilently'
+	| 'getIdTokenClaims'
 	| 'loginWithRedirect'
 	| 'handleRedirectCallback'
 	| 'logout'
@@ -31,10 +38,40 @@ export type AuthClient = Pick<
 
 type Enabled = Extract<AuthConfig, { enabled: true }>;
 
+/** Where the sign-up choice waits while the browser is away at Auth0. */
+export type PendingStore = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
+
 export type SessionDependencies = {
 	fetcher?: Fetcher;
 	createClient?: (config: Enabled) => Promise<AuthClient>;
+	/** `null` keeps nothing between page loads. */
+	storage?: PendingStore | null;
 };
+
+const PENDING_KEY = 'studyspot:pending-sign-up';
+
+/**
+ * localStorage, or nothing where it is unavailable: during prerendering, in
+ * a private window that refuses it, or with site data blocked. Losing the
+ * pending choice only means asking for it again.
+ */
+function browserStorage(): PendingStore | null {
+	try {
+		return typeof window === 'undefined' ? null : window.localStorage;
+	} catch {
+		return null;
+	}
+}
+
+function isCompleteSignUp(value: unknown): value is CompleteSignUp {
+	if (typeof value !== 'object' || value === null) return false;
+	const choice = value as Record<string, unknown>;
+	if (choice.account_type === 'business') return typeof choice.business_name === 'string';
+	return (
+		choice.account_type === 'student' &&
+		(choice.username === undefined || typeof choice.username === 'string')
+	);
+}
 
 /** Where Auth0 sends the browser back to, which must be listed in its settings. */
 export const CALLBACK_PATH = '/callback';
@@ -79,6 +116,13 @@ function describe(error: unknown): string {
 		}
 		return error.message;
 	}
+	// Auth0 explains a refused log-in in `error_description`, as in "Service not
+	// found: https://api.example" for a misconfigured API. Hiding that behind a
+	// generic message leaves nobody able to tell what to fix.
+	const description = (error as { error_description?: unknown } | null)?.error_description;
+	if (typeof description === 'string' && description) {
+		return `Auth0 could not log you in: ${description}`;
+	}
 	return 'Something went wrong while logging in.';
 }
 
@@ -94,14 +138,26 @@ export class Session {
 	account = $state<Account | null>(null);
 	error = $state('');
 
+	/**
+	 * What was chosen on the sign-up page, kept until the account exists to
+	 * apply it to. The email has to be verified first, which can take a day.
+	 */
+	pending = $state<CompleteSignUp | null>(null);
+
+	/** Why applying `pending` was refused, for the form to show. */
+	pendingError = $state<ApiError | null>(null);
+
 	#fetcher: Fetcher;
 	#createClient: (config: Enabled) => Promise<AuthClient>;
+	#storage: PendingStore | null;
 	#client: AuthClient | null = null;
 	#started: Promise<void> | null = null;
 
 	constructor(dependencies: SessionDependencies = {}) {
 		this.#fetcher = dependencies.fetcher ?? ((...args) => globalThis.fetch(...args));
 		this.#createClient = dependencies.createClient ?? auth0Client;
+		this.#storage = dependencies.storage === undefined ? browserStorage() : dependencies.storage;
+		this.pending = this.#readPending();
 	}
 
 	/**
@@ -168,9 +224,16 @@ export class Session {
 		await this.#redirect(returnTo, {});
 	}
 
-	/** Go to Auth0's sign-up page, which then comes back to finish here. */
-	async signUp(returnTo = '/account'): Promise<void> {
-		await this.#redirect(returnTo, { screen_hint: 'signup' });
+	/**
+	 * Go to Auth0's sign-up page for the email and password.
+	 *
+	 * `choice` is everything else, from StudySpot's own sign-up page. It is
+	 * kept here and applied as soon as the new account's email is verified, so
+	 * nobody is asked the same question twice.
+	 */
+	async signUp(choice?: CompleteSignUp): Promise<void> {
+		if (choice) this.#writePending(choice);
+		await this.#redirect('/account', { screen_hint: 'signup' });
 	}
 
 	async logOut(): Promise<void> {
@@ -178,6 +241,7 @@ export class Session {
 		if (!client) return;
 		this.account = null;
 		this.status = 'signed-out';
+		this.#writePending(null);
 		await client.logout({ logoutParams: { returnTo: window.location.origin } });
 	}
 
@@ -195,10 +259,16 @@ export class Session {
 		}
 	}
 
+	/** Whether a username is free, for the sign-up form to say as it is typed. */
+	checkUsername(username: string): Promise<UsernameCheck> {
+		return checkUsername(username, this.#fetcher);
+	}
+
 	/** Choose student or business. Validation errors are thrown to the form. */
 	async completeSignUp(choice: CompleteSignUp): Promise<Account> {
-		const account = await completeSignUp(await this.#token(), choice, this.#fetcher);
+		const account = await completeSignUp(await this.#credentials(), choice, this.#fetcher);
 		this.account = account;
+		this.#writePending(null);
 		return account;
 	}
 
@@ -211,24 +281,70 @@ export class Session {
 		});
 	}
 
-	async #token(fresh = false): Promise<string> {
-		const token = fresh
+	async #credentials(fresh = false): Promise<Credentials> {
+		const access = fresh
 			? await this.#client?.getTokenSilently({ cacheMode: 'off' })
 			: await this.#client?.getTokenSilently();
 		// The SDK's types allow for no token at all; that is being logged out.
-		if (!token) throw new ApiError('unauthorized', 'You are not logged in.', 401);
-		return token;
+		if (!access) throw new ApiError('unauthorized', 'You are not logged in.', 401);
+		// Renewed alongside the access token, so after `fresh` it is the new one.
+		const id = (await this.#client?.getIdTokenClaims())?.__raw;
+		return { access, id };
 	}
 
 	async #loadAccount(fresh = false): Promise<void> {
 		try {
-			this.account = await fetchAccount(await this.#token(fresh), this.#fetcher);
+			this.account = await fetchAccount(await this.#credentials(fresh), this.#fetcher);
 			this.status = 'signed-in';
 			this.error = '';
 		} catch (error) {
 			if (!isLoggedOut(error)) throw error;
 			this.account = null;
 			this.status = 'signed-out';
+			return;
+		}
+		await this.#applyPending();
+	}
+
+	/** Finish sign-up with the pending choice, once the account can take it. */
+	async #applyPending(): Promise<void> {
+		const account = this.account;
+		if (!account || !this.pending) return;
+		if (account.account_type !== null) {
+			// Finished some other way, as in another tab.
+			this.#writePending(null);
+			return;
+		}
+		if (!account.email_verified) return;
+
+		try {
+			await this.completeSignUp(this.pending);
+			this.pendingError = null;
+		} catch (error) {
+			// Left for the form, filled in with the same values: a username can
+			// be taken in the time it took to verify an email.
+			if (!(error instanceof ApiError) || isLoggedOut(error)) throw error;
+			this.pendingError = error;
+		}
+	}
+
+	#readPending(): CompleteSignUp | null {
+		try {
+			const value: unknown = JSON.parse(this.#storage?.getItem(PENDING_KEY) ?? 'null');
+			return isCompleteSignUp(value) ? value : null;
+		} catch {
+			return null;
+		}
+	}
+
+	#writePending(choice: CompleteSignUp | null): void {
+		this.pending = choice;
+		if (!choice) this.pendingError = null;
+		try {
+			if (choice) this.#storage?.setItem(PENDING_KEY, JSON.stringify(choice));
+			else this.#storage?.removeItem(PENDING_KEY);
+		} catch {
+			// Storage refused: the choice lives only as long as this page.
 		}
 	}
 
