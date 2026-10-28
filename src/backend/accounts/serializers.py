@@ -5,9 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from .models import Account, AccountType
+from .models import Account, AccountType, username_validator
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -56,11 +57,17 @@ class CompleteSignUpSerializer(serializers.Serializer):
     business_name = serializers.CharField(
         max_length=200, required=False, allow_blank=True, trim_whitespace=True
     )
+    #: Only for a student whose Auth0 log-in did not come with one.
+    username = serializers.CharField(
+        max_length=30, required=False, allow_blank=True, trim_whitespace=True
+    )
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         account: Account = self.context["account"]
         account_type = attrs["account_type"]
         business_name = attrs.get("business_name", "")
+        chosen = attrs.get("username", "")
+        username = str(account.username)
 
         if not account.email_verified:
             raise serializers.ValidationError(
@@ -74,11 +81,15 @@ class CompleteSignUpSerializer(serializers.Serializer):
                     {"email": "A student account needs a university email address."},
                     code="not_a_student_email",
                 )
-            if not account.username:
-                raise serializers.ValidationError(
-                    {"username": "A student account needs a username."},
-                    code="required",
-                )
+            if username:
+                # Auth0 already holds one, and it is what they log in with.
+                if chosen and chosen.casefold() != username.casefold():
+                    raise serializers.ValidationError(
+                        {"username": f"Your username is already {username}."},
+                        code="not_allowed",
+                    )
+            else:
+                username = self._choose(chosen, account)
             if business_name:
                 raise serializers.ValidationError(
                     {"business_name": "Only a business account has a business name."},
@@ -91,4 +102,37 @@ class CompleteSignUpSerializer(serializers.Serializer):
                 code="required",
             )
 
-        return {"account_type": account_type, "business_name": business_name}
+        return {
+            "account_type": account_type,
+            "business_name": business_name,
+            "username": username,
+        }
+
+    @staticmethod
+    def _choose(username: str, account: Account) -> str:
+        """Check a username a student picked here."""
+        problem = username_problem(username, exclude=account)
+        if problem is not None:
+            code, message = problem
+            raise serializers.ValidationError({"username": message}, code=code)
+        return username
+
+
+def username_problem(username: str, exclude: Account | None = None) -> tuple[str, str] | None:
+    """Why ``username`` cannot be chosen, as ``(code, message)``, or ``None``.
+
+    Shared by sign-up and the availability check, so the form's live answer and
+    the final one cannot disagree.
+    """
+    if not username:
+        return "required", "Choose a username."
+    try:
+        username_validator(username)
+    except DjangoValidationError as error:
+        return "invalid_username", str(error.messages[0])
+    taken = Account.objects.filter(username__iexact=username)
+    if exclude is not None:
+        taken = taken.exclude(pk=exclude.pk)
+    if taken.exists():
+        return "username_taken", "That username is taken."
+    return None

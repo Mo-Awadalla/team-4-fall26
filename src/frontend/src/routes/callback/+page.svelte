@@ -24,7 +24,13 @@
 	<main aria-live="polite">
 		{#if session.status === 'error'}
 			<p class="panel error" role="alert">{session.error}</p>
-			<p class="back"><a href={resolve('/account')}>Try again</a></p>
+			<p class="back">
+				<!--
+				A full load rather than client-side navigation: the session has
+				already settled on this error, and only a fresh start retries.
+			-->
+				<a href={resolve('/account')} data-sveltekit-reload>Try again</a>
+			</p>
 		{:else}
 			<p class="panel">Logging you in…</p>
 		{/if}

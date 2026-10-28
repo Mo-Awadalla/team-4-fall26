@@ -52,12 +52,13 @@ async function started(account?: Account, onPost?: (body: unknown) => Response) 
 		checkSession: async () => {},
 		isAuthenticated: async () => account !== undefined,
 		getTokenSilently: async () => 'token',
+		getIdTokenClaims: async () => ({ __raw: 'id-token' }),
 		loginWithRedirect: async () => {},
 		handleRedirectCallback: async () => ({}),
 		logout: async () => {}
 	} as unknown as AuthClient;
 
-	const session = new Session({ fetcher, createClient: async () => client });
+	const session = new Session({ fetcher, createClient: async () => client, storage: null });
 	await session.start();
 	return { session, posted };
 }
@@ -68,7 +69,7 @@ describe('signed out', () => {
 		render(AccountPage, { session });
 
 		await expect.element(page.getByRole('heading', { name: 'Join StudySpot.' })).toBeVisible();
-		await expect.element(page.getByRole('button', { name: 'Sign up' }).first()).toBeVisible();
+		await expect.element(page.getByRole('link', { name: 'Sign up' }).first()).toBeVisible();
 		await expect.element(page.getByRole('button', { name: 'Log in' }).first()).toBeVisible();
 	});
 });
@@ -82,6 +83,25 @@ describe('finishing sign-up', () => {
 
 		await expect.element(page.getByText('Student account')).toBeVisible();
 		expect(posted).toEqual([{ account_type: 'student' }]);
+	});
+
+	it('lets a student without an Auth0 username choose one', async () => {
+		const { session, posted } = await started({ ...NEW_ACCOUNT, username: '' });
+		render(AccountPage, { session });
+
+		await page.getByRole('textbox', { name: 'Username' }).fill(' grace_h ');
+		await page.getByRole('button', { name: 'Finish sign-up' }).click();
+
+		await expect.element(page.getByRole('heading', { name: 'grace_h' })).toBeVisible();
+		expect(posted).toEqual([{ account_type: 'student', username: 'grace_h' }]);
+	});
+
+	it('does not ask for a username Auth0 already has', async () => {
+		const { session } = await started(NEW_ACCOUNT);
+		render(AccountPage, { session });
+
+		await expect.element(page.getByRole('button', { name: 'Finish sign-up' })).toBeVisible();
+		await expect.element(page.getByRole('textbox', { name: 'Username' })).not.toBeInTheDocument();
 	});
 
 	it('asks a business for its name', async () => {

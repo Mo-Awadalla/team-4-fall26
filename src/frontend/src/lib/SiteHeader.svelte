@@ -42,7 +42,7 @@
 			</a>
 		{:else if session.status === 'signed-out'}
 			<button class="nav-link" type="button" onclick={() => session.logIn(here)}>Log in</button>
-			<button class="sign-in" type="button" onclick={() => session.signUp()}>Sign up</button>
+			<a class="sign-in" href={resolve('/signup')}>Sign up</a>
 		{/if}
 	</nav>
 </header>

@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { Account } from './contract';
-import { Session, safeReturnTo, type AuthClient } from './session.svelte';
+import { Session, safeReturnTo, type AuthClient, type PendingStore } from './session.svelte';
 
 const CONFIG = { enabled: true, domain: 'x.auth0.com', client_id: 'spa', audience: 'api' };
 
@@ -32,15 +32,32 @@ type Options = {
 	authenticated?: boolean;
 	account?: Account;
 	returnTo?: string;
+	storage?: PendingStore | null;
+	/** Answers `POST /account`; by default it accepts the choice. */
+	onPost?: (body: unknown) => Response;
 };
+
+/** An in-memory stand-in for localStorage. */
+function memoryStorage(): PendingStore & { items: Map<string, string> } {
+	const items = new Map<string, string>();
+	return {
+		items,
+		getItem: (key) => items.get(key) ?? null,
+		setItem: (key, value) => void items.set(key, value),
+		removeItem: (key) => void items.delete(key)
+	};
+}
 
 /** A session wired to a fake client, and a log of what was asked of the client. */
 function setup({
 	enabled = true,
 	authenticated = true,
 	account = ACCOUNT,
-	returnTo
+	returnTo,
+	storage = null,
+	onPost
 }: Options = {}) {
+	const posted: unknown[] = [];
 	const log: { method: string; argument?: unknown }[] = [];
 
 	const client = {
@@ -50,19 +67,25 @@ function setup({
 			log.push({ method: 'getTokenSilently', argument });
 			return 'token';
 		},
+		getIdTokenClaims: async () => ({ __raw: 'id-token' }),
 		loginWithRedirect: async (argument?: unknown) =>
 			void log.push({ method: 'loginWithRedirect', argument }),
 		handleRedirectCallback: async () => ({ appState: { returnTo } }),
 		logout: async (argument?: unknown) => void log.push({ method: 'logout', argument })
 	} as unknown as AuthClient;
 
-	const fetcher = (async (input: RequestInfo | URL) => {
+	const fetcher = (async (input: RequestInfo | URL, init: RequestInit = {}) => {
 		if (String(input) === '/api/auth/config') return json(enabled ? CONFIG : { enabled: false });
+		if (init.method === 'POST') {
+			const body = JSON.parse(String(init.body));
+			posted.push(body);
+			return onPost ? onPost(body) : json({ ...account, ...body }, 201);
+		}
 		return json(account);
 	}) as typeof globalThis.fetch;
 
-	const session = new Session({ fetcher, createClient: async () => client });
-	return { session, log };
+	const session = new Session({ fetcher, createClient: async () => client, storage });
+	return { session, log, posted };
 }
 
 describe('start', () => {
@@ -125,6 +148,30 @@ describe('finishLogIn', () => {
 		expect(session.status).toBe('signed-in');
 	});
 
+	it('says why Auth0 refused, in Auth0’s words', async () => {
+		// What Auth0 really answered while the tenant had no API configured.
+		const session = new Session({
+			fetcher: (async () => json(CONFIG)) as typeof globalThis.fetch,
+			createClient: async () =>
+				({
+					handleRedirectCallback: async () => {
+						throw Object.assign(new Error('access_denied'), {
+							error: 'access_denied',
+							error_description: 'Service not found: https://api.studyspot.app'
+						});
+					}
+				}) as unknown as AuthClient,
+			storage: null
+		});
+
+		await session.finishLogIn();
+
+		expect(session.status).toBe('error');
+		expect(session.error).toBe(
+			'Auth0 could not log you in: Service not found: https://api.studyspot.app'
+		);
+	});
+
 	it('will not return to another site', async () => {
 		const { session } = setup({ returnTo: '//evil.example/phish' });
 
@@ -183,5 +230,100 @@ describe('safeReturnTo', () => {
 		expect(safeReturnTo('//evil.example')).toBe('/');
 		expect(safeReturnTo('https://evil.example')).toBe('/');
 		expect(safeReturnTo(undefined)).toBe('/');
+	});
+});
+
+describe('the sign-up choice', () => {
+	const NEW = { ...ACCOUNT, account_type: null };
+	const CHOICE = { account_type: 'student', username: 'grace_h' } as const;
+
+	it('is kept across the trip to Auth0', async () => {
+		const storage = memoryStorage();
+		const before = setup({ authenticated: false, storage });
+
+		await before.session.signUp(CHOICE);
+
+		// A new page load, as after Auth0 redirects back.
+		const after = setup({ storage });
+		expect(after.session.pending).toEqual(CHOICE);
+		expect(before.log.at(-1)).toMatchObject({
+			method: 'loginWithRedirect',
+			argument: { authorizationParams: { screen_hint: 'signup' } }
+		});
+	});
+
+	it('finishes sign-up by itself once the email is verified', async () => {
+		const storage = memoryStorage();
+		storage.setItem('studyspot:pending-sign-up', JSON.stringify(CHOICE));
+		const { session, posted } = setup({ account: NEW, storage });
+
+		await session.start();
+
+		expect(posted).toEqual([CHOICE]);
+		expect(session.account?.account_type).toBe('student');
+		expect(session.pending).toBeNull();
+		expect(storage.items.size).toBe(0);
+	});
+
+	it('waits while the email is unverified', async () => {
+		const storage = memoryStorage();
+		storage.setItem('studyspot:pending-sign-up', JSON.stringify(CHOICE));
+		const { session, posted } = setup({ account: { ...NEW, email_verified: false }, storage });
+
+		await session.start();
+
+		expect(posted).toEqual([]);
+		expect(session.pending).toEqual(CHOICE);
+	});
+
+	it('keeps the choice and the reason when the API refuses it', async () => {
+		const storage = memoryStorage();
+		storage.setItem('studyspot:pending-sign-up', JSON.stringify(CHOICE));
+		const { session } = setup({
+			account: NEW,
+			storage,
+			onPost: () =>
+				json(
+					{
+						error: {
+							code: 'validation_error',
+							message: 'The request could not be validated.',
+							details: [
+								{
+									field: 'body.username',
+									message: 'That username is taken.',
+									type: 'username_taken'
+								}
+							]
+						}
+					},
+					422
+				)
+		});
+
+		await session.start();
+
+		expect(session.status).toBe('signed-in');
+		expect(session.pending).toEqual(CHOICE);
+		expect(session.pendingError?.details[0].message).toBe('That username is taken.');
+	});
+
+	it('is forgotten on log-out', async () => {
+		const storage = memoryStorage();
+		storage.setItem('studyspot:pending-sign-up', JSON.stringify(CHOICE));
+		const { session } = setup({ account: { ...NEW, email_verified: false }, storage });
+		await session.start();
+
+		await session.logOut();
+
+		expect(session.pending).toBeNull();
+		expect(storage.items.size).toBe(0);
+	});
+
+	it('ignores anything in storage that is not a choice', () => {
+		const storage = memoryStorage();
+		storage.setItem('studyspot:pending-sign-up', '{"account_type":"admin"}');
+
+		expect(setup({ storage }).session.pending).toBeNull();
 	});
 });
