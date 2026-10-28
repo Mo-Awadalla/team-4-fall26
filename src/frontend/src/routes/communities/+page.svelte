@@ -9,7 +9,11 @@
 	let hasMoreMembers = $state(false);
 	let invites = $state<Invite[]>([]);
 	let bannedIds = $state<(string | number)[]>([]);
+	let moderationEvents = $state<
+		{ id: number; action: string; target_id: string | number | null }[]
+	>([]);
 	let query = $state('');
+	let viewMine = $state(false);
 	let hasMore = $state(false);
 	let error = $state('');
 	let loading = $state(true);
@@ -24,19 +28,23 @@
 	let requestNumber = 0;
 	const activeCommunityId = () => selected?.id;
 
-	async function browse(search = query, more = false) {
+	async function browse(search = query, more = false, mine = viewMine) {
 		const current = ++requestNumber;
 		loading = true;
 		try {
 			const result = await communityRequest<{ items: Community[]; has_more: boolean }>(
-				`/communities?q=${encodeURIComponent(search)}&offset=${more ? communities.length : 0}`
+				`/communities?q=${encodeURIComponent(search)}&offset=${more ? communities.length : 0}${mine ? '&mine=true' : ''}`
 			);
 			if (current === requestNumber) {
 				communities = more ? [...communities, ...result.items] : result.items;
 				hasMore = result.has_more;
 			}
 		} catch (cause) {
-			if (current === requestNumber) error = message(cause);
+			if (current === requestNumber) {
+				communities = [];
+				hasMore = false;
+				error = message(cause);
+			}
 		} finally {
 			if (current === requestNumber) loading = false;
 		}
@@ -129,11 +137,12 @@
 		if (selected.role === 'owner' || selected.role === 'moderator') {
 			try {
 				invites = await communityRequest<Invite[]>(`/communities/${selected.id}/invites`);
-				bannedIds = (
-					await communityRequest<{ banned_user_ids: (string | number)[] }>(
-						`/communities/${selected.id}/moderation`
-					)
-				).banned_user_ids;
+				const moderation = await communityRequest<{
+					banned_user_ids: (string | number)[];
+					events: typeof moderationEvents;
+				}>(`/communities/${selected.id}/moderation`);
+				bannedIds = moderation.banned_user_ids;
+				moderationEvents = moderation.events;
 			} catch (cause) {
 				error = message(cause);
 			}
@@ -159,7 +168,7 @@
 	}
 
 	$effect(() => {
-		void browse(query);
+		void browse(query, false, viewMine);
 	});
 
 	onMount(() => {
@@ -199,6 +208,12 @@
 			<h1>Find your people.</h1>
 			<p>Public study communities for courses, schools, and neighborhoods.</p>
 			<label for="community-search">Search communities</label>
+			<div class="tabs">
+				<button class:chosen={!viewMine} onclick={() => (viewMine = false)}>All</button><button
+					class:chosen={viewMine}
+					onclick={() => (viewMine = true)}>Joined</button
+				>
+			</div>
 			<input id="community-search" bind:value={query} placeholder="Math 51A, NYU, Brooklyn…" />
 			<button
 				class="primary"
@@ -364,6 +379,10 @@
 									})}>Unban</button
 							>
 						</div>{/each}
+					<h3>Recent moderation</h3>
+					{#each moderationEvents as event (event.id)}<p class="muted">
+							{event.action} · Member #{event.target_id ?? 'deleted'}
+						</p>{/each}
 					{#if selected.role === 'owner'}
 						<h3>Community details</h3>
 						<form
