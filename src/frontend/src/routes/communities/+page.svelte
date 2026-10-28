@@ -2,6 +2,7 @@
 	import { base, resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
+	import Autocomplete from '$lib/Autocomplete.svelte';
 	import ChannelChat from '$lib/ChannelChat.svelte';
 	import DirectMessages from '$lib/DirectMessages.svelte';
 	import {
@@ -38,13 +39,41 @@
 	let course = $state('');
 	let schools = $state<string[]>([]);
 	let schoolsRequested = false;
-	let schoolChoices = $derived(
-		school.trim().length < 2
-			? []
-			: schools
-					.filter((name) => name.toLocaleLowerCase().includes(school.trim().toLocaleLowerCase()))
-					.slice(0, 30)
-	);
+	const popularSchools = [
+		'New York University',
+		'CUNY Hunter College',
+		'CUNY Queens College',
+		'Columbia University in the City of New York',
+		'Cornell University',
+		'Harvard University',
+		'Massachusetts Institute of Technology',
+		'Stanford University',
+		'University of California-Berkeley',
+		'University of California-Los Angeles',
+		'University of Michigan-Ann Arbor'
+	];
+	const popularCourses = [
+		'Calculus I',
+		'Calculus II',
+		'Linear Algebra',
+		'Introduction to Statistics',
+		'Introduction to Computer Science',
+		'Data Structures',
+		'General Biology',
+		'General Chemistry',
+		'Physics I',
+		'Introduction to Psychology',
+		'Microeconomics',
+		'English Composition'
+	];
+	let courseOptions = $derived([
+		...new Set([
+			...communities
+				.filter((community) => community.school === school && community.course)
+				.map((community) => community.course),
+			...popularCourses
+		])
+	]);
 	let channelName = $state('');
 	let channelCreateOpen = $state(false);
 	let channelMenuOpen = $state<number | null>(null);
@@ -432,9 +461,6 @@
 
 <div class="shell">
 	<SiteHeader />
-	<datalist id="us-schools">
-		{#each schoolChoices as schoolName (schoolName)}<option value={schoolName}></option>{/each}
-	</datalist>
 	<dialog
 		bind:this={deleteDialog}
 		class="confirm-dialog"
@@ -527,18 +553,25 @@
 						/></label
 					>
 					<label>Description<textarea maxlength="1000" bind:value={description}></textarea></label>
-					<label
-						>School<input
-							maxlength="100"
-							list="us-schools"
-							onfocus={() => void loadSchools()}
-							bind:value={school}
-							placeholder="Search US schools"
-						/></label
-					>
-					<p class="field-help">Search US colleges and trade schools, or type another school.</p>
-					<label>Course<input maxlength="100" bind:value={course} placeholder="MATH 51A" /></label>
-					<p class="field-help">Enter your school's course code or course name.</p>
+					<Autocomplete
+						id="create-school"
+						label="School"
+						bind:value={school}
+						options={schools}
+						popular={popularSchools}
+						placeholder="Search US schools"
+						help="Choose a school or type another name."
+						onOpen={() => void loadSchools()}
+					/>
+					<Autocomplete
+						id="create-course"
+						label="Course"
+						bind:value={course}
+						options={courseOptions}
+						popular={courseOptions}
+						placeholder="Search courses or enter a code"
+						help="Course codes vary by school; you can enter yours."
+					/>
 					<button class="primary">Create community</button>
 				</form>
 			{:else if selectedDM}
@@ -842,16 +875,24 @@
 						>
 							<label>Name<input required maxlength="100" bind:value={name} /></label><label
 								>Description<textarea maxlength="1000" bind:value={description}></textarea></label
-							><label
-								>School<input
-									maxlength="100"
-									list="us-schools"
-									onfocus={() => void loadSchools()}
-									bind:value={school}
-								/></label
-							><label>Course<input maxlength="100" bind:value={course} /></label><button
-								>Save details</button
-							>
+							><Autocomplete
+								id="edit-school"
+								label="School"
+								bind:value={school}
+								options={schools}
+								popular={popularSchools}
+								placeholder="Search US schools"
+								help="Choose a school or type another name."
+								onOpen={() => void loadSchools()}
+							/><Autocomplete
+								id="edit-course"
+								label="Course"
+								bind:value={course}
+								options={courseOptions}
+								popular={courseOptions}
+								placeholder="Search courses or enter a code"
+								help="Course codes vary by school; you can enter yours."
+							/><button>Save details</button>
 						</form>
 						<button class="danger" onclick={() => void deleteCommunity()}>Delete community</button>
 					{/if}
@@ -920,11 +961,6 @@
 		font-size: 13px;
 		font-weight: 700;
 		margin: 18px 0 8px;
-	}
-	.field-help {
-		margin: 4px 0 0;
-		color: #65585d;
-		font-size: 12px;
 	}
 	input,
 	textarea {
