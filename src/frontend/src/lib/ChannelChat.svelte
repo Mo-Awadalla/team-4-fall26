@@ -210,13 +210,7 @@
 			if (method === 'DELETE' && !suffix) {
 				messages = messages.map((item) =>
 					item.id === message.id
-						? {
-								...item,
-								content: '',
-								deleted_at: new Date().toISOString(),
-								reactions: [],
-								pinned_at: null
-							}
+						? { ...item, content: '', deleted_at: new Date().toISOString(), reactions: [], pinned_at: null }
 						: item
 				);
 			} else {
@@ -318,51 +312,21 @@
 				title="Search"
 				onclick={() => {
 					showSearch = !showSearch;
-					if (!showSearch) {
-						search = '';
-						results = null;
-					}
+					if (!showSearch) { search = ''; results = null; }
 					pins = null;
 					showPinsPanel = false;
 				}}
 			>
-				<svg
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg
-				>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
 			</button>
 			<button
 				class="icon-btn"
 				class:active={showPinsPanel}
 				aria-label="Pinned messages"
 				title="Pins"
-				onclick={() => {
-					void loadPins();
-					showSearch = false;
-				}}
+				onclick={() => { void loadPins(); showSearch = false; }}
 			>
-				<svg
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle
-						cx="12"
-						cy="10"
-						r="3"
-					/></svg
-				>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
 			</button>
 		</div>
 	</div>
@@ -370,10 +334,7 @@
 	{#if showSearch}
 		<form
 			class="search-bar"
-			onsubmit={(e) => {
-				e.preventDefault();
-				void find();
-			}}
+			onsubmit={(e) => { e.preventDefault(); void find(); }}
 		>
 			<input
 				aria-label="Search messages in this channel"
@@ -434,30 +395,19 @@
 					id={`msg-${message.id}`}
 				>
 					{#if header}
-						<div
-							class="avatar"
-							style="background:{avatarColor(message.author_name)}"
-							aria-hidden="true"
-						>
+						<div class="avatar" style="background:{avatarColor(message.author_name)}" aria-hidden="true">
 							{initials(message.author_name)}
 						</div>
 					{:else}
 						<div class="avatar-gap" aria-hidden="true">
-							<time class="hover-time"
-								>{new Date(message.created_at).toLocaleTimeString([], {
-									hour: 'numeric',
-									minute: '2-digit'
-								})}</time
-							>
+							<time class="hover-time">{new Date(message.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</time>
 						</div>
 					{/if}
 					<div class="msg-body">
 						{#if header}
 							<div class="msg-head">
 								<strong class="author">{message.author_name}</strong>
-								<time class="timestamp" datetime={message.created_at}
-									>{formatTime(message.created_at)}</time
-								>
+								<time class="timestamp" datetime={message.created_at}>{formatTime(message.created_at)}</time>
 								{#if message.pinned_at}<span class="pin-badge">📌</span>{/if}
 							</div>
 						{/if}
@@ -470,10 +420,7 @@
 						{#if editingId === message.id}
 							<form
 								class="edit-form"
-								onsubmit={(e) => {
-									e.preventDefault();
-									void change(message, 'PATCH', '', { content: draft });
-								}}
+								onsubmit={(e) => { e.preventDefault(); void change(message, 'PATCH', '', { content: draft }); }}
 							>
 								<textarea
 									aria-label="Edit message"
@@ -481,12 +428,10 @@
 									bind:value={draft}
 									rows="2"
 									onkeydown={(e) => {
-										if (e.key === 'Enter' && !e.shiftKey) {
-											e.preventDefault();
-											void change(message, 'PATCH', '', { content: draft });
-										}
+										if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void change(message, 'PATCH', '', { content: draft }); }
 										if (e.key === 'Escape') editingId = null;
-									}}></textarea>
+									}}
+								></textarea>
 								<div class="edit-actions">
 									<span class="hint">Enter to save · Escape to cancel</span>
 									<button disabled={!draft.trim()}>Save</button>
@@ -506,14 +451,13 @@
 									<button
 										class="reaction"
 										class:reacted={reaction.me}
-										onclick={() =>
-											void change(
-												message,
-												reaction.me ? 'DELETE' : 'POST',
-												`/reactions${reaction.me ? `/${encodeURIComponent(reaction.emoji)}` : ''}`,
-												reaction.me ? undefined : { emoji: reaction.emoji }
-											)}>{reaction.emoji} <span>{reaction.count}</span></button
-									>
+										onclick={() => void change(
+											message,
+											reaction.me ? 'DELETE' : 'POST',
+											`/reactions${reaction.me ? `/${encodeURIComponent(reaction.emoji)}` : ''}`,
+											reaction.me ? undefined : { emoji: reaction.emoji }
+										)}
+									>{reaction.emoji} <span>{reaction.count}</span></button>
 								{/each}
 							</div>
 						{/if}
@@ -525,44 +469,27 @@
 								class="action-btn"
 								title="Add reaction"
 								onclick={() => (reactionFor = reactionFor === message.id ? null : message.id)}
-								>😊</button
-							>
-							<button class="action-btn" title="Reply" onclick={() => (replyTo = message)}>↩</button
-							>
+							>😊</button>
+							<button class="action-btn" title="Reply" onclick={() => (replyTo = message)}>↩</button>
 							{#if !message.mine}
-								<button
-									class="action-btn"
-									title="Direct message"
-									onclick={() => void startDM(message)}>✉</button
-								>
+								<button class="action-btn" title="Direct message" onclick={() => void startDM(message)}>✉</button>
 							{/if}
 							{#if message.mine}
-								<button
-									class="action-btn"
-									title="Edit message"
-									onclick={() => {
-										editingId = message.id;
-										draft = message.content;
-									}}>✏</button
-								>
+								<button class="action-btn" title="Edit message" onclick={() => { editingId = message.id; draft = message.content; }}>✏</button>
 							{/if}
 							{#if role === 'owner' || role === 'moderator'}
 								<button
 									class="action-btn"
 									title={message.pinned_at ? 'Unpin' : 'Pin message'}
-									onclick={() =>
-										void change(message, message.pinned_at ? 'DELETE' : 'POST', '/pin')}
-									>{message.pinned_at ? '📌' : '📍'}</button
-								>
+									onclick={() => void change(message, message.pinned_at ? 'DELETE' : 'POST', '/pin')}
+								>{message.pinned_at ? '📌' : '📍'}</button>
 							{/if}
 							{#if message.can_delete}
 								<button
 									class="action-btn danger"
 									title="Delete message"
-									onclick={() => {
-										if (confirm('Delete this message?')) void change(message, 'DELETE');
-									}}>🗑</button
-								>
+									onclick={() => { if (confirm('Delete this message?')) void change(message, 'DELETE'); }}
+								>🗑</button>
 							{/if}
 						</div>
 					{/if}
@@ -570,9 +497,7 @@
 				{#if reactionFor === message.id}
 					<div class="emoji-picker" role="toolbar" aria-label="Reaction picker">
 						{#each emojiChoices as emoji (emoji)}
-							<button onclick={() => void change(message, 'POST', '/reactions', { emoji })}
-								>{emoji}</button
-							>
+							<button onclick={() => void change(message, 'POST', '/reactions', { emoji })}>{emoji}</button>
 						{/each}
 						<button onclick={() => (reactionFor = null)}>✕</button>
 					</div>
@@ -583,12 +508,7 @@
 		{#if replyTo}
 			<div class="reply-bar">
 				<span class="reply-bar-icon">↩</span>
-				<span
-					>Replying to <strong>{replyTo.author_name}</strong> — {replyTo.content.slice(
-						0,
-						60
-					)}{replyTo.content.length > 60 ? '…' : ''}</span
-				>
+				<span>Replying to <strong>{replyTo.author_name}</strong> — {replyTo.content.slice(0, 60)}{replyTo.content.length > 60 ? '…' : ''}</span>
 				<button onclick={() => (replyTo = null)} aria-label="Cancel reply">✕</button>
 			</div>
 		{/if}
@@ -603,16 +523,15 @@
 				bind:value={content}
 				disabled={channel.archived}
 				onkeydown={handleCompose}
-				oninput={resizeCompose}></textarea>
+				oninput={resizeCompose}
+			></textarea>
 			<button
 				class="send-btn"
 				disabled={channel.archived || sending || !content.trim()}
 				onclick={() => void send()}
 				aria-label="Send message"
 			>
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
-					><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg
-				>
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
 			</button>
 		</div>
 	{/if}
@@ -671,9 +590,7 @@
 		border-radius: 8px;
 		color: #8a8490;
 		cursor: pointer;
-		transition:
-			background 0.12s,
-			color 0.12s;
+		transition: background 0.12s, color 0.12s;
 		padding: 0;
 		min-height: 0;
 		font-size: 14px;
@@ -710,7 +627,7 @@
 	.search-bar input:focus {
 		outline: none;
 		border-color: #9b1c3a;
-		box-shadow: 0 0 0 3px rgba(155, 28, 58, 0.1);
+		box-shadow: 0 0 0 3px rgba(155,28,58,0.10);
 	}
 	.search-bar button {
 		cursor: pointer;
@@ -724,9 +641,7 @@
 		transition: background 0.1s;
 		color: #4a4550;
 	}
-	.search-bar button:hover {
-		background: #f3f2f5;
-	}
+	.search-bar button:hover { background: #f3f2f5; }
 
 	/* ── Overlay (search results / pins) ── */
 	.overlay-panel {
@@ -765,23 +680,10 @@
 		align-items: baseline;
 		margin-bottom: 4px;
 	}
-	.overlay-meta strong {
-		font-size: 14px;
-		color: #0f0d10;
-	}
-	.overlay-meta time {
-		font-size: 11px;
-		color: #8a8490;
-	}
-	.overlay-message p {
-		margin: 0;
-		font-size: 14px;
-		color: #4a4550;
-	}
-	.empty {
-		color: #8a8490;
-		font-size: 14px;
-	}
+	.overlay-meta strong { font-size: 14px; color: #0f0d10; }
+	.overlay-meta time { font-size: 11px; color: #8a8490; }
+	.overlay-message p { margin: 0; font-size: 14px; color: #4a4550; }
+	.empty { color: #8a8490; font-size: 14px; }
 
 	/* ── Messages list ── */
 	.messages {
@@ -829,16 +731,8 @@
 		font-weight: 700;
 		margin-bottom: 16px;
 	}
-	.channel-start h3 {
-		margin: 0 0 6px;
-		font-size: 26px;
-		color: #0f0d10;
-	}
-	.channel-start p {
-		margin: 0;
-		color: #8a8490;
-		font-size: 15px;
-	}
+	.channel-start h3 { margin: 0 0 6px; font-size: 26px; color: #0f0d10; }
+	.channel-start p { margin: 0; color: #8a8490; font-size: 15px; }
 
 	.load-older {
 		display: block;
@@ -851,9 +745,7 @@
 		padding: 4px 8px;
 		font-weight: 600;
 	}
-	.load-older:hover {
-		text-decoration: underline;
-	}
+	.load-older:hover { text-decoration: underline; }
 
 	/* ── Message ── */
 	.message {
@@ -903,9 +795,7 @@
 		transition: opacity 0.1s;
 		white-space: nowrap;
 	}
-	.message:hover .hover-time {
-		opacity: 1;
-	}
+	.message:hover .hover-time { opacity: 1; }
 
 	/* Body */
 	.msg-body {
@@ -927,9 +817,7 @@
 		font-size: 11px;
 		color: #8a8490;
 	}
-	.pin-badge {
-		font-size: 11px;
-	}
+	.pin-badge { font-size: 11px; }
 
 	.msg-content {
 		margin: 0;
@@ -952,11 +840,7 @@
 		font-size: 13px;
 		overflow: hidden;
 	}
-	.reply-author {
-		font-weight: 700;
-		color: #9b1c3a;
-		white-space: nowrap;
-	}
+	.reply-author { font-weight: 700; color: #9b1c3a; white-space: nowrap; }
 	.reply-text {
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -980,26 +864,13 @@
 		background: #f3f2f5;
 		font-size: 13px;
 		cursor: pointer;
-		transition:
-			background 0.1s,
-			border-color 0.1s;
+		transition: background 0.1s, border-color 0.1s;
 		min-height: 26px;
 	}
-	.reaction span {
-		color: #4a4550;
-		font-size: 13px;
-	}
-	.reaction:hover {
-		background: #ebebed;
-		border-color: #b4afba;
-	}
-	.reaction.reacted {
-		background: #fdf2f5;
-		border-color: #9b1c3a;
-	}
-	.reaction.reacted span {
-		color: #9b1c3a;
-	}
+	.reaction span { color: #4a4550; font-size: 13px; }
+	.reaction:hover { background: #ebebed; border-color: #b4afba; }
+	.reaction.reacted { background: #fdf2f5; border-color: #9b1c3a; }
+	.reaction.reacted span { color: #9b1c3a; }
 
 	/* Edit form */
 	.edit-form {
@@ -1015,7 +886,7 @@
 		resize: none;
 		outline: none;
 		background: #fff;
-		box-shadow: 0 0 0 2px rgba(155, 28, 58, 0.15);
+		box-shadow: 0 0 0 2px rgba(155,28,58,0.15);
 	}
 	.edit-actions {
 		display: flex;
@@ -1024,11 +895,7 @@
 		margin-top: 6px;
 		flex-wrap: wrap;
 	}
-	.hint {
-		font-size: 11px;
-		color: #8a8490;
-		margin-right: auto;
-	}
+	.hint { font-size: 11px; color: #8a8490; margin-right: auto; }
 	.edit-actions button {
 		font-size: 13px;
 		padding: 4px 12px;
@@ -1039,18 +906,9 @@
 		font-weight: 600;
 		color: #4a4550;
 	}
-	.edit-actions button[disabled] {
-		opacity: 0.5;
-		cursor: default;
-	}
-	.edit-actions button:first-of-type {
-		background: #9b1c3a;
-		color: white;
-		border-color: #9b1c3a;
-	}
-	.edit-actions button:first-of-type:hover:not([disabled]) {
-		background: #7d1630;
-	}
+	.edit-actions button[disabled] { opacity: 0.5; cursor: default; }
+	.edit-actions button:first-of-type { background: #9b1c3a; color: white; border-color: #9b1c3a; }
+	.edit-actions button:first-of-type:hover:not([disabled]) { background: #7d1630; }
 
 	/* Floating action toolbar */
 	.msg-actions {
@@ -1067,9 +925,7 @@
 		border: 1px solid #ebebed;
 		border-radius: 8px;
 		padding: 3px;
-		box-shadow:
-			0 4px 12px rgba(0, 0, 0, 0.1),
-			0 0 0 1px rgba(0, 0, 0, 0.06);
+		box-shadow: 0 4px 12px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06);
 		z-index: 2;
 	}
 	.message:hover .msg-actions {
@@ -1091,13 +947,8 @@
 		padding: 0;
 		min-height: 0;
 	}
-	.action-btn:hover {
-		background: #f3f2f5;
-	}
-	.action-btn.danger:hover {
-		background: #fdf2f5;
-		color: #9b1c3a;
-	}
+	.action-btn:hover { background: #f3f2f5; }
+	.action-btn.danger:hover { background: #fdf2f5; color: #9b1c3a; }
 
 	/* Emoji picker */
 	.emoji-picker {
@@ -1120,10 +971,7 @@
 		padding: 0;
 		min-height: 0;
 	}
-	.emoji-picker button:hover {
-		background: #f3f2f5;
-		border-color: #d4d2d8;
-	}
+	.emoji-picker button:hover { background: #f3f2f5; border-color: #d4d2d8; }
 
 	/* Reply bar */
 	.reply-bar {
@@ -1139,13 +987,8 @@
 		flex-shrink: 0;
 		animation: slideUp 0.1s ease;
 	}
-	.reply-bar-icon {
-		font-size: 15px;
-		color: #9b1c3a;
-	}
-	.reply-bar strong {
-		color: #1a1a1a;
-	}
+	.reply-bar-icon { font-size: 15px; color: #9b1c3a; }
+	.reply-bar strong { color: #1a1a1a; }
 	.reply-bar button {
 		margin-left: auto;
 		border: 0;
@@ -1158,10 +1001,7 @@
 		border-radius: 4px;
 		min-height: 0;
 	}
-	.reply-bar button:hover {
-		background: #f0dde3;
-		color: #1a1a1a;
-	}
+	.reply-bar button:hover { background: #f0dde3; color: #1a1a1a; }
 
 	/* Composer */
 	.composer {
@@ -1185,10 +1025,7 @@
 		overflow: hidden;
 		line-height: 1.5;
 		max-height: 200px;
-		transition:
-			border-color 0.15s,
-			background 0.15s,
-			box-shadow 0.15s;
+		transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 		background: #f3f2f5;
 		color: #0f0d10;
 	}
@@ -1196,11 +1033,9 @@
 		outline: none;
 		border-color: #9b1c3a;
 		background: #fff;
-		box-shadow: 0 0 0 2px rgba(155, 28, 58, 0.15);
+		box-shadow: 0 0 0 2px rgba(155,28,58,0.15);
 	}
-	.composer textarea::placeholder {
-		color: #8a8490;
-	}
+	.composer textarea::placeholder { color: #8a8490; }
 	.composer.archived textarea {
 		background: #f9f8fa;
 		color: #8a8490;
@@ -1216,20 +1051,11 @@
 		display: grid;
 		place-items: center;
 		flex-shrink: 0;
-		transition:
-			background 0.1s,
-			transform 0.1s;
+		transition: background 0.1s, transform 0.1s;
 		padding: 0;
 	}
-	.send-btn:hover:not([disabled]) {
-		background: #7d1630;
-		transform: scale(1.05);
-	}
-	.send-btn[disabled] {
-		background: #d4d2d8;
-		color: #8a8490;
-		cursor: default;
-	}
+	.send-btn:hover:not([disabled]) { background: #7d1630; transform: scale(1.05); }
+	.send-btn[disabled] { background: #d4d2d8; color: #8a8490; cursor: default; }
 
 	.error {
 		padding: 8px 16px;
@@ -1242,38 +1068,20 @@
 
 	/* Animations */
 	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateY(-6px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
+		from { opacity: 0; transform: translateY(-6px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 	@keyframes slideUp {
-		from {
-			opacity: 0;
-			transform: translateY(4px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
+		from { opacity: 0; transform: translateY(4px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
+		from { opacity: 0; }
+		to { opacity: 1; }
 	}
 
 	/* Focus styles */
-	button:focus-visible,
-	textarea:focus-visible,
-	input:focus-visible {
+	button:focus-visible, textarea:focus-visible, input:focus-visible {
 		outline: 2px solid #9b1c3a;
 		outline-offset: 2px;
 	}
