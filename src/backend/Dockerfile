@@ -12,6 +12,8 @@ RUN uv sync --frozen --no-dev --no-install-project
 
 COPY studyspot ./studyspot
 COPY spots ./spots
+COPY communities ./communities
+COPY accounts ./accounts
 COPY manage.py handler.py ./
 
 EXPOSE 8000

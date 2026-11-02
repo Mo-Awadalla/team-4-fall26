@@ -62,6 +62,8 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+if DEBUG and "http://localhost:7500" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append("http://localhost:7500")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -75,6 +77,8 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "rest_framework",
     "spots",
+    "communities",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -197,6 +201,41 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "studyspot.errors.exception_handler",
     "UNAUTHENTICATED_USER": None,
 }
+
+# -- Accounts ------------------------------------------------------------------
+
+#: Auth0 signs people up, logs them in, verifies their email and resets their
+#: password; this API only ever sees the access token it issues. Blank leaves
+#: accounts switched off: GET /auth/config says so, and the frontend hides its
+#: log-in controls instead of offering one that cannot work.
+AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN", "").strip()
+
+#: The public identifier of the single-page application in Auth0. Not a secret:
+#: every browser that logs in reads it, and the API hands it out to them.
+AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID", "").strip()
+
+#: The API identifier configured in Auth0, which every token must be issued for.
+AUTH0_AUDIENCE = os.environ.get("AUTH0_AUDIENCE", "").strip()
+
+#: The tenant's public signing keys, as the JSON document Auth0 serves at
+#: https://{AUTH0_DOMAIN}/.well-known/jwks.json. The deployed API has no route to
+#: the internet (see infra/terraform/network.tf), so it cannot fetch them for
+#: itself; Terraform passes them in. Blank means fetch them on demand, which is
+#: what local development does.
+AUTH0_JWKS = os.environ.get("AUTH0_JWKS", "").strip()
+
+#: Prefix of the custom claims the Auth0 post-login Action adds to the access
+#: token. Auth0 requires a namespaced URL for any claim it did not define, and
+#: the value need not resolve. See docs/source/accounts.md.
+AUTH0_CLAIM_NAMESPACE = os.environ.get("AUTH0_CLAIM_NAMESPACE", "https://studyspot.app/")
+
+#: Domains a student account's email may end in. A suffix rather than a list of
+#: universities, so a campus nobody thought to add is not locked out.
+STUDENT_EMAIL_DOMAINS = tuple(
+    domain.strip().lower().lstrip(".")
+    for domain in os.environ.get("STUDENT_EMAIL_DOMAINS", "edu").split(",")
+    if domain.strip()
+)
 
 # -- Admin ---------------------------------------------------------------------
 
