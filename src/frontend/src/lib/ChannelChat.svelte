@@ -1,4 +1,5 @@
 <script lang="ts">
+	import MessageBody from './MessageBody.svelte';
 	import { tick } from 'svelte';
 	import {
 		communityRequest,
@@ -494,11 +495,9 @@
 								</div>
 							</form>
 						{:else}
-							<p class="msg-content">
-								{message.deleted_at
-									? 'This message was deleted.'
-									: message.content}{message.edited_at && !message.deleted_at ? ' (edited)' : ''}
-							</p>
+							{#if message.deleted_at}This message was deleted.{:else}<MessageBody
+									content={message.content}
+								/>{#if message.edited_at}<small>(edited)</small>{/if}{/if}
 						{/if}
 						{#if message.reactions.length}
 							<div class="reactions">

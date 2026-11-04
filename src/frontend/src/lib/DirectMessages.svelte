@@ -1,4 +1,5 @@
 <script lang="ts">
+	import MessageBody from './MessageBody.svelte';
 	import { communityRequest, type DirectConversation, type DirectMessage } from './communities';
 
 	let { conversation }: { conversation: DirectConversation } = $props();
@@ -143,11 +144,9 @@
 							onclick={() => (editingId = null)}>Cancel</button
 						>
 					</form>
-				{:else}<p>
-						{message.deleted_at ? 'Message deleted' : message.content}{message.edited_at
-							? ' (edited)'
-							: ''}
-					</p>{/if}
+				{:else}{#if message.deleted_at}Message deleted{:else}<MessageBody
+							content={message.content}
+						/>{#if message.edited_at}<small>(edited)</small>{/if}{/if}{/if}
 				{#if !message.deleted_at}<div class="actions">
 						<button onclick={() => (replyTo = message)}>Reply</button>
 						{#if message.mine}<button
