@@ -11,7 +11,7 @@ const choices = extract(({ document }) => {
 	for (const element of document.querySelectorAll('button, summary')) {
 		const label = element.getAttribute('aria-label') || element.textContent?.trim() || '';
 		if (
-			!/inbox|navigation|theme|members|overview|manage|settings|close|browse communities|pinned messages|search conversation/i.test(
+			!/new message|community actions|options for #|cancel|inbox|navigation|theme|members|overview|manage|settings|close|browse communities|pinned messages|search conversation/i.test(
 				label
 			) &&
 			!element.matches('.sidebar-item, .community-card, .channel-btn')

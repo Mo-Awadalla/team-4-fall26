@@ -1,4 +1,7 @@
 <script lang="ts">
+	import SiteHeader from '$lib/SiteHeader.svelte';
+	import MoreHorizontal from '@lucide/svelte/icons/ellipsis';
+	import SquarePen from '@lucide/svelte/icons/square-pen';
 	import { chatControls } from '$lib/chatControls';
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
@@ -39,16 +42,31 @@
 		community_id: number;
 		target: { user_id: string } | { guest_member_id: number };
 	};
+	let composing = $state(false);
+	let recipientQuery = $state('');
+	let preview = $state<{
+		name: string;
+		member_count: number;
+		token: string;
+		channel: number | null;
+	} | null>(null);
+	let accepting = $state(false);
+	let inviteOpen = $state(false);
+	let communityMenu = $state<HTMLDivElement>();
+	let communityTrigger: HTMLElement | null = null;
+	let menuCommunity = $state<Community | null>(null);
+	let menuLeft = $state(0),
+		menuTop = $state(0);
+	let headerHeight = $state(76);
 	let people = $state<Person[]>([]);
 	let peopleStatus = $state('');
 	$effect(() => {
-		const term = query.trim();
+		const term = (composing ? recipientQuery : query).trim();
 		people = [];
 		peopleStatus = '';
 		if (
 			term.length < 2 ||
-			selected ||
-			selectedDM ||
+			(!composing && (selected || selectedDM)) ||
 			(!guestPreview && session.status !== 'signed-in')
 		)
 			return;
@@ -80,6 +98,7 @@
 				person.target
 			);
 			query = '';
+			composing = false;
 			openDM(chat);
 		} catch (cause) {
 			peopleStatus = message(cause);
@@ -172,6 +191,7 @@
 	let guestPreview = $state(false);
 	let accessError = $state('');
 	let inviteLink = $state('');
+	let inviteCopyStatus = $state('');
 	let shareLink = $state('');
 	let copyStatus = $state('');
 	let tab = $state<'main' | 'members' | 'settings'>('main');
@@ -251,6 +271,8 @@
 			channelMenuOpen = null;
 			editingChannelId = null;
 			shareLink = '';
+			inviteLink = '';
+			inviteCopyStatus = '';
 			copyStatus = '';
 			activeChannelId =
 				selected.channels?.find((channel) => channel.id === channelId)?.id ??
@@ -532,6 +554,11 @@
 
 	function handleEscape(event: KeyboardEvent) {
 		if (event.key !== 'Escape' || deleteDialog?.open) return;
+		if (communityMenu?.matches(':popover-open')) {
+			communityMenu.hidePopover();
+			communityTrigger?.focus();
+			return;
+		}
 		if (channelMenuOpen !== null) {
 			const channelId = channelMenuOpen;
 			channelMenuOpen = null;
@@ -647,8 +674,71 @@
 		return () => window.clearTimeout(timer);
 	});
 
+	function openCommunityMenu(event: MouseEvent, community: Community) {
+		event.preventDefault();
+		communityTrigger = event.currentTarget as HTMLElement;
+		const rect = communityTrigger.getBoundingClientRect();
+		const pointer = event.type === 'contextmenu' && (event.clientX || event.clientY);
+		menuLeft = Math.max(4, Math.min(pointer ? event.clientX : rect.left, innerWidth - 232));
+		menuTop = Math.max(4, Math.min(pointer ? event.clientY : rect.bottom, innerHeight - 275));
+		menuCommunity = community;
+		communityMenu?.showPopover();
+		void tick().then(() => communityMenu?.querySelector('button')?.focus());
+	}
+
+	async function communityOption(option: 'open' | 'settings' | 'create' | 'leave' | 'invite') {
+		const target = menuCommunity;
+		communityMenu?.hidePopover();
+		if (!target) return;
+		if (option === 'leave') {
+			if (!confirm('Leave ' + target.name + '?')) return;
+			try {
+				await communityRequest('/communities/' + target.id + '/leave', 'POST');
+				if (selected?.id === target.id) goHome();
+				await browse();
+			} catch (cause) {
+				error = message(cause);
+			}
+			return;
+		}
+		if (selected?.id !== target.id) await choose(target.id);
+		if (selected?.id !== target.id) return;
+		if (option === 'invite') {
+			inviteLink = '';
+			inviteOpen = true;
+			await createInvite();
+		}
+		if (option === 'settings') {
+			membersOpen = true;
+			await loadSettings();
+		}
+		if (option === 'create') {
+			navOpen = true;
+			await openChannelCreate();
+		}
+	}
+
+	async function acceptInvite() {
+		if (!preview || accepting) return;
+		accepting = true;
+		try {
+			const result = await communityRequest<{ community_id: number }>(
+				'/communities/invites/' + encodeURIComponent(preview.token) + '/redeem',
+				'POST'
+			);
+			await choose(result.community_id, preview.channel);
+			preview = null;
+			await browse();
+		} catch (cause) {
+			error = message(cause);
+		} finally {
+			accepting = false;
+		}
+	}
+
 	async function createInvite() {
 		if (!selected) return;
+		inviteCopyStatus = '';
 		try {
 			const result = await communityRequest<{ token: string }>(
 				`/communities/${selected.id}/invites`,
@@ -659,7 +749,7 @@
 				invite: result.token,
 				channel: activeChannelId
 			});
-			await loadSettings();
+			if (!inviteOpen) await loadSettings();
 		} catch (cause) {
 			error = message(cause);
 		}
@@ -694,11 +784,10 @@
 			const dmId = Number(url.searchParams.get('dm'));
 			try {
 				if (token) {
-					const result = await communityRequest<{ community_id: number }>(
-						`/communities/invites/${encodeURIComponent(token)}/redeem`,
-						'POST'
+					const details = await communityRequest<{ name: string; member_count: number }>(
+						'/communities/invites/' + encodeURIComponent(token)
 					);
-					await choose(result.community_id, channelId);
+					preview = { ...details, token, channel: channelId };
 				} else if (dmId) {
 					openDM(await communityRequest<DirectConversation>(`/dms/${dmId}`));
 					return;
@@ -711,17 +800,39 @@
 			}
 		}
 		void enter().catch((e) => (accessError = message(e)));
+		const refreshDMs = () => {
+			if (!document.hidden && (guestPreview || session.status === 'signed-in')) void loadDMs();
+		};
+		document.addEventListener('visibilitychange', refreshDMs);
+		const refreshTimer = window.setInterval(refreshDMs, 8000);
+		return () => {
+			clearInterval(refreshTimer);
+			document.removeEventListener('visibilitychange', refreshDMs);
+		};
 	});
 </script>
 
-<svelte:window onkeydown={handleEscape} />
+<svelte:window
+	onkeydown={handleEscape}
+	onpointerdown={(event) => {
+		if (
+			communityMenu?.matches(':popover-open') &&
+			event.target instanceof Node &&
+			!communityMenu.contains(event.target)
+		)
+			communityMenu.hidePopover();
+	}}
+/>
 
 <svelte:head>
 	<title>Communities · StudySpot</title>
 	<meta name="description" content="Find and create public study communities." />
 </svelte:head>
 
-<div class="shell chat-shell" data-theme={theme}>
+<div class="site-navigation" data-theme={theme} bind:clientHeight={headerHeight}>
+	<SiteHeader />
+</div>
+<div class="shell chat-shell" data-theme={theme} style:--site-header-height={headerHeight + 'px'}>
 	{#if accessError}<p role="alert">
 			{accessError}
 		</p>{:else if !guestPreview && session.status === 'loading'}
@@ -729,7 +840,11 @@
 			<span class="auth-spinner" aria-hidden="true"></span>
 		</div>
 	{:else if !guestPreview && (session.status === 'signed-out' || session.status === 'disabled' || session.status === 'error')}
-		<!-- redirect fires in onMount; show nothing while it happens -->
+		<p role="status">
+			{session.status === 'signed-out'
+				? 'Opening sign-in…'
+				: 'Sign-in is unavailable. Please check your account configuration.'}
+		</p>
 	{:else}
 		<dialog
 			bind:this={deleteDialog}
@@ -752,6 +867,122 @@
 			{/if}
 		</dialog>
 
+		<div
+			bind:this={communityMenu}
+			popover="manual"
+			class="community-pop"
+			style:left={menuLeft + 'px'}
+			style:top={menuTop + 'px'}
+			role="group"
+			aria-label="Community actions"
+		>
+			{#if menuCommunity}<strong>{menuCommunity.name}</strong>
+				<button onclick={() => void communityOption('open')}>Open community</button>
+				{#if menuCommunity.role === 'owner' || menuCommunity.role === 'moderator'}
+					<button onclick={() => void communityOption('settings')}>Community settings</button>
+					<button onclick={() => void communityOption('invite')}>Invite people</button>
+				{/if}
+				{#if menuCommunity.role === 'owner'}<button onclick={() => void communityOption('create')}
+						>Create channel</button
+					>{/if}
+				{#if menuCommunity.role === 'member' || menuCommunity.role === 'moderator'}<button
+						onclick={() => void communityOption('leave')}>Leave community…</button
+					>{/if}
+			{/if}
+		</div>
+		{#if composing}
+			<dialog
+				class="confirm-dialog flow-dialog"
+				aria-labelledby="compose-title"
+				{@attach (node) => node.showModal()}
+				onclose={() => (composing = false)}
+			>
+				<h2 id="compose-title">New message</h2>
+				<label for="recipient-search">Find someone in your communities</label>
+				<Input
+					id="recipient-search"
+					bind:value={recipientQuery}
+					maxlength={100}
+					placeholder="Type at least two letters"
+				/>
+				<p role="status">{peopleStatus}</p>
+				{#each people as person (person.community_id + JSON.stringify(person.target))}
+					<button class={chatControls.row} onclick={() => void messagePerson(person)}
+						>{person.name} · {person.community}</button
+					>{/each}
+				<button class={chatControls.ghost} onclick={() => (composing = false)}>Cancel</button>
+			</dialog>{/if}
+		{#snippet generatedInvite()}{#if inviteLink}
+				<Input
+					readonly
+					aria-label="New invite link"
+					value={inviteLink}
+					onclick={(e) => e.currentTarget.select()}
+					style="margin-top:8px"
+				/>
+				<button
+					class={chatControls.ghost}
+					onclick={async () => {
+						try {
+							await navigator.clipboard.writeText(inviteLink);
+							inviteCopyStatus = 'Invite link copied.';
+						} catch {
+							inviteCopyStatus = 'Select the link above and copy it.';
+						}
+					}}>Copy invite link</button
+				>
+				<small role="status">{inviteCopyStatus}</small>
+			{/if}{/snippet}
+		{#if inviteOpen}
+			<dialog
+				class="confirm-dialog flow-dialog"
+				aria-labelledby="share-title"
+				{@attach (node) => node.showModal()}
+				onclose={() => (inviteOpen = false)}
+			>
+				<h2 id="share-title">Invite people</h2>
+				<p>
+					Invite a classmate to {selected?.name}. This link opens the selected channel and expires
+					in seven days.
+				</p>
+				{#if error}<p role="alert">{error}</p>{:else if !inviteLink}<p role="status">
+						Creating invitation…
+					</p>{/if}
+				{@render generatedInvite()}
+				<button class={chatControls.ghost} onclick={() => (inviteOpen = false)}>Done</button>
+			</dialog>{/if}
+
+		{#if preview}
+			<dialog
+				class="confirm-dialog flow-dialog"
+				aria-labelledby="invite-title"
+				{@attach (node) => node.showModal()}
+				onclose={() => {
+					preview = null;
+					goHome();
+				}}
+			>
+				<small>COMMUNITY INVITATION</small>
+				<h2 id="invite-title">{preview.name}</h2>
+				<p>
+					{preview.member_count}
+					{preview.member_count === 1 ? 'member' : 'members'} · Accept to join and open the shared channel.
+				</p>
+				{#if error}<p role="alert">{error}</p>{/if}
+				<button
+					class="btn-primary {chatControls.primary}"
+					disabled={accepting}
+					onclick={() => void acceptInvite()}>{accepting ? 'Joining…' : 'Accept invite'}</button
+				>
+				<button
+					class={chatControls.ghost}
+					disabled={accepting}
+					onclick={() => {
+						preview = null;
+						goHome();
+					}}>Decline</button
+				>
+			</dialog>{/if}
 		<main
 			class:in-room={!!selected || !!selectedDM}
 			class:nav-open={navOpen}
@@ -818,6 +1049,7 @@
 						<button
 							class="sidebar-item {chatControls.row}"
 							title={community.name}
+							oncontextmenu={(event) => openCommunityMenu(event, community)}
 							aria-label={community.name}
 							class:active={selected?.id === community.id}
 							aria-current={selected?.id === community.id ? 'page' : undefined}
@@ -889,11 +1121,12 @@
 						aria-expanded={navOpen}
 						onclick={() => (navOpen = !navOpen)}><PanelLeft size={18} /></button
 					>
-					<a class="product-mark" href={resolve('/')}>
-						<MessageCircle size={17} strokeWidth={2.5} /><strong>StudySpot</strong>
-					</a>
-					<span class="workspace-title"
-						>{selected?.name ?? selectedDM?.other_name ?? 'Communities'}</span
+					<button
+						class={chatControls.ghost}
+						onclick={() => {
+							recipientQuery = '';
+							composing = true;
+						}}><SquarePen size={16} /> New message</button
 					>
 					<div class="app-controls">
 						{#if selected}<button
@@ -981,8 +1214,18 @@
 								</div>
 								<div class="community-header-text">
 									<span class="community-name">{selected.name}</span>
-									<span class="community-meta">{selected.member_count} members</span>
+									<span class="community-meta"
+										>{selected.member_count}
+										{selected.member_count === 1 ? 'member' : 'members'}</span
+									>
 								</div>
+								<button
+									class={chatControls.icon}
+									aria-label="Community actions"
+									title="Community actions"
+									onclick={(event) => selected && openCommunityMenu(event, selected)}
+									><MoreHorizontal size={18} /></button
+								>
 							</div>
 
 							<div class="rail-section">
@@ -1042,6 +1285,10 @@
 												<button
 													class="channel-btn {chatControls.row}"
 													id={`channel-select-${channel.id}`}
+													oncontextmenu={(e) => {
+														e.preventDefault();
+														void toggleChannelMenu(channel.id);
+													}}
 													aria-current={activeChannelId === channel.id ? 'page' : undefined}
 													onclick={() => selectChannel(channel.id)}
 												>
@@ -1049,16 +1296,14 @@
 													<span class="ch-name">{channel.name}</span>
 													{#if channel.archived}<span class="archived-chip">archived</span>{/if}
 												</button>
-												{#if selected.role === 'owner'}
-													<button
-														class="ch-options-btn {chatControls.icon}"
-														id={`channel-trigger-${channel.id}`}
-														aria-label={`Options for #${channel.name}`}
-														aria-expanded={channelMenuOpen === channel.id}
-														aria-controls={`channel-options-${channel.id}`}
-														onclick={() => void toggleChannelMenu(channel.id)}>⋯</button
-													>
-												{/if}
+												<button
+													class="ch-options-btn {chatControls.icon}"
+													id={`channel-trigger-${channel.id}`}
+													aria-label={`Options for #${channel.name}`}
+													aria-expanded={channelMenuOpen === channel.id}
+													aria-controls={`channel-options-${channel.id}`}
+													onclick={() => void toggleChannelMenu(channel.id)}>⋯</button
+												>
 											</div>
 											{#if channelMenuOpen === channel.id}
 												<div
@@ -1069,34 +1314,42 @@
 												>
 													<button
 														class={chatControls.ghost}
-														onclick={() => void startChannelRename(channel)}>Rename channel</button
+														onclick={() => {
+															selectChannel(channel.id);
+															void shareChannel();
+														}}>Copy channel link</button
 													>
-													<button
-														class={chatControls.ghost}
-														disabled={channel.position === 0}
-														onclick={() =>
-															void updateChannel(channel.id, { position: channel.position - 1 })}
-														>↑ Move up</button
-													>
-													<button
-														class={chatControls.ghost}
-														disabled={channel.position >= (selected.channels?.length ?? 0) - 1}
-														onclick={() =>
-															void updateChannel(channel.id, { position: channel.position + 1 })}
-														>↓ Move down</button
-													>
-													<button
-														class={chatControls.ghost}
-														onclick={() =>
-															void updateChannel(channel.id, { archived: !channel.archived })}
-													>
-														{channel.archived ? 'Restore channel' : 'Archive channel'}
-													</button>
-													<button
-														class="menu-danger {chatControls.danger}"
-														onclick={() => void confirmChannelDelete(channel)}
-														>Delete channel</button
-													>
+													{#if selected.role === 'owner'}<button
+															class={chatControls.ghost}
+															onclick={() => void startChannelRename(channel)}
+															>Channel settings</button
+														>
+														<button
+															class={chatControls.ghost}
+															disabled={channel.position === 0}
+															onclick={() =>
+																void updateChannel(channel.id, { position: channel.position - 1 })}
+															>↑ Move up</button
+														>
+														<button
+															class={chatControls.ghost}
+															disabled={channel.position >= (selected.channels?.length ?? 0) - 1}
+															onclick={() =>
+																void updateChannel(channel.id, { position: channel.position + 1 })}
+															>↓ Move down</button
+														>
+														<button
+															class={chatControls.ghost}
+															onclick={() =>
+																void updateChannel(channel.id, { archived: !channel.archived })}
+														>
+															{channel.archived ? 'Restore channel' : 'Archive channel'}
+														</button>
+														<button
+															class="menu-danger {chatControls.danger}"
+															onclick={() => void confirmChannelDelete(channel)}
+															>Delete channel</button
+														>{/if}
 												</div>
 											{/if}
 										</li>
@@ -1124,7 +1377,10 @@
 								{:else if selected.role !== 'owner'}
 									<button
 										class="rail-leave-btn {chatControls.ghost}"
-										onclick={() => void action(`/communities/${activeCommunityId()}/leave`)}
+										onclick={() => {
+											menuCommunity = selected;
+											void communityOption('leave');
+										}}
 									>
 										Leave community
 									</button>
@@ -1565,15 +1821,7 @@
 												onclick={() => void createInvite()}
 												>Create 7-day invite to selected channel</button
 											>
-											{#if inviteLink}
-												<Input
-													readonly
-													aria-label="New invite link"
-													value={inviteLink}
-													onclick={(e) => e.currentTarget.select()}
-													style="margin-top:8px"
-												/>
-											{/if}
+											{@render generatedInvite()}
 											{#each invites as invite (invite.id)}
 												<div class="invite-row">
 													<span
@@ -1637,9 +1885,8 @@
 								the course you're working through.
 							</p>
 							<div class="landing-cta">
-								<button
-									class="btn-primary {chatControls.primary}"
-									onclick={showCreate}>Create a community</button
+								<button class="btn-primary {chatControls.primary}" onclick={showCreate}
+									>Create a community</button
 								>
 								<button
 									class="landing-cta-secondary {chatControls.outline}"
@@ -1677,6 +1924,7 @@
 							{#each communities.slice(0, 6) as community (community.id)}
 								<button
 									class="community-card {chatControls.row}"
+									oncontextmenu={(e) => openCommunityMenu(e, community)}
 									onclick={() => void choose(community.id)}
 								>
 									<div class="community-card-icon" style="background:{avatarColor(community.name)}">
@@ -1706,6 +1954,51 @@
 </div>
 
 <style>
+	.site-navigation {
+		padding: 0 clamp(10px, 3vw, 40px);
+		background: white;
+	}
+	.site-navigation[data-theme='dark'] {
+		background: #1e1f22;
+		--color-brand-hover: #a4acff;
+	}
+	.site-navigation[data-theme='dark'] :global(.nav-link) {
+		background: #2b2d31;
+		color: #f2f3f5;
+		border-color: #41434a;
+	}
+	.community-pop {
+		position: fixed;
+		inset: auto;
+		margin: 0;
+		width: min(224px, 95vw);
+		padding: 8px;
+		background: var(--panel);
+		color: var(--ink);
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		box-shadow: 0 8px 28px #0003;
+	}
+	.community-pop:popover-open,
+	.flow-dialog[open] {
+		display: grid;
+		gap: 4px;
+	}
+	.community-pop strong,
+	.community-pop button {
+		padding: 7px 10px;
+		text-align: left;
+		overflow-wrap: anywhere;
+	}
+	.community-pop button:hover,
+	.community-pop button:focus-visible {
+		background: var(--well);
+		border-radius: 6px;
+	}
+	.flow-dialog[open] {
+		gap: 12px;
+	}
+
 	/* ── Shell ── */
 	.shell {
 		min-height: 100vh;
@@ -2215,8 +2508,14 @@
 			color 0.1s;
 		padding: 0;
 	}
-	.channel-row:hover .ch-options-btn {
+	.channel-row:hover .ch-options-btn,
+	.channel-row:focus-within .ch-options-btn {
 		opacity: 1;
+	}
+	@media (hover: none) {
+		.channel-row .ch-options-btn {
+			opacity: 1;
+		}
 	}
 	.ch-options-btn:hover {
 		background: var(--sb-active);
@@ -2828,8 +3127,12 @@
 		border-color: var(--danger) !important;
 	}
 
-	/* ── Dialog — Slack modal ── */
 	.confirm-dialog {
+		margin: auto;
+		max-height: 85dvh;
+		overflow: auto;
+		background: var(--panel);
+		color: var(--ink);
 		width: min(420px, calc(100vw - 32px));
 		padding: 28px;
 		border: 1px solid var(--line);

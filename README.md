@@ -93,7 +93,7 @@ docker compose up --build --watch
 
 Open <http://localhost:7500>. Source changes are synchronized into the frontend and backend containers; dependency changes rebuild only the affected image.
 
-To try community writes before the account UI is integrated, run `docker compose exec backend uv run python manage.py createsuperuser`, sign in at <http://localhost:7501/admin/>, then visit <http://localhost:7500/communities>. The backend and frontend share the `localhost` session cookie. Public browsing needs no account.
+For a two-person local chat demo, start Postgres with `just start-db`, run `STUDYSPOT_CHAT_DEMO=true just dev-local`, and open <http://localhost:7500/communities>. Create a community, choose **⋯ → Invite people**, and open the invite in a private window to join as a second person. The default chat API requires sign-in.
 
 For local development, install Bun, Python 3.12, uv, just, pre-commit, Git, and Docker, then run `just setup` followed by `just check`. Use `just --list` to see every supported repository command.
 

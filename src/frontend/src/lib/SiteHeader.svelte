@@ -31,7 +31,7 @@
 	</a>
 	<nav aria-label="Main navigation">
 		<a class="nav-link" href={resolve('/')}>Explore</a>
-		<a class="nav-link" href={resolve('/communities')}>Communities</a>
+		<a class="nav-link" data-sveltekit-reload href={resolve('/communities')}>Communities</a>
 		{#if onMap}
 			<!--
 				A button, because from here it goes nowhere: the results are on
@@ -46,11 +46,6 @@
 			-->
 			<a class="nav-link" href="{resolve('/')}?view=map">Map</a>
 		{/if}
-		<!-- svelte-ignore a11y_invalid_attribute -->
-		<a class="nav-link" href="#">Saved</a>
-		<!-- svelte-ignore a11y_invalid_attribute -->
-		<a class="nav-link" href="#">Suggest a spot</a>
-
 		<!--
 			Nothing until the session is known, so a prerendered "Log in" never
 			flashes at someone who is already logged in. With accounts switched

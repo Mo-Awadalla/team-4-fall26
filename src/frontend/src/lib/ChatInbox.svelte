@@ -119,10 +119,10 @@
 	}
 	.inbox-panel {
 		position: fixed;
-		inset: 48px 12px auto auto;
+		inset: calc(var(--site-header-height, 0px) + 48px) 12px auto auto;
 		margin: 0;
 		width: min(420px, calc(100% - 24px));
-		max-height: min(620px, calc(100dvh - 68px));
+		max-height: min(620px, calc(100dvh - var(--site-header-height, 0px) - 68px));
 		border: 1px solid var(--line);
 		border-radius: 14px;
 		background: var(--side);

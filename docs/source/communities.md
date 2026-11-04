@@ -1,10 +1,10 @@
 # Communities
 
-The static `/communities` page discovers public groups through the Django API. In local development with Django debug mode enabled, open `http://localhost:7500/communities` to browse, create or join as a browser-session guest. Open a copied channel link in a private window and select **Join community** to chat as a second guest. With debug mode off, sign in to browse or create a community. Local guests get stable fictional names. Use the theme button in the top bar to switch between light and dark. A group has an owner, members, text channels, optional school and course, and shareable invitations. Members can read and post channel messages, reply, react, edit their own messages, and delete their own messages. Owners and moderators can delete and pin messages. Search covers nondeleted messages in a community. Community members can also start private one-to-one conversations from a member or channel message. Channel chat and DMs support threads, emoji reactions, polls, file attachments, Markdown, code blocks, spoilers and a searchable Unicode emoji picker.
+The static `/communities` page discovers public groups through the Django API. After starting Postgres with `just start-db` and the app with `STUDYSPOT_CHAT_DEMO=true just dev-local`, open `http://localhost:7500/communities` to browse, create or join as a browser-session guest. Open a copied channel link in a private window and select **Join community** to chat as a second guest. Outside this opt-in debug demo, the chat API requires an active account. Local guests get stable fictional names. Use the theme button in the top bar to switch between light and dark. A group has an owner, members, text channels, optional school and course, and shareable invitations. Members can read and post channel messages, reply, react, edit their own messages, and delete their own messages. Owners and moderators can delete and pin messages. Search covers nondeleted messages in a community. Community members can also start private one-to-one conversations from a member or channel message. Channel chat and DMs support threads, emoji reactions, polls, file attachments, Markdown, code blocks, spoilers and a searchable Unicode emoji picker.
 
-All community paths have no trailing slash. `GET /communities?q=&limit=&offset=` requires an active account. Public `GET /communities/{id}`, `GET /communities/{id}/members`, and `GET /communities/{id}/channels` need no account. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` shows communities joined or owned by the current account or browser session. Member listings page account members in `items` and active guest members in `guest_items`, with separate continuation flags and a `guest_count`. Guest identities are shown as stable pseudonyms; their session IDs are never returned.
+All community paths have no trailing slash. `GET /communities?q=&limit=&offset=` requires an active account. Community details, members and channels require the same access. The list returns `{items, has_more}` with a default page size of 20 and maximum of 50. `mine=true` shows communities joined or owned by the current account or browser session. Member listings page account members in `items` and active guest members in `guest_items`, with separate continuation flags and a `guest_count`. Guest identities are shown as stable pseudonyms; their session IDs are never returned.
 
-Joining, leaving, and invite redemption support guest sessions. Browser sessions identify guest members and owners of existing guest-created groups. Session writes require a CSRF token. Guest memberships expire with their session and stop counting after expiry. Visitors can join up to 100 communities in one session. Clearing site cookies loses guest ownership and membership; a future claim flow can transfer them to an account. Guest creators manage channels, invitations and moderation through the same permission policy as account owners. Auth0 bearer tokens supply `request.user` for signed-in account actions; foreign keys use `settings.AUTH_USER_MODEL`. StudySpot admins must be marked `is_staff`. No client-supplied actor or role is trusted.
+In the local demo, joining, leaving, and invite redemption support guest sessions. Browser sessions identify guest members and owners of existing guest-created groups. Session writes require a CSRF token. Guest memberships expire with their session and stop counting after expiry. Visitors can join up to 100 communities in one session. Clearing site cookies loses guest ownership and membership; a future claim flow can transfer them to an account. Guest creators manage channels, invitations and moderation through the same permission policy as account owners. Auth0 bearer tokens supply `request.user` for signed-in account actions; foreign keys use `settings.AUTH_USER_MODEL`. StudySpot admins must be marked `is_staff`. No client-supplied actor or role is trusted.
 
 | Route | Method | Rule |
 |---|---|---|
@@ -29,6 +29,7 @@ Joining, leaving, and invite redemption support guest sessions. Browser sessions
 | `/dms/{id}/messages/{message_id}` | PATCH, DELETE | The author edits or deletes their private message. |
 | `/communities/{id}/invites` | GET, POST | Owner or moderator lists or creates links. |
 | `/communities/{id}/invites/{invite_id}` | DELETE | Owner or moderator revokes a link. |
+| `/communities/invites/{token}` | GET | Preview the community without joining or consuming an invite use. |
 | `/communities/invites/{token}/redeem` | POST | Join through a valid link. |
 | `/communities/{id}/moderation` | GET, POST | Owner or moderator reads events and bans, or kicks, bans and unbans. |
 | `/communities/{id}/admin` | DELETE | StudySpot admin removes a group. |
@@ -43,7 +44,7 @@ The `/communities` landing page shows public communities and a creation action. 
 
 ## Using chat
 
-- **Find a person.** On Communities, type at least two characters in **Search people and communities**. Choose a name under **People in your communities** to open a private conversation. Results include current account and guest members of groups you have joined.
+- **Find a person.** Choose **New message** from any chat and enter at least two characters of a shared member’s name, or search in **Search people and communities**. Choose a name under **People in your communities** to open a private conversation. Results include current account and guest members of groups you have joined.
 - **Set up a DM.** Use the gear in the conversation header to choose all messages, mentions only, or muted. The pin and search buttons open their respective panels.
 
 - **Share a destination.** Copy channel link opens the selected channel. Create a seven-day invite from community settings to join and open that channel. Copy link on a message opens it directly, including messages outside the latest history page. Access checks still apply.
@@ -65,7 +66,7 @@ cd src/backend
 DJANGO_DEBUG=true uv run --env-file ../../.env python manage.py seed_sample_communities --demo-channel 26
 ```
 
-The inbox button opens a scrollable list of unread message cards. Each card opens its message. Owners and moderators can open **Manage** in the member list to view community settings. Owners can edit details, and changes save automatically.
+The inbox button opens a scrollable list of unread message cards. Each card opens its message. Right-click a community in the sidebar or open **⋯** beside its name for community actions. To role-play, choose **Invite people**, copy the link into a private browser window and choose **Accept invite**. Owners and moderators can also open **Manage** in the member list to view community settings. Owners can edit details, and changes save automatically.
 
 To run the chat layout checks on a running local frontend with Chrome installed:
 
@@ -75,3 +76,5 @@ bunx bombadil browser test --headless --exit-on-violation --time-limit 30s http:
 ```
 
 Use `--width 390 --height 844` to exercise the mobile navigation. The specification explores visible controls, checks for uncaught errors, and verifies the document and inbox fit the viewport. Set `CHROME` to a Chrome headless shell executable if the default browser cannot capture frames.
+
+With the local demo running and at least one community present, run `node --test qa/community-menu.mjs` from `src/frontend` to check secondary-click menus and keyboard focus in Chromium.

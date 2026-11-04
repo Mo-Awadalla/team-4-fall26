@@ -660,3 +660,33 @@
 .chat-shell .composer [data-slot='textarea'] {
 	min-height: 32px;
 }
+
+.chat-shell.chat-shell,
+.chat-shell.chat-shell main,
+.chat-shell.chat-shell main.in-room,
+.chat-shell.chat-shell main:not(.in-room) {
+	height: calc(100dvh - var(--site-header-height));
+	min-height: 0;
+}
+.chat-shell.chat-shell main.nav-open:not(.in-room) .sidebar {
+	top: calc(var(--site-header-height) + 42px);
+	height: calc(100dvh - var(--site-header-height) - 42px);
+}
+@media (prefers-reduced-motion: no-preference) {
+	.chat-shell :is(dialog[open], [popover]:popover-open, .channel-menu, .members-open .member-rail) {
+		animation: chat-reveal 140ms ease-out;
+	}
+	.chat-shell :is(.composer button, .app-controls button, .channel-btn, .sidebar-item):active {
+		transform: scale(0.98);
+	}
+	@keyframes chat-reveal {
+		from {
+			opacity: 0;
+			translate: 0 3px;
+		}
+		to {
+			opacity: 1;
+			translate: 0 0;
+		}
+	}
+}
