@@ -457,3 +457,18 @@
 .chat-shell .attachment-chip {
 	color: var(--muted);
 }
+
+.chat-shell .join-wall .btn-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	padding: 0 22px;
+	border: 0;
+	border-radius: 8px;
+	background: #5865f2;
+	color: white;
+	font-weight: 650;
+}
+.chat-shell .join-wall .btn-primary:hover { background: #4752c4; }
+.chat-shell .join-wall .btn-primary:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
