@@ -558,7 +558,7 @@
 				'POST',
 				{ expires_in_hours: 168, max_uses: 100 }
 			);
-			inviteLink = `${location.origin}${resolve('/communities')}?invite=${result.token}`;
+			inviteLink = `${location.origin}${resolve('/communities')}?invite=${result.token}${activeChannelId ? `&channel=${activeChannelId}` : ''}`;
 			await loadSettings();
 		} catch (cause) {
 			error = message(cause);
@@ -926,6 +926,9 @@
 						<div class="chat-area">
 							{#each selected.channels?.filter((ch) => ch.id === activeChannelId) ?? [] as channel (channel.id)}
 								<div class="channel-pane">
+									<button class="btn-sm-outline" onclick={() => void shareChannel()}
+										>Copy channel link</button
+									>
 									{#if channel.topic}<p class="channel-topic">{channel.topic}</p>{/if}
 									{#if editingChannelId === channel.id}
 										<div class="channel-edit-bar">
@@ -1266,7 +1269,7 @@
 										<div class="settings-section-head">Invite links</div>
 										<p class="rail-muted">Invite classmates to this community.</p>
 										<button class="btn-sm-primary" onclick={() => void createInvite()}
-											>Create 7-day invite</button
+											>Create 7-day invite to selected channel</button
 										>
 										{#if inviteLink}
 											<input
