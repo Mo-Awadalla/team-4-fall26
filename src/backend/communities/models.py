@@ -258,6 +258,7 @@ class RoomMemberState(models.Model):
     actor = models.CharField(max_length=128)
     name = models.CharField(max_length=150)
     last_active = models.DateTimeField(auto_now=True)
+    last_read = models.PositiveBigIntegerField(default=0)
     typing_until = models.DateTimeField(null=True)
 
     class Meta:

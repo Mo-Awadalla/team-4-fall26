@@ -47,6 +47,19 @@
 	let error = $state('');
 	let files = $state<FileList>();
 	let thread = $state<{ id: number; content: string } | null>(null);
+	let lastRead = $state(0);
+	async function mark(unread_from?: number) {
+		try {
+			const result = await communityRequest<{ last_read: number }>(
+				base() + '/read',
+				'PUT',
+				unread_from ? { unread_from } : {}
+			);
+			lastRead = result.last_read;
+		} catch (e) {
+			error = problem(e);
+		}
+	}
 	let presence = $state<Presence>();
 	let sending = $state(false);
 	let polling = false;
@@ -431,6 +444,11 @@
 				{#if showDateSep(i)}
 					<div class="date-sep"><span>{formatDate(message.created_at)}</span></div>
 				{/if}
+				{#if message.id > lastRead && messages.find((m) => m.id > lastRead)?.id === message.id}<div
+						class="unread-divider"
+					>
+						Unread messages
+					</div>{/if}
 				<article
 					class="message"
 					class:grouped={!header}
@@ -537,9 +555,9 @@
 								onclick={() => (reactionFor = reactionFor === message.id ? null : message.id)}
 								>😊</button
 							>
-							<button onclick={() => (thread = message)}>Thread</button><MessageLink
-								id={message.id}
-							/>
+							<button onclick={() => (thread = message)}>Thread</button><button
+								onclick={() => void mark(message.id)}>Mark unread</button
+							><MessageLink id={message.id} />
 							<button class="action-btn" title="Reply" onclick={() => (replyTo = message)}>↩</button
 							>
 							{#if !message.mine}
@@ -606,7 +624,11 @@
 			</div>
 		{/if}
 
-		<PollComposer url={base() + '/messages'} onsent={() => void refresh()} /><Presence
+		<PollComposer url={base() + '/messages'} onsent={() => void refresh()} /><button
+			type="button"
+			onclick={() => void mark()}>Mark as read</button
+		><Presence
+			onread={(id) => (lastRead = id)}
 			bind:this={presence}
 			url={base() + '/presence'}
 		/><Stickers
@@ -646,6 +668,12 @@
 </div>
 
 <style>
+	.unread-divider {
+		border-top: 1px solid #99354e;
+		color: #93314b;
+		font-size: 0.8rem;
+		text-align: center;
+	}
 	.chat {
 		position: relative;
 	}

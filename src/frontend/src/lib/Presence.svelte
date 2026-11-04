@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { communityRequest } from './communities';
-	let { url }: { url: string } = $props();
+	let { url, onread }: { url: string; onread?: (id: number) => void } = $props();
 	let names = $state<string[]>([]),
 		lastSignal = 0,
 		lastActive = 0;
@@ -28,8 +28,11 @@
 					lastActive = Date.now();
 					await signal({});
 				}
-				const data = await communityRequest<{ typing: string[] }>(url);
-				if (!closed) names = data.typing;
+				const data = await communityRequest<{ typing: string[]; last_read: number }>(url);
+				if (!closed) {
+					names = data.typing;
+					onread?.(data.last_read);
+				}
 			} catch {
 				names = [];
 			} finally {

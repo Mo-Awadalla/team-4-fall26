@@ -43,11 +43,33 @@ def room_state(room):
     return RoomMemberState.objects.filter(channel_id=room["channel_id"])
 
 
+def state_scope(room):
+    return {k: v for k, v in room.items() if k != "community_id"}
+
+
+class ReadMarker(CommunityView):
+    def put(self, request, **room):
+        messages, key = room_messages(request, **room)
+        class Marker(serializers.Serializer):
+            unread_from = serializers.IntegerField(min_value=1, required=False)
+        parsed = Marker(data=request.data)
+        parsed.is_valid(raise_exception=True)
+        target = parsed.validated_data.get("unread_from")
+        if target:
+            get_object_or_404(messages, pk=target)
+            last_read = target - 1
+        else:
+            last_read = messages.order_by("-pk").values_list("pk", flat=True).first() or 0
+        RoomMemberState.objects.update_or_create(actor=key, **state_scope(room), defaults={"last_read": last_read, "name": author_name(request)})
+        return Response({"last_read": last_read})
+
+
 class RoomPresence(CommunityView):
     def get(self, request, **room):
         _, key = room_messages(request, **room)
         names = room_state(room).exclude(actor=key).filter(typing_until__gt=timezone.now()).order_by("-typing_until").values_list("name", flat=True)[:5]
-        return Response({"typing": list(names)})
+        last_read = room_state(room).filter(actor=key).values_list("last_read", flat=True).first() or 0
+        return Response({"typing": list(names), "last_read": last_read})
 
     def post(self, request, **room):
         _, key = room_messages(request, **room)

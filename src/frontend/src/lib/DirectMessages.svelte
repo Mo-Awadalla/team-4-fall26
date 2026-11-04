@@ -57,6 +57,19 @@
 	let error = $state('');
 	let files = $state<FileList>();
 	let thread = $state<{ id: number; content: string } | null>(null);
+	let lastRead = $state(0);
+	async function mark(unread_from?: number) {
+		try {
+			const result = await communityRequest<{ last_read: number }>(
+				`/dms/${conversation.id}` + '/read',
+				'PUT',
+				unread_from ? { unread_from } : {}
+			);
+			lastRead = result.last_read;
+		} catch (e) {
+			error = problem(e);
+		}
+	}
 	let presence = $state<Presence>();
 	let sending = $state(false);
 	let polling = false;
@@ -204,6 +217,11 @@
 	<div class="messages" aria-live="polite">
 		{#if hasOlder}<button onclick={() => void older()}>Load older messages</button>{/if}
 		{#each messages as message (message.id)}
+			{#if message.id > lastRead && messages.find((m) => m.id > lastRead)?.id === message.id}<div
+					class="unread-divider"
+				>
+					Unread messages
+				</div>{/if}
 			<article>
 				<div class="heading">
 					<strong>{message.author_name}</strong><time datetime={message.created_at}
@@ -248,9 +266,9 @@
 								aria-pressed={r.me}
 								onclick={() => void react(message, r.emoji)}>{r.emoji} {r.count}</button
 							>{/each}
-						<button onclick={() => (thread = message)}>Thread</button><MessageLink
-							id={message.id}
-						/>
+						<button onclick={() => (thread = message)}>Thread</button><button
+							onclick={() => void mark(message.id)}>Mark unread</button
+						><MessageLink id={message.id} />
 						<button onclick={() => (replyTo = message)}>Reply</button>
 						{#if message.mine}<button
 								onclick={() => {
@@ -276,7 +294,11 @@
 			void send();
 		}}
 	>
-		<PollComposer url={base()} onsent={() => void refresh()} /><Presence
+		<PollComposer url={base()} onsent={() => void refresh()} /><button
+			type="button"
+			onclick={() => void mark()}>Mark as read</button
+		><Presence
+			onread={(id) => (lastRead = id)}
 			bind:this={presence}
 			url={`/dms/${conversation.id}` + '/presence'}
 		/><Stickers
@@ -296,6 +318,12 @@
 </div>
 
 <style>
+	.unread-divider {
+		border-top: 1px solid #99354e;
+		color: #93314b;
+		font-size: 0.8rem;
+		text-align: center;
+	}
 	.dm {
 		position: relative;
 	}
