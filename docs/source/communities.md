@@ -64,3 +64,14 @@ For a local demo, run `just seed` to populate the study groups with named partic
 cd src/backend
 DJANGO_DEBUG=true uv run --env-file ../../.env python manage.py seed_sample_communities --demo-channel 26
 ```
+
+The inbox button opens a scrollable list of unread message cards. Each card opens its message. Owners and moderators can open **Manage** in the member list to view community settings. Owners can edit details, and changes save automatically.
+
+To run the chat layout checks on a running local frontend with Chrome installed:
+
+```sh
+cd src/frontend
+bunx bombadil browser test --headless --exit-on-violation --time-limit 30s http://localhost:7500/communities qa/chat.bombadil.ts
+```
+
+Use `--width 390 --height 844` to exercise the mobile navigation. The specification explores visible controls, checks for uncaught errors, and verifies the document and inbox fit the viewport. Set `CHROME` to a Chrome headless shell executable if the default browser cannot capture frames.
