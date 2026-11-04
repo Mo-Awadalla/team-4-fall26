@@ -182,6 +182,12 @@ class Messages(CommunityView):
 
 
 class MessageDetail(CommunityView):
+    def get(self, request: Request, community_id: int, channel_id: int, message_id: int) -> Response:
+        channel = channel_for(community_id, channel_id)
+        role = member_role(request, channel)
+        return Response(message_data(request, message_for(channel, message_id), role))
+
+
     def patch(
         self, request: Request, community_id: int, channel_id: int, message_id: int
     ) -> Response:

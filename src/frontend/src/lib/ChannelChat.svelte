@@ -1,5 +1,7 @@
 <script lang="ts">
 	import SearchMessages from './SearchMessages.svelte';
+	import MessageLink from './MessageLink.svelte';
+	import LinkedMessage from './LinkedMessage.svelte';
 	import MessageBody from './MessageBody.svelte';
 	import { tick } from 'svelte';
 	import {
@@ -367,6 +369,7 @@
 		/>
 	{/if}
 
+	<LinkedMessage url={base() + '/messages'} />
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 
 	{#if results !== null || (pins !== null && showPinsPanel)}
@@ -506,6 +509,7 @@
 								onclick={() => (reactionFor = reactionFor === message.id ? null : message.id)}
 								>😊</button
 							>
+							<MessageLink id={message.id} />
 							<button class="action-btn" title="Reply" onclick={() => (replyTo = message)}>↩</button
 							>
 							{#if !message.mine}

@@ -156,6 +156,12 @@
 	}
 
 	async function choose(id: number, channelId?: number | null) {
+		const initial = new URL(location.href);
+		const hash =
+			Number(initial.searchParams.get('id')) === id &&
+			Number(initial.searchParams.get('channel')) === channelId
+				? initial.hash
+				: '';
 		error = '';
 		try {
 			selected = await communityRequest<Community>(`/communities/${id}`);
@@ -185,7 +191,7 @@
 			history.replaceState(
 				null,
 				'',
-				`?id=${id}${activeChannelId ? `&channel=${activeChannelId}` : ''}`
+				`?id=${id}${activeChannelId ? `&channel=${activeChannelId}` : ''}${hash}`
 			);
 			void loadMembers();
 		} catch (cause) {
@@ -207,7 +213,11 @@
 		selectedDM = conversation;
 		selected = null;
 		creating = false;
-		history.replaceState(null, '', `?dm=${conversation.id}`);
+		history.replaceState(
+			null,
+			'',
+			`?dm=${conversation.id}${Number(new URL(location.href).searchParams.get('dm')) === conversation.id ? location.hash : ''}`
+		);
 		void loadDMs();
 	}
 
@@ -773,7 +783,7 @@
 						</div>
 					</div>
 				{:else if selectedDM}
-					<DirectMessages conversation={selectedDM} />
+					{#key selectedDM.id}<DirectMessages conversation={selectedDM} />{/key}
 				{:else if selected}
 					<!-- Community workspace -->
 					<div class="workspace">

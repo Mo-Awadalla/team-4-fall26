@@ -4,6 +4,7 @@ import hashlib
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -213,6 +214,12 @@ class DirectMessages(CommunityView):
 
 
 class DirectMessageDetail(CommunityView):
+    def get(self, request: Request, conversation_id: int, message_id: int) -> Response:
+        conversation, key = conversation_for(request, conversation_id)
+        message = get_object_or_404(DirectMessage, conversation=conversation, pk=message_id)
+        return Response(direct_message_data(message, key))
+
+
     def patch(self, request: Request, conversation_id: int, message_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
         try:

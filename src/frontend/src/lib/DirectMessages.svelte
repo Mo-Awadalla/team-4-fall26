@@ -1,5 +1,7 @@
 <script lang="ts">
 	import SearchMessages from './SearchMessages.svelte';
+	import MessageLink from './MessageLink.svelte';
+	import LinkedMessage from './LinkedMessage.svelte';
 	import MessageBody from './MessageBody.svelte';
 	import { communityRequest, type DirectConversation, type DirectMessage } from './communities';
 
@@ -131,6 +133,7 @@
 			</p>{/each}
 	</details>
 	<p class="muted">Only the two of you can read this conversation.</p>
+	<LinkedMessage url={base()} />
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	<div class="messages" aria-live="polite">
 		{#if hasOlder}<button onclick={() => void older()}>Load older messages</button>{/if}
@@ -160,6 +163,7 @@
 							content={message.content}
 						/>{#if message.edited_at}<small>(edited)</small>{/if}{/if}{/if}
 				{#if !message.deleted_at}<div class="actions">
+						<MessageLink id={message.id} />
 						<button onclick={() => (replyTo = message)}>Reply</button>
 						{#if message.mine}<button
 								onclick={() => {
