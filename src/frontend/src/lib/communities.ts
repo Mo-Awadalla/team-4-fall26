@@ -13,7 +13,13 @@ export type Community = {
 	channels?: Channel[];
 };
 
-export type Channel = { id: number; name: string; position: number; archived: boolean };
+export type Channel = {
+	id: number;
+	name: string;
+	position: number;
+	topic?: string;
+	archived: boolean;
+};
 export type Message = {
 	id: number;
 	channel_id: number;

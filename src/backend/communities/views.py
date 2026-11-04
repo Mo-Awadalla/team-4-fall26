@@ -376,6 +376,7 @@ class ChannelDetail(CommunityView):
         class Update(serializers.Serializer):
             name = serializers.RegexField(r"^[a-z0-9][a-z0-9-]{0,49}$", required=False)
             position = serializers.IntegerField(min_value=0, max_value=19, required=False)
+            topic = serializers.CharField(max_length=256, allow_blank=True, required=False)
             archived = serializers.BooleanField(required=False)
 
         parsed = Update(data=request.data)

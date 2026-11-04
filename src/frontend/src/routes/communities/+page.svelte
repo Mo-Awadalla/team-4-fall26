@@ -926,6 +926,7 @@
 						<div class="chat-area">
 							{#each selected.channels?.filter((ch) => ch.id === activeChannelId) ?? [] as channel (channel.id)}
 								<div class="channel-pane">
+									{#if channel.topic}<p class="channel-topic">{channel.topic}</p>{/if}
 									{#if editingChannelId === channel.id}
 										<div class="channel-edit-bar">
 											<form
@@ -934,6 +935,14 @@
 													void finishChannelEdit(channel.id);
 												}}
 											>
+												<label
+													>Topic <input
+														maxlength="256"
+														value={channel.topic ?? ''}
+														onchange={(e) =>
+															void updateChannel(channel.id, { topic: e.currentTarget.value })}
+													/></label
+												>
 												<label for={`rename-channel-${channel.id}`}>Rename #</label>
 												<input
 													id={`rename-channel-${channel.id}`}

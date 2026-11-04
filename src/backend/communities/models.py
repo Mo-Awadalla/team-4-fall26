@@ -64,6 +64,7 @@ class Channel(models.Model):
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="channels")
     name = models.CharField(max_length=50)
     position = models.PositiveSmallIntegerField(default=0)
+    topic = models.CharField(max_length=256, blank=True)
     archived = models.BooleanField(default=False)
 
     class Meta:
