@@ -160,10 +160,6 @@ docs:
     uv run --project docs sphinx-build --builder html docs/source docs/build/html
     python3.12 -m http.server 7503 --bind 127.0.0.1 --directory docs/build/html
 
-# Validate the Nix development environment.
-nix-check:
-    nix --extra-experimental-features "nix-command flakes" flake check --print-build-logs
-
 # -- AWS ----------------------------------------------------------------------
 #
 # See infra/README.md. The order for a first deployment is:
