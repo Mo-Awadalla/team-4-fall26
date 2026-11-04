@@ -50,6 +50,11 @@ class CommunitySessionAuthentication(SessionAuthentication):
 class CommunityView(APIView):
     authentication_classes = [Auth0Authentication, CommunitySessionAuthentication]
 
+    def check_permissions(self, request: Request) -> None:
+        super().check_permissions(request)
+        if not settings.CHAT_GUEST_DEMO:
+            actor(request)
+
 
 def actor(request: Request):
     if not request.user or not request.user.is_authenticated or not request.user.is_active:
@@ -86,6 +91,8 @@ def counted_communities():
 
 
 def viewer(request: Request, community: Community):
+    if not settings.CHAT_GUEST_DEMO or getattr(request.user, "is_authenticated", False):
+        return request.user
     if community.owner_id is None and community.pk in request.session.get("guest_communities", []):
         return GuestOwner(community.pk)
     if not getattr(request.user, "is_authenticated", False):
@@ -133,16 +140,18 @@ def page(request: Request) -> tuple[int, int]:
     return parsed.validated_data["limit"], parsed.validated_data["offset"]
 
 
-class CommunityAccess(CommunityView):
+class CommunityAccess(APIView):
+    authentication_classes = [Auth0Authentication, CommunitySessionAuthentication]
+
     def get(self, request: Request) -> Response:
         # First-time invite recipients need a CSRF cookie before redeeming.
         get_token(request._request)
-        return Response({"guest_preview": settings.DEBUG})
+        return Response({"guest_preview": settings.CHAT_GUEST_DEMO})
 
 
 class CommunityList(CommunityView):
     def get(self, request: Request) -> Response:
-        if not settings.DEBUG or request.user:
+        if not settings.CHAT_GUEST_DEMO or request.user:
             actor(request)
         get_token(request._request)
         limit, offset = page(request)
@@ -157,8 +166,8 @@ class CommunityList(CommunityView):
             communities = communities.filter(
                 Q(name__icontains=query) | Q(school__icontains=query) | Q(course__icontains=query)
             )
-        guest_ids = request.session.get("guest_communities", [])
-        identity = guest_id(request)
+        guest_ids = request.session.get("guest_communities", []) if not request.user else []
+        identity = guest_id(request) if not request.user else None
         if mine == "true":
             owned_or_joined = Q(pk__in=guest_ids, owner__isnull=True)
             if identity:
@@ -210,7 +219,7 @@ class CommunityList(CommunityView):
         )
 
     def post(self, request: Request) -> Response:
-        user = None if settings.DEBUG and not request.user else actor(request)
+        user = None if settings.CHAT_GUEST_DEMO and not request.user else actor(request)
         parsed = CommunityWriteSerializer(data=request.data)
         parsed.is_valid(raise_exception=True)
         if user is None:
@@ -486,6 +495,12 @@ class InviteDetail(CommunityView):
             invite.revoked = True
             invite.save(update_fields=["revoked"])
         return Response(status=204)
+
+
+class InvitePreview(CommunityView):
+    def get(self, request: Request, token: str) -> Response:
+        community = services.preview_invite(token)
+        return Response({"name": community.name, "member_count": services.member_count(community)})
 
 
 class Redeem(CommunityView):

@@ -85,6 +85,7 @@ urlpatterns = [
     ),
     path("communities/<int:community_id>/invites", views.Invites.as_view()),
     path("communities/<int:community_id>/invites/<int:invite_id>", views.InviteDetail.as_view()),
+    path("communities/invites/<str:token>", views.InvitePreview.as_view()),
     path("communities/invites/<str:token>/redeem", views.Redeem.as_view()),
     path("communities/<int:community_id>/moderation", views.Moderation.as_view()),
     path("communities/<int:community_id>/dms", dm_views.StartFromMember.as_view()),

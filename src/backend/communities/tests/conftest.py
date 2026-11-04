@@ -5,8 +5,9 @@ from communities.services import create_guest_community
 
 
 @pytest.fixture
-def existing_guest_community(db):
+def existing_guest_community(db, settings):
     """A guest-owned group and browser session created before sign-in was required."""
+    settings.CHAT_GUEST_DEMO = True
     owner = APIClient(enforce_csrf_checks=True)
     session = owner.session
     identity = "existing-guest"
