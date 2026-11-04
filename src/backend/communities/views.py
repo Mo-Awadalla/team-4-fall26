@@ -383,6 +383,7 @@ class ChannelDetail(CommunityView):
             position = serializers.IntegerField(min_value=0, max_value=19, required=False)
             private = serializers.BooleanField(required=False)
             read_only = serializers.BooleanField(required=False)
+            slowmode_seconds = serializers.IntegerField(min_value=0, max_value=21600, required=False)
             topic = serializers.CharField(max_length=256, allow_blank=True, required=False)
             archived = serializers.BooleanField(required=False)
 

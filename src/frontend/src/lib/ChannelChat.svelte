@@ -307,6 +307,7 @@
 	<div class="chat-header">
 		<span class="hash" aria-hidden="true">#</span>
 		<strong class="channel-title">{channel.name}</strong>
+		{#if channel.slowmode_seconds}<span>Slowmode · {channel.slowmode_seconds}s</span>{/if}
 		{#if channel.read_only}<span>Read-only</span>{/if}
 		{#if channel.archived}<span class="archived-badge">Archived</span>{/if}
 		<div class="header-actions">

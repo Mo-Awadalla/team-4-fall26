@@ -91,3 +91,19 @@ def test_private_channel_visibility_and_read_only(existing_guest_community):
     owner.patch(base, {"private": False, "read_only": True})
     assert member.get(f"{base}/messages").status_code == 200
     assert member.post(f"{base}/messages", {"content": "hello"}).status_code == 403
+
+
+def test_slowmode_survives_deleting_last_post(existing_guest_community):
+    owner, cid = existing_guest_community
+    channels = f"/communities/{cid}/channels"
+    base = f"{channels}/{owner.get(channels).data[0]['id']}"
+    member = APIClient()
+    member.post(f"/communities/{cid}/join")
+    owner.patch(base, {"slowmode_seconds": 60})
+    url = f"{base}/messages"
+    sent = member.post(url, {"content": "one"})
+    member.delete(f"{url}/{sent.data['id']}")
+    limited = member.post(url, {"content": "two"})
+    assert limited.status_code == 429
+    assert 0 < int(limited["Retry-After"]) <= 60
+    assert owner.post(url, {"content": "announcement"}).status_code == 201

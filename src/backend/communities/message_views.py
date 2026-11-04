@@ -1,17 +1,18 @@
 """Channel text chat. Every read and write checks current community membership."""
 
 import hashlib
+from math import ceil
 from typing import cast
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied, Throttled
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .models import Channel, Community, Message, Reaction
+from .models import Channel, Community, GuestMembership, Membership, Message, Reaction
 from .permissions import role_for
 from .views import CommunityView, community_for, guest_id, viewer, visible_channels
 
@@ -137,6 +138,7 @@ class Messages(CommunityView):
             }
         )
 
+    @transaction.atomic
     def post(self, request: Request, community_id: int, channel_id: int) -> Response:
         channel = channel_for(community_id, channel_id)
         role = member_role(request, channel)
@@ -154,6 +156,20 @@ class Messages(CommunityView):
             ).exists()
         ):
             raise NotFound("Reply target not found in this channel.")
+        if channel.slowmode_seconds and role == "member":
+            # Serialize concurrent sends by this member before checking their last post.
+            if authenticated(request):
+                Membership.objects.select_for_update().get(community=channel.community, user=request.user)
+                previous = channel.messages.filter(author=request.user)
+            else:
+                identity = guest_id(request)
+                GuestMembership.objects.select_for_update().get(community=channel.community, guest_id=identity)
+                previous = channel.messages.filter(guest_id=identity)
+            latest = previous.order_by("-id").values_list("created_at", flat=True).first()
+            if latest:
+                remaining = channel.slowmode_seconds - (timezone.now() - latest).total_seconds()
+                if remaining > 0:
+                    raise Throttled(wait=ceil(remaining), detail="Slowmode is enabled.")
         message = Message.objects.create(
             channel=channel,
             author=request.user if authenticated(request) else None,

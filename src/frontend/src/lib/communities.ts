@@ -19,6 +19,7 @@ export type Channel = {
 	position: number;
 	private?: boolean;
 	read_only?: boolean;
+	slowmode_seconds?: number;
 	topic?: string;
 	archived: boolean;
 };

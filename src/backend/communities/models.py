@@ -66,6 +66,7 @@ class Channel(models.Model):
     position = models.PositiveSmallIntegerField(default=0)
     private = models.BooleanField(default=False)
     read_only = models.BooleanField(default=False)
+    slowmode_seconds = models.PositiveIntegerField(default=0)
     topic = models.CharField(max_length=256, blank=True)
     archived = models.BooleanField(default=False)
 

@@ -964,6 +964,18 @@
 															})}
 													/> Only moderators and owner can post</label
 												>
+												<label
+													>Slowmode (seconds)<input
+														type="number"
+														min="0"
+														max="21600"
+														value={channel.slowmode_seconds ?? 0}
+														onchange={(e) =>
+															void updateChannel(channel.id, {
+																slowmode_seconds: e.currentTarget.valueAsNumber
+															})}
+													/></label
+												>
 												<label for={`rename-channel-${channel.id}`}>Rename #</label>
 												<input
 													id={`rename-channel-${channel.id}`}
