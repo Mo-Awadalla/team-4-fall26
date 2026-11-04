@@ -2,7 +2,6 @@ import { expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { render } from 'vitest-browser-svelte';
 import MessageBody from './MessageBody.svelte';
-import { stickers } from './stickers';
 
 it('reveals only the selected spoiler and hides it again', async () => {
 	render(MessageBody, { content: 'Plain ||**answer**|| then ||another||' });
@@ -24,9 +23,7 @@ it('keeps code literal and treats untrusted HTML as text', async () => {
 	expect(document.querySelector('img[onerror]')).toBeNull();
 });
 
-it.each(stickers)('renders the bundled $name sticker with an accessible name', async (sticker) => {
-	render(MessageBody, { content: ':sticker:' + sticker.id + ':' });
-	await expect
-		.element(page.getByRole('img', { name: sticker.name }))
-		.toHaveAttribute('src', sticker.src);
+it('displays a saved study sticker as its emoji equivalent', async () => {
+	render(MessageBody, { content: ':sticker:study:' });
+	await expect.element(page.getByText('📚')).toBeVisible();
 });

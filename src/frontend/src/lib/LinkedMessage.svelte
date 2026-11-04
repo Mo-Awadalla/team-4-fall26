@@ -4,9 +4,16 @@
 	import { communityRequest, type DirectMessage } from './communities';
 	import MessageBody from './MessageBody.svelte';
 	import { onMount } from 'svelte';
-	let { url }: { url: string } = $props();
+	let { url, loaded }: { url: string; loaded: { id: number }[] } = $props();
 	let linked = $state<DirectMessage | null>(null);
 	let error = $state('');
+	let visibleTarget = $derived(
+		linked && loaded.some((item) => item.id === linked?.id) ? linked.id : null
+	);
+	$effect(() => {
+		if (visibleTarget !== null)
+			document.getElementById(`message-${visibleTarget}`)?.scrollIntoView({ block: 'nearest' });
+	});
 	onMount(() => {
 		let current = 0;
 		async function open() {
@@ -31,7 +38,7 @@
 	});
 </script>
 
-{#if linked}<aside aria-label="Linked message">
+{#if linked && !loaded.some((m) => m.id === linked?.id)}<aside aria-label="Linked message">
 		<strong>Linked message · {linked.author_name}</strong><MessageBody
 			content={linked.deleted_at ? 'Message deleted' : linked.content}
 		/>

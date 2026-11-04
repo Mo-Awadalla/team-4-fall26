@@ -1,14 +1,17 @@
 <script lang="ts">
-	import { stickers } from './stickers';
 	import { renderMessage } from './markdown';
+	const legacyEmoji: Record<string, string> = {
+		':sticker:study:': '📚',
+		':sticker:break:': '☕',
+		':sticker:done:': '🎉'
+	};
 	let { content }: { content: string } = $props();
-	let sticker = $derived(stickers.find((s) => content === ':sticker:' + s.id + ':'));
 </script>
 
-{#if sticker}<img width="112" src={sticker.src} alt={sticker.name} />{:else}<div class="body">
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -- parser disables HTML and escapes spoiler text -->
-		{@html renderMessage(content)}
-	</div>{/if}
+<div class="body">
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- parser disables HTML and escapes spoiler text -->
+	{@html renderMessage(Object.hasOwn(legacyEmoji, content) ? legacyEmoji[content] : content)}
+</div>
 
 <style>
 	.body {

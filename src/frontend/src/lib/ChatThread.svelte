@@ -115,8 +115,8 @@
 
 <style>
 	.thread {
-		background: white;
-		border: 1px solid #c7beca;
+		background: var(--panel);
+		border: 1px solid var(--line);
 		padding: 1rem;
 		position: absolute;
 		inset: 0 0 0 auto;

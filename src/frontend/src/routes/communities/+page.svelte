@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { base, resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
-	import SiteHeader from '$lib/SiteHeader.svelte';
+	import Moon from '@lucide/svelte/icons/moon';
+	import Sun from '@lucide/svelte/icons/sun';
+	import Compass from '@lucide/svelte/icons/compass';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Hash from '@lucide/svelte/icons/hash';
+	import MessageCircle from '@lucide/svelte/icons/message-circle';
+	import Link2 from '@lucide/svelte/icons/link-2';
+	import PanelLeft from '@lucide/svelte/icons/panel-left';
+	import Users from '@lucide/svelte/icons/users';
+	import '$lib/chat-theme.css';
 	import Autocomplete from '$lib/Autocomplete.svelte';
 	import { channelLink } from '$lib/chatLinks';
 	import ChatInbox from '$lib/ChatInbox.svelte';
@@ -84,6 +93,7 @@
 	let transferableMembers = $derived(
 		members.filter((member) => member.user_id !== String(selected?.owner_id))
 	);
+	let selfName = $derived([...members, ...guestMembers].find((m) => m.is_me)?.display_name);
 	let channelName = $state('');
 	let channelCreateOpen = $state(false);
 	let channelMenuOpen = $state<number | null>(null);
@@ -94,6 +104,13 @@
 	let renameInput = $state<HTMLInputElement>();
 	let deleteDialog = $state<HTMLDialogElement>();
 	let activeChannelId = $state<number | null>(null);
+	let theme = $state<'light' | 'dark'>('light');
+	let navOpen = $state(false),
+		membersOpen = $state(false);
+	function toggleTheme() {
+		theme = theme === 'light' ? 'dark' : 'light';
+		localStorage.setItem('studyspot.chat.theme', theme);
+	}
 	let guestPreview = $state(false);
 	let accessError = $state('');
 	let inviteLink = $state('');
@@ -103,7 +120,7 @@
 	let requestNumber = 0;
 	const activeCommunityId = () => selected?.id;
 
-	const palette = ['#9b1c3a', '#eb459e', '#3ba55c', '#faa61a', '#9b59b6', '#1abc9c', '#e67e22'];
+	const palette = ['#5865b9', '#976689', '#377f73', '#95634d', '#79659b', '#43728b', '#8c6441'];
 	function avatarColor(name: string): string {
 		let h = 0;
 		for (const c of name) h = (h * 31 + c.charCodeAt(0)) | 0;
@@ -160,6 +177,8 @@
 	}
 
 	async function choose(id: number, channelId?: number | null) {
+		navOpen = false;
+		membersOpen = false;
 		const initial = new URL(location.href);
 		const hash =
 			Number(initial.searchParams.get('id')) === id &&
@@ -287,6 +306,7 @@
 	}
 
 	function selectChannel(channelId: number) {
+		navOpen = false;
 		activeChannelId = channelId;
 		channelMenuOpen = null;
 		editingChannelId = null;
@@ -591,6 +611,13 @@
 	});
 
 	onMount(() => {
+		const saved = localStorage.getItem('studyspot.chat.theme');
+		theme =
+			saved === 'light' || saved === 'dark'
+				? saved
+				: matchMedia('(prefers-color-scheme: dark)').matches
+					? 'dark'
+					: 'light';
 		const url = new URL(location.href);
 		async function enter() {
 			const access = await communityRequest<{ guest_preview: boolean }>('/communities/access');
@@ -634,9 +661,7 @@
 	<meta name="description" content="Find and create public study communities." />
 </svelte:head>
 
-<div class="shell">
-	<SiteHeader />
-
+<div class="shell chat-shell" data-theme={theme}>
 	{#if accessError}<p role="alert">
 			{accessError}
 		</p>{:else if !guestPreview && session.status === 'loading'}
@@ -665,11 +690,20 @@
 			{/if}
 		</dialog>
 
-		<main class:in-room={!!selected || !!selectedDM}>
+		<main
+			class:in-room={!!selected || !!selectedDM}
+			class:nav-open={navOpen}
+			class:members-open={membersOpen}
+		>
 			<!-- ── Left sidebar ── -->
 			<aside class="sidebar">
 				<div class="sidebar-top">
-					<button class="home-link" onclick={goHome}>Communities</button>
+					<button
+						class="home-link"
+						onclick={goHome}
+						title="Browse communities"
+						aria-label="Browse communities"><Compass size={23} /><span>Communities</span></button
+					>
 					<div class="sidebar-search-row">
 						<input id="community-search" bind:value={query} placeholder="Search communities…" />
 					</div>
@@ -741,15 +775,43 @@
 				{/if}
 
 				<div class="sidebar-bottom">
-					<button class="create-btn" onclick={showCreate}> + New community </button>
+					<button
+						class="create-btn"
+						title="Create community"
+						aria-label="Create community"
+						onclick={showCreate}><Plus size={21} /><span>New community</span></button
+					>
 				</div>
 			</aside>
 
 			<!-- ── Main content ── -->
 			<div class="content" class:workspace-mode={!!selected || !!selectedDM}>
 				<header class="room-bar">
-					<span>StudySpot / {selected?.name ?? selectedDM?.other_name ?? 'Communities'}</span
-					><ChatInbox />
+					<button
+						class="chat-icon mobile-nav"
+						aria-label="Toggle navigation"
+						onclick={() => (navOpen = !navOpen)}><PanelLeft size={18} /></button
+					>
+					<a class="product-mark" href={resolve('/')}>
+						<MessageCircle size={17} strokeWidth={2.5} /><strong>StudySpot</strong>
+					</a>
+					<span class="workspace-title"
+						>{selected?.name ?? selectedDM?.other_name ?? 'Communities'}</span
+					>
+					<div class="app-controls">
+						{#if selected}<button
+								class="chat-icon members-toggle"
+								title="Toggle member list"
+								aria-label="Toggle member list"
+								onclick={() => (membersOpen = !membersOpen)}><Users size={18} /></button
+							>{/if}<ChatInbox /><button
+							class="chat-icon"
+							aria-label={'Switch to ' + (theme === 'light' ? 'dark' : 'light') + ' theme'}
+							title="Switch theme"
+							onclick={toggleTheme}
+							>{#if theme === 'light'}<Moon size={18} />{:else}<Sun size={18} />{/if}</button
+						>
+					</div>
 				</header>
 				{#if error}<p class="error-banner" role="alert">{error}</p>{/if}
 
@@ -828,7 +890,7 @@
 
 							<div class="rail-section">
 								<div class="rail-section-header">
-									<span>CHANNELS</span>
+									<span>Text channels</span>
 									{#if selected.role === 'owner'}
 										<button
 											class="rail-add-btn"
@@ -883,7 +945,7 @@
 													aria-current={activeChannelId === channel.id ? 'page' : undefined}
 													onclick={() => selectChannel(channel.id)}
 												>
-													<span class="ch-hash" aria-hidden="true">#</span>
+													<Hash size={18} />
 													<span class="ch-name">{channel.name}</span>
 													{#if channel.archived}<span class="archived-chip">archived</span>{/if}
 												</button>
@@ -905,7 +967,9 @@
 													role="group"
 													aria-label={`Options for #${channel.name}`}
 												>
-													<button onclick={() => void startChannelRename(channel)}>✏ Rename</button>
+													<button onclick={() => void startChannelRename(channel)}
+														>Rename channel</button
+													>
 													<button
 														disabled={channel.position === 0}
 														onclick={() =>
@@ -922,11 +986,12 @@
 														onclick={() =>
 															void updateChannel(channel.id, { archived: !channel.archived })}
 													>
-														{channel.archived ? '↩ Restore' : '📦 Archive'}
+														{channel.archived ? 'Restore channel' : 'Archive channel'}
 													</button>
 													<button
 														class="menu-danger"
-														onclick={() => void confirmChannelDelete(channel)}>🗑 Delete</button
+														onclick={() => void confirmChannelDelete(channel)}
+														>Delete channel</button
 													>
 												</div>
 											{/if}
@@ -937,6 +1002,14 @@
 
 							<!-- Community action buttons at bottom of rail -->
 							<div class="rail-actions">
+								{#if selfName}<div class="self-card">
+										<span style:background={avatarColor(selfName)}>{initials(selfName)}</span>
+										<div>
+											<strong>{selfName}</strong><small
+												>{guestPreview ? 'Demo session' : 'Your profile'}</small
+											>
+										</div>
+									</div>{/if}
 								{#if selected.role === 'visitor'}
 									<button
 										class="rail-join-btn"
@@ -959,10 +1032,14 @@
 						<div class="chat-area">
 							{#each selected.channels?.filter((ch) => ch.id === activeChannelId) ?? [] as channel (channel.id)}
 								<div class="channel-pane">
-									<button class="btn-sm-outline" onclick={() => void shareChannel()}
-										>Copy channel link</button
-									>
-									{#if channel.topic}<p class="channel-topic">{channel.topic}</p>{/if}
+									{#if selected.role === 'visitor'}<div class="visitor-channel">
+											<Hash size={20} /><strong>{channel.name}</strong><button
+												class="chat-icon"
+												title="Copy channel link"
+												aria-label="Copy channel link"
+												onclick={() => void shareChannel()}><Link2 size={18} /></button
+											>
+										</div>{/if}
 									{#if editingChannelId === channel.id}
 										<div class="channel-edit-bar">
 											<form
@@ -1083,6 +1160,7 @@
 											{channel}
 											role={selected.role}
 											names={[...members, ...guestMembers].map((m) => m.display_name)}
+											onShare={() => void shareChannel()}
 											onDirectMessage={openDM}
 										/>
 									{/if}
@@ -1108,7 +1186,7 @@
 								<button
 									class="tab-link"
 									class:chosen={tab === 'main'}
-									onclick={() => (tab = 'main')}>Chat</button
+									onclick={() => (tab = 'main')}>Overview</button
 								>
 								<button
 									class="tab-link"
@@ -1140,7 +1218,11 @@
 											{initials(member.display_name)}
 										</div>
 										<div class="member-info">
-											<strong>{member.is_me ? 'You' : member.display_name}</strong>
+											<strong
+												>{member.is_me
+													? member.display_name + ' (you)'
+													: member.display_name}</strong
+											>
 											<span
 												>{member.user_id === String(selected.owner_id)
 													? 'Owner'
@@ -1151,7 +1233,8 @@
 											<button
 												class="dm-btn"
 												title="Send DM"
-												onclick={() => void startMemberDM(member.user_id)}>✉</button
+												onclick={() => void startMemberDM(member.user_id)}
+												aria-label="Send direct message"><MessageCircle size={15} /></button
 											>
 										{/if}
 									</div>
@@ -1162,14 +1245,15 @@
 											{initials(guest.display_name)}
 										</div>
 										<div class="member-info">
-											<strong>{guest.is_me ? 'You' : guest.display_name}</strong>
+											<strong>{guest.display_name}{guest.is_me ? ' (you)' : ''}</strong>
 											<span>{guest.role === 'owner' ? 'Owner' : 'Guest'}</span>
 										</div>
 										{#if !guest.is_me && selected.role !== 'visitor'}
 											<button
 												class="dm-btn"
 												title="Send DM"
-												onclick={() => void startGuestDM(guest.id)}>✉</button
+												onclick={() => void startGuestDM(guest.id)}
+												aria-label="Send direct message"><MessageCircle size={15} /></button
 											>
 										{/if}
 									</div>
@@ -1195,7 +1279,11 @@
 											{initials(member.display_name)}
 										</div>
 										<div class="member-info">
-											<strong>{member.is_me ? 'You' : member.display_name}</strong>
+											<strong
+												>{member.is_me
+													? member.display_name + ' (you)'
+													: member.display_name}</strong
+											>
 											<span
 												>{member.user_id === String(selected.owner_id)
 													? 'Owner'
@@ -1247,7 +1335,7 @@
 											{initials(guest.display_name)}
 										</div>
 										<div class="member-info">
-											<strong>{guest.is_me ? 'You' : guest.display_name}</strong>
+											<strong>{guest.display_name}{guest.is_me ? ' (you)' : ''}</strong>
 											<span>{guest.role === 'owner' ? 'Owner' : 'Guest'}</span>
 										</div>
 										{#if !guest.is_me && selected.role !== 'visitor'}
@@ -1454,43 +1542,23 @@
 </div>
 
 <style>
-	/* ── Design tokens — OG StudySpot palette ── */
-	:root {
-		/* Sidebar (warm cream, matching OG site) */
-		--sb-bg: #f5f0ea;
-		--sb-hover: rgba(0, 0, 0, 0.05);
-		--sb-active: rgba(155, 28, 58, 0.1);
-		--sb-border: #e5ddd5;
-		--sb-text: #4a3f38;
-		--sb-muted: #9b8e84;
-		--sb-text-act: #9b1c3a;
-
-		/* Brand / actions */
-		--accent: #9b1c3a;
-		--accent-h: #7d1630;
-		--accent-lt: #fdf2f5;
-
-		/* Danger */
-		--danger: #c0392b;
-	}
-
 	/* ── Shell ── */
 	.shell {
 		min-height: 100vh;
-		background: #fff;
+		background: var(--panel);
 	}
 
 	.auth-loading {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		height: calc(100vh - 76px);
+		height: 100dvh;
 	}
 	.auth-spinner {
 		width: 32px;
 		height: 32px;
-		border: 3px solid #e5ddd5;
-		border-top-color: #9b1c3a;
+		border: 3px solid var(--line);
+		border-top-color: var(--accent);
 		border-radius: 50%;
 		animation: spin 0.7s linear infinite;
 	}
@@ -1500,7 +1568,7 @@
 		}
 	}
 	main {
-		height: calc(100vh - 76px);
+		height: 100dvh;
 		min-height: 620px;
 		display: grid;
 		grid-template-columns: 248px minmax(0, 1fr);
@@ -1539,7 +1607,7 @@
 	}
 	.sidebar-search-row input {
 		width: 100%;
-		background: #fff;
+		background: var(--panel);
 		border: 1px solid var(--sb-border);
 		border-radius: 8px;
 		color: var(--sb-text);
@@ -1555,7 +1623,7 @@
 	.sidebar-search-row input:focus {
 		outline: none;
 		border-color: var(--accent);
-		box-shadow: 0 0 0 2px rgba(155, 28, 58, 0.12);
+		box-shadow: 0 0 0 2px var(--selected);
 	}
 	.sidebar-tabs {
 		display: flex;
@@ -1582,7 +1650,7 @@
 	}
 	.sidebar-tabs button.chosen {
 		color: var(--accent);
-		background: #fff;
+		background: var(--panel);
 	}
 	.sidebar-tabs button:hover:not(.chosen) {
 		color: var(--sb-text);
@@ -1729,7 +1797,7 @@
 		min-width: 0;
 		min-height: 0;
 		overflow-y: auto;
-		background: #fff;
+		background: var(--panel);
 	}
 	.content.workspace-mode {
 		overflow: hidden;
@@ -1740,7 +1808,7 @@
 		background: var(--accent-lt);
 		color: var(--accent);
 		font-size: 13px;
-		border-bottom: 1px solid rgba(155, 28, 58, 0.15);
+		border-bottom: 1px solid var(--selected);
 		flex-shrink: 0;
 	}
 
@@ -1853,19 +1921,19 @@
 	}
 	.channel-create-form input {
 		width: 100%;
-		background: #fff;
+		background: var(--panel);
 		border: 1px solid var(--sb-border);
 		border-radius: 6px;
 		padding: 6px 8px;
 		font: inherit;
 		font-size: 13px;
-		color: #1a1a1a;
+		color: var(--ink);
 		box-sizing: border-box;
 	}
 	.channel-create-form input:focus {
 		outline: none;
 		border-color: var(--accent);
-		box-shadow: 0 0 0 2px rgba(155, 28, 58, 0.15);
+		box-shadow: 0 0 0 2px var(--selected);
 	}
 	.channel-name-hint {
 		font-size: 11px;
@@ -1882,7 +1950,7 @@
 		padding: 4px 10px;
 		border: 1px solid var(--sb-border);
 		border-radius: 5px;
-		background: #fff;
+		background: var(--panel);
 		color: var(--sb-text);
 		cursor: pointer;
 		font: inherit;
@@ -1951,16 +2019,6 @@
 		color: var(--sb-text-act);
 		font-weight: 600;
 	}
-
-	.ch-hash {
-		color: var(--sb-muted);
-		font-size: 16px;
-		font-weight: 600;
-		flex-shrink: 0;
-	}
-	.channel-row.active .ch-hash {
-		color: var(--sb-text);
-	}
 	.ch-name {
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -2006,7 +2064,7 @@
 		top: 36px;
 		right: 0;
 		z-index: 10;
-		background: #fff;
+		background: var(--panel);
 		border: 1px solid var(--sb-border);
 		border-radius: 10px;
 		padding: 4px;
@@ -2022,7 +2080,7 @@
 		text-align: left;
 		border: 0;
 		background: transparent;
-		color: #1a1a1a;
+		color: var(--ink);
 		padding: 8px 10px;
 		font: inherit;
 		font-size: 13px;
@@ -2072,7 +2130,7 @@
 	}
 	.rail-leave-btn:hover {
 		background: rgba(0, 0, 0, 0.09);
-		color: #1a1a1a;
+		color: var(--ink);
 	}
 
 	/* Chat area */
@@ -2082,7 +2140,7 @@
 		min-width: 0;
 		min-height: 0;
 		overflow: hidden;
-		background: #fff;
+		background: var(--panel);
 	}
 	.channel-pane {
 		display: flex;
@@ -2092,8 +2150,8 @@
 	}
 	.channel-edit-bar {
 		padding: 10px 20px;
-		background: #fffbf0;
-		border-bottom: 1px solid #f0e0a0;
+		background: var(--selected);
+		border-bottom: 1px solid var(--line);
 		flex-shrink: 0;
 	}
 	.channel-edit-bar form {
@@ -2108,10 +2166,10 @@
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.channel-edit-bar input {
-		border: 1px solid #d8d8d8;
+		border: 1px solid var(--line);
 		border-radius: 4px;
 		padding: 5px 8px;
 		font: inherit;
@@ -2121,11 +2179,11 @@
 	.channel-edit-bar input:focus {
 		outline: none;
 		border-color: var(--accent);
-		box-shadow: 0 0 0 2px rgba(155, 28, 58, 0.15);
+		box-shadow: 0 0 0 2px var(--selected);
 	}
 	.save-hint {
 		font-size: 11px;
-		color: #6b6459;
+		color: var(--muted);
 	}
 	.btn-danger-sm {
 		color: var(--danger) !important;
@@ -2134,23 +2192,23 @@
 
 	.share-banner {
 		padding: 8px 20px;
-		background: #f0fff4;
-		border-bottom: 1px solid #c3e6cb;
+		background: var(--selected);
+		border-bottom: 1px solid var(--line);
 		flex-shrink: 0;
 	}
 	.share-msg {
 		margin: 0 0 4px;
 		font-size: 13px;
-		color: #285736;
+		color: var(--success);
 	}
 	.share-link {
 		width: 100%;
-		border: 1px solid #a8d8bc;
+		border: 1px solid var(--line);
 		border-radius: 6px;
 		padding: 6px 10px;
 		font: inherit;
 		font-size: 12px;
-		background: white;
+		background: var(--panel);
 	}
 
 	.join-wall {
@@ -2176,10 +2234,10 @@
 	.join-wall h3 {
 		margin: 0 0 8px;
 		font-size: 22px;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.join-wall p {
-		color: #616061;
+		color: var(--muted);
 		margin: 0 0 20px;
 	}
 
@@ -2194,15 +2252,15 @@
 	}
 	.empty-icon {
 		font-size: 48px;
-		color: #d4d2d8;
+		color: var(--line);
 		margin-bottom: 16px;
 	}
 	.empty-channel h3 {
 		margin: 0 0 8px;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.empty-channel p {
-		color: #616061;
+		color: var(--muted);
 		margin: 0 0 20px;
 	}
 
@@ -2387,7 +2445,7 @@
 	}
 	.transfer-section select {
 		width: 100%;
-		background: #fff;
+		background: var(--panel);
 		border: 1px solid var(--sb-border);
 		color: var(--sb-text);
 		border-radius: 6px;
@@ -2423,12 +2481,11 @@
 		margin: 10px 0 4px;
 	}
 	.settings-section input,
-	.settings-section textarea,
-	.settings-section select {
+	.settings-section textarea {
 		width: 100%;
-		background: #fff;
+		background: var(--panel);
 		border: 1px solid var(--sb-border);
-		color: #1a1a1a;
+		color: var(--ink);
 		border-radius: 6px;
 		padding: 7px 8px;
 		font: inherit;
@@ -2440,11 +2497,10 @@
 		resize: vertical;
 	}
 	.settings-section input:focus,
-	.settings-section textarea:focus,
-	.settings-section select:focus {
+	.settings-section textarea:focus {
 		outline: none;
 		border-color: var(--accent);
-		box-shadow: 0 0 0 2px rgba(155, 28, 58, 0.15);
+		box-shadow: 0 0 0 2px var(--selected);
 	}
 	.save-status {
 		font-size: 11px;
@@ -2469,7 +2525,7 @@
 		padding: 5px 10px;
 		border: 1px solid var(--sb-border);
 		border-radius: 6px;
-		background: #fff;
+		background: var(--panel);
 		color: var(--sb-text);
 		cursor: pointer;
 		font: inherit;
@@ -2521,10 +2577,10 @@
 		font-size: 28px;
 		font-weight: 800;
 		letter-spacing: -0.03em;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.form-lead {
-		color: #616061;
+		color: var(--muted);
 		margin: 0 0 28px;
 		font-size: 15px;
 	}
@@ -2533,22 +2589,21 @@
 		font-size: 13px;
 		font-weight: 700;
 		margin: 18px 0 6px;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.form-page-inner label span {
 		display: block;
 		font-size: 12px;
 		font-weight: 700;
-		color: #616061;
+		color: var(--muted);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		margin-bottom: 6px;
 	}
 	.form-page-inner input,
-	.form-page-inner textarea,
-	.form-page-inner select {
+	.form-page-inner textarea {
 		width: 100%;
-		border: 1px solid #d8d8d8;
+		border: 1px solid var(--line);
 		border-radius: 4px;
 		padding: 10px 12px;
 		font: inherit;
@@ -2557,7 +2612,7 @@
 			border-color 0.15s,
 			box-shadow 0.15s;
 		box-sizing: border-box;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.form-page-inner textarea {
 		min-height: 100px;
@@ -2567,7 +2622,7 @@
 	.form-page-inner textarea:focus {
 		outline: none;
 		border-color: var(--accent);
-		box-shadow: 0 0 0 2px rgba(155, 28, 58, 0.15);
+		box-shadow: 0 0 0 2px var(--selected);
 	}
 
 	/* ── Shared buttons — Slack style ── */
@@ -2579,9 +2634,9 @@
 	}
 	.form-actions button {
 		cursor: pointer;
-		border: 1px solid #d8d8d8;
+		border: 1px solid var(--line);
 		border-radius: 4px;
-		background: #fff;
+		background: var(--panel);
 		padding: 10px 22px;
 		font: inherit;
 		font-size: 14px;
@@ -2589,10 +2644,10 @@
 		transition:
 			background 0.1s,
 			border-color 0.1s;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.form-actions button:hover {
-		background: #f8f8f8;
+		background: var(--well);
 	}
 	.btn-primary {
 		background: var(--accent) !important;
@@ -2613,7 +2668,7 @@
 	.confirm-dialog {
 		width: min(420px, calc(100vw - 32px));
 		padding: 28px;
-		border: 1px solid #e8e8e8;
+		border: 1px solid var(--line);
 		border-radius: 8px;
 		box-shadow:
 			0 0 0 1px rgba(0, 0, 0, 0.08),
@@ -2625,10 +2680,10 @@
 	.confirm-dialog h2 {
 		font-size: 22px;
 		margin: 0 0 8px;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.confirm-dialog p {
-		color: #616061;
+		color: var(--muted);
 		margin: 0 0 20px;
 	}
 
@@ -2651,12 +2706,12 @@
 		letter-spacing: -0.04em;
 		margin: 0 0 20px;
 		max-width: 680px;
-		color: #1d1c1d;
+		color: var(--ink);
 		font-weight: 800;
 	}
 	.landing-lead {
 		font-size: 17px;
-		color: #616061;
+		color: var(--muted);
 		max-width: 560px;
 		line-height: 1.65;
 		margin: 0 0 32px;
@@ -2689,21 +2744,21 @@
 	}
 	.landing-cta-secondary {
 		padding: 13px 26px;
-		border: 1px solid #d8d8d8;
+		border: 1px solid var(--line);
 		border-radius: 4px;
 		font: inherit;
 		font-size: 15px;
 		font-weight: 600;
 		cursor: pointer;
-		background: #fff;
-		color: #1d1c1d;
+		background: var(--panel);
+		color: var(--ink);
 		transition:
 			background 0.15s,
 			border-color 0.15s;
 	}
 	.landing-cta-secondary:hover {
-		background: #f8f8f8;
-		border-color: #aaa;
+		background: var(--well);
+		border-color: var(--muted);
 	}
 
 	.landing-features {
@@ -2714,9 +2769,9 @@
 	}
 	.feature-card {
 		padding: 22px;
-		border: 1px solid #e8e8e8;
+		border: 1px solid var(--line);
 		border-radius: 4px;
-		background: #f8f8f8;
+		background: var(--well);
 		transition: box-shadow 0.15s;
 	}
 	.feature-card:hover {
@@ -2734,12 +2789,12 @@
 		display: block;
 		font-size: 15px;
 		margin-bottom: 6px;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.feature-card p {
 		margin: 0;
 		font-size: 13px;
-		color: #616061;
+		color: var(--muted);
 		line-height: 1.55;
 	}
 
@@ -2748,7 +2803,7 @@
 		font-weight: 700;
 		margin: 0 0 16px;
 		letter-spacing: -0.025em;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.community-grid {
 		display: grid;
@@ -2761,9 +2816,9 @@
 		gap: 14px;
 		text-align: left;
 		padding: 18px;
-		border: 1px solid #e8e8e8;
+		border: 1px solid var(--line);
 		border-radius: 4px;
-		background: white;
+		background: var(--panel);
 		cursor: pointer;
 		transition:
 			border-color 0.15s,
@@ -2771,7 +2826,7 @@
 		font: inherit;
 	}
 	.community-card:hover {
-		border-color: #aaa;
+		border-color: var(--muted);
 		box-shadow:
 			0 0 0 1px rgba(0, 0, 0, 0.06),
 			0 4px 12px rgba(0, 0, 0, 0.06);
@@ -2796,22 +2851,22 @@
 	.community-card-info strong {
 		font-size: 14px;
 		font-weight: 700;
-		color: #1d1c1d;
+		color: var(--ink);
 	}
 	.community-card-info span {
 		font-size: 12px;
-		color: #616061;
+		color: var(--muted);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 	.community-card-info small {
 		font-size: 11px;
-		color: #aaa;
+		color: var(--muted);
 	}
 
 	.muted {
-		color: #616061;
+		color: var(--muted);
 		font-size: 13px;
 	}
 
@@ -2851,7 +2906,7 @@
 		font-size: 0.85rem;
 	}
 	.room-bar :global(details[open]) {
-		background: white;
+		background: var(--panel);
 		box-shadow: 0 4px 16px #0002;
 		z-index: 4;
 	}

@@ -3,11 +3,10 @@
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
 	import Ballot from './Ballot.svelte';
-	import PollComposer from './PollComposer.svelte';
-	import Presence from './Presence.svelte';
-	import MentionPicker from './MentionPicker.svelte';
+	import ComposerTools from './ComposerTools.svelte';
+	import Send from '@lucide/svelte/icons/send';
 	import { pollMessages, mergeMessages } from './history';
-	import Stickers from './Stickers.svelte';
+	import EmojiPicker from './EmojiPicker.svelte';
 	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
 	import { composeMessage } from './communities';
@@ -72,7 +71,7 @@
 			error = problem(e);
 		}
 	}
-	let presence = $state<Presence>();
+	let presence = $state<ComposerTools>();
 	let sending = $state(false);
 	let cursor: number | null = null,
 		refreshCount = 0;
@@ -222,7 +221,7 @@
 				root={thread}
 				onclose={() => (thread = null)}
 			/>{/key}{/if}
-	<LinkedMessage url={base()} />
+	<LinkedMessage loaded={messages} url={base()} />
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	<div class="messages" aria-live="polite">
 		{#if hasOlder}<button onclick={() => void older()}>Load older messages</button>{/if}
@@ -232,7 +231,7 @@
 				>
 					Unread messages
 				</div>{/if}
-			<article>
+			<article id={`message-${message.id}`}>
 				<div class="heading">
 					<strong>{message.author_name}</strong><time datetime={message.created_at}
 						>{new Date(message.created_at).toLocaleString()}</time
@@ -266,12 +265,7 @@
 							>{/if}{/if}{/if}
 				{#if !message.deleted_at}<div class="actions">
 						<button onclick={() => void pin(message)}>{message.pinned_at ? 'Unpin' : 'Pin'}</button>
-						<details>
-							<summary>React</summary
-							>{#each ['👍', '❤️', '😂', '🎉', '😮', '🔥', '😢'] as emoji (emoji)}<button
-									onclick={() => void react(message, emoji)}>{emoji}</button
-								>{/each}
-						</details>
+						<EmojiPicker reaction onpick={(emoji) => void react(message, emoji)} />
 						{#each message.reactions ?? [] as r (r.emoji)}<button
 								aria-pressed={r.me}
 								onclick={() => void react(message, r.emoji)}>{r.emoji} {r.count}</button
@@ -297,23 +291,15 @@
 	{#if replyTo}<p class="replying">
 			Replying to {replyTo.author_name} <button onclick={() => (replyTo = null)}>Cancel</button>
 		</p>{/if}
-	<div class="compose-tools">
-		<PollComposer url={base()} onsent={() => void refresh()} /><button
-			type="button"
-			onclick={() => void mark()}>Mark as read</button
-		><Presence
-			onread={(id) => (lastRead = id)}
-			bind:this={presence}
-			url={`/dms/${conversation.id}` + '/presence'}
-		/><MentionPicker
-			names={[conversation.other_name]}
-			onpick={(s) => (content = (content ? content + ' ' : '') + s + ' ')}
-		/><Stickers
-			onpick={(s) => {
-				content = s;
-			}}
-		/><label>Attach file (2 MiB)<input type="file" bind:files /></label>
-	</div>
+
+	{#if files?.length}<p class="attachment-chip">
+			{files[0].name}
+			<button
+				type="button"
+				aria-label="Remove attachment"
+				onclick={() => (files = new DataTransfer().files)}>×</button
+			>
+		</p>{/if}
 	<form
 		class="composer"
 		onsubmit={(event) => {
@@ -321,6 +307,16 @@
 			void send();
 		}}
 	>
+		<ComposerTools
+			room={`/dms/${conversation.id}`}
+			names={[conversation.other_name]}
+			bind:files
+			bind:this={presence}
+			onread={(id) => (lastRead = id)}
+			onmention={(v) => (content += (content ? ' ' : '') + v + ' ')}
+			onmark={() => void mark()}
+			onsent={() => void refresh()}
+		/>
 		<input
 			aria-label={`Message ${conversation.other_name}`}
 			maxlength="2000"
@@ -328,39 +324,17 @@
 			oninput={() => presence?.typing()}
 			bind:value={content}
 		/>
-		<button disabled={(!content.trim() && !files?.length) || sending}>Send</button>
+		<EmojiPicker onpick={(v) => (content += v)} /><button
+			disabled={(!content.trim() && !files?.length) || sending}
+			aria-label="Send message"><Send size={18} /></button
+		>
 	</form>
 </div>
 
 <style>
-	.compose-tools {
-		display: flex;
-		align-items: center;
-		gap: 0.35rem 0.75rem;
-		flex-wrap: wrap;
-		padding: 0.45rem 0.85rem;
-		border-top: 1px solid #e1dce4;
-		color: #514653;
-		font-size: 0.78rem;
-		background: #faf8fa;
-	}
-	.compose-tools :global(summary),
-	.compose-tools :global(button) {
-		cursor: pointer;
-	}
-	.compose-tools :global(input[type='file']) {
-		display: block;
-		max-width: 11rem;
-		font-size: 0.72rem;
-	}
-	.compose-tools :global(details[open]) {
-		padding: 0.35rem;
-		background: white;
-	}
-
 	.unread-divider {
-		border-top: 1px solid #99354e;
-		color: #93314b;
+		border-top: 1px solid var(--accent);
+		color: var(--accent);
 		font-size: 0.8rem;
 		text-align: center;
 	}
@@ -372,7 +346,7 @@
 		flex-direction: column;
 		flex: 1;
 		min-height: 0;
-		border: 1px solid #eee1e4;
+		border: 1px solid var(--line);
 		border-radius: 12px;
 		padding: 20px;
 	}
@@ -382,7 +356,7 @@
 	.muted,
 	time,
 	small {
-		color: #746c70;
+		color: var(--muted);
 	}
 	time {
 		font-size: 12px;
@@ -403,12 +377,7 @@
 	}
 	article {
 		padding: 12px 0;
-		border-bottom: 1px solid #f2ecee;
-	}
-	article p {
-		margin: 6px 0;
-		white-space: pre-wrap;
-		overflow-wrap: anywhere;
+		border-bottom: 1px solid var(--line);
 	}
 	.actions {
 		flex-wrap: wrap;
@@ -422,16 +391,16 @@
 		flex: 1;
 	}
 	input {
-		border: 1px solid #d8cdd0;
+		border: 1px solid var(--line);
 		border-radius: 7px;
 		padding: 9px;
 		font: inherit;
 	}
 	button {
 		cursor: pointer;
-		border: 1px solid #ddd2d5;
+		border: 1px solid var(--line);
 		border-radius: 7px;
-		background: white;
+		background: var(--panel);
 		padding: 6px 10px;
 	}
 	button:disabled {
@@ -439,6 +408,6 @@
 		cursor: default;
 	}
 	.error {
-		color: #a51f3b;
+		color: var(--danger);
 	}
 </style>

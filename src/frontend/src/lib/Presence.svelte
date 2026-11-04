@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { communityRequest } from './communities';
-	let { url, onread }: { url: string; onread?: (id: number) => void } = $props();
+	let {
+		url,
+		onread,
+		ontyping
+	}: { url: string; onread?: (id: number) => void; ontyping: (names: string[]) => void } = $props();
 	let mode = $state('all'),
 		notice = $state('');
 	async function setMode(alerts: string) {
@@ -13,8 +17,7 @@
 			notice = e instanceof Error ? e.message : 'Save failed';
 		}
 	}
-	let names = $state<string[]>([]),
-		lastSignal = 0,
+	let lastSignal = 0,
 		lastActive = 0;
 	export function typing() {
 		if (Date.now() - lastSignal < 3000) return;
@@ -25,7 +28,7 @@
 		try {
 			await communityRequest(url, 'POST', body);
 		} catch {
-			names = [];
+			ontyping([]);
 		}
 	}
 	onMount(() => {
@@ -45,12 +48,12 @@
 					last_read: number;
 				}>(url);
 				if (!closed) {
-					names = data.typing;
+					ontyping(data.typing);
 					mode = data.alerts;
 					onread?.(data.last_read);
 				}
 			} catch {
-				names = [];
+				ontyping([]);
 			} finally {
 				busy = false;
 			}
@@ -71,6 +74,3 @@
 		></select
 	></label
 >{#if notice}<span role="alert">{notice}</span>{/if}
-{#if names.length}<small aria-live="polite"
-		>{names.join(', ')} {names.length === 1 ? 'is' : 'are'} typing…</small
-	>{/if}
