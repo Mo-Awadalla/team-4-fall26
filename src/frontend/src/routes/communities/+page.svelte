@@ -182,6 +182,8 @@
 	let deleteDialog = $state<HTMLDialogElement>();
 	let activeChannelId = $state<number | null>(null);
 	let theme = $state<'light' | 'dark'>('light');
+	let channelsOpen = $state(false);
+	let joining = $state<number | null>(null);
 	let navOpen = $state(false),
 		membersOpen = $state(false);
 	function toggleTheme() {
@@ -254,8 +256,29 @@
 		return cause instanceof Error ? cause.message : 'Something went wrong.';
 	}
 
+	async function enterFromExplore(community: Community) {
+		if (joining !== null) return;
+		joining = community.id;
+		try {
+			if (community.role === 'visitor') {
+				await communityRequest('/communities/' + community.id + '/join', 'POST');
+			}
+			await choose(community.id);
+			if (selected?.id === community.id) {
+				await tick();
+				document.querySelector<HTMLElement>('.content')?.focus();
+				await browse();
+			}
+		} catch (cause) {
+			error = message(cause);
+		} finally {
+			joining = null;
+		}
+	}
+
 	async function choose(id: number, channelId?: number | null) {
 		navOpen = false;
+		channelsOpen = false;
 		membersOpen = false;
 		const initial = new URL(location.href);
 		const hash =
@@ -314,6 +337,7 @@
 
 	function openDM(conversation: DirectConversation) {
 		navOpen = false;
+		channelsOpen = false;
 		selectedDM = conversation;
 		selected = null;
 		creating = false;
@@ -327,6 +351,7 @@
 
 	function goHome() {
 		navOpen = false;
+		channelsOpen = false;
 		selected = null;
 		selectedDM = null;
 		creating = false;
@@ -389,6 +414,7 @@
 
 	function selectChannel(channelId: number) {
 		navOpen = false;
+		channelsOpen = false;
 		activeChannelId = channelId;
 		channelMenuOpen = null;
 		editingChannelId = null;
@@ -559,6 +585,23 @@
 			communityTrigger?.focus();
 			return;
 		}
+		if (
+			(navOpen || channelsOpen) &&
+			channelMenuOpen === null &&
+			!channelCreateOpen &&
+			editingChannelId === null
+		) {
+			document
+				.querySelector<HTMLButtonElement>(
+					channelsOpen
+						? '[aria-controls="channel-navigation"]'
+						: '[aria-controls="community-navigation"]'
+				)
+				?.focus();
+			navOpen = false;
+			channelsOpen = false;
+			return;
+		}
 		if (channelMenuOpen !== null) {
 			const channelId = channelMenuOpen;
 			channelMenuOpen = null;
@@ -713,7 +756,8 @@
 			await loadSettings();
 		}
 		if (option === 'create') {
-			navOpen = true;
+			navOpen = false;
+			channelsOpen = true;
 			await openChannelCreate();
 		}
 	}
@@ -986,10 +1030,11 @@
 		<main
 			class:in-room={!!selected || !!selectedDM}
 			class:nav-open={navOpen}
+			class:channels-open={channelsOpen}
 			class:members-open={membersOpen}
 		>
 			<!-- ── Left sidebar ── -->
-			<aside class="sidebar">
+			<aside id="community-navigation" class="sidebar" aria-label="Communities and direct messages">
 				<div class="sidebar-top">
 					<button
 						class="home-link {chatControls.row}"
@@ -1021,87 +1066,88 @@
 					</div>
 				</div>
 
-				{#if loading}<p class="sidebar-muted">Loading…</p>{/if}
+				<div class="sidebar-scroll">
+					{#if loading}<p class="sidebar-muted">Loading…</p>{/if}
 
-				{#if query.trim().length >= 2 && !selected && !selectedDM}
-					<div class="sidebar-section-label">People in your communities</div>
-					{#if peopleStatus}<p role="status" class="sidebar-muted">{peopleStatus}</p>{/if}
+					{#if query.trim().length >= 2 && !selected && !selectedDM}
+						<div class="sidebar-section-label">People in your communities</div>
+						{#if peopleStatus}<p role="status" class="sidebar-muted">{peopleStatus}</p>{/if}
+						<div class="sidebar-list">
+							{#each people as person (person.community_id + JSON.stringify(person.target))}
+								<button
+									class="sidebar-item {chatControls.row}"
+									aria-label={'Message ' + person.name}
+									onclick={() => void messagePerson(person)}
+								>
+									<span class="sidebar-item-avatar" style="background:{avatarColor(person.name)}"
+										>{initials(person.name)}</span
+									>
+									<span class="sidebar-item-text"
+										><strong class="sidebar-item-name">{person.name}</strong><small
+											class="sidebar-item-meta">{person.community}</small
+										></span
+									>
+								</button>{/each}
+						</div>{/if}
+					<div class="sidebar-section-label">Communities</div>
 					<div class="sidebar-list">
-						{#each people as person (person.community_id + JSON.stringify(person.target))}
+						{#each communities as community (community.id)}
 							<button
 								class="sidebar-item {chatControls.row}"
-								aria-label={'Message ' + person.name}
-								onclick={() => void messagePerson(person)}
+								title={community.name}
+								oncontextmenu={(event) => openCommunityMenu(event, community)}
+								aria-label={community.name}
+								class:active={selected?.id === community.id}
+								aria-current={selected?.id === community.id ? 'page' : undefined}
+								onclick={() => void choose(community.id)}
 							>
-								<span class="sidebar-item-avatar" style="background:{avatarColor(person.name)}"
-									>{initials(person.name)}</span
-								>
-								<span class="sidebar-item-text"
-									><strong class="sidebar-item-name">{person.name}</strong><small
-										class="sidebar-item-meta">{person.community}</small
-									></span
-								>
-							</button>{/each}
-					</div>{/if}
-				<div class="sidebar-section-label">Communities</div>
-				<div class="sidebar-list">
-					{#each communities as community (community.id)}
-						<button
-							class="sidebar-item {chatControls.row}"
-							title={community.name}
-							oncontextmenu={(event) => openCommunityMenu(event, community)}
-							aria-label={community.name}
-							class:active={selected?.id === community.id}
-							aria-current={selected?.id === community.id ? 'page' : undefined}
-							onclick={() => void choose(community.id)}
-						>
-							<div class="sidebar-item-icon" style="background:{avatarColor(community.name)}">
-								{initials(community.name)}
-							</div>
-							<div class="sidebar-item-text">
-								<span class="sidebar-item-name">{community.name}</span>
-								<span class="sidebar-item-meta"
-									>{community.member_count}
-									{community.member_count === 1 ? 'member' : 'members'}</span
-								>
-							</div>
-						</button>
-					{/each}
-				</div>
-				{#if hasMore}
-					<button
-						class="sidebar-load-more {chatControls.ghost}"
-						onclick={() => void browse(query, true)}>Show more</button
-					>
-				{/if}
-
-				{#if directConversations.length}
-					<div class="sidebar-section-label">Direct Messages</div>
-					<div class="sidebar-list">
-						{#each directConversations as conversation (conversation.id)}
-							<button
-								class="sidebar-item {chatControls.row}"
-								title={conversation.other_name}
-								aria-label={conversation.other_name}
-								class:active={selectedDM?.id === conversation.id}
-								aria-current={selectedDM?.id === conversation.id ? 'page' : undefined}
-								onclick={() => openDM(conversation)}
-							>
-								<div
-									class="sidebar-item-avatar"
-									style="background:{avatarColor(conversation.other_name)}"
-								>
-									{initials(conversation.other_name)}
+								<div class="sidebar-item-icon" style="background:{avatarColor(community.name)}">
+									{initials(community.name)}
 								</div>
 								<div class="sidebar-item-text">
-									<span class="sidebar-item-name">{conversation.other_name}</span>
-									<span class="sidebar-item-meta">Direct message</span>
+									<span class="sidebar-item-name">{community.name}</span>
+									<span class="sidebar-item-meta"
+										>{community.member_count}
+										{community.member_count === 1 ? 'member' : 'members'}</span
+									>
 								</div>
 							</button>
 						{/each}
 					</div>
-				{/if}
+					{#if hasMore}
+						<button
+							class="sidebar-load-more {chatControls.ghost}"
+							onclick={() => void browse(query, true)}>Show more</button
+						>
+					{/if}
 
+					{#if directConversations.length}
+						<div class="sidebar-section-label">Direct Messages</div>
+						<div class="sidebar-list">
+							{#each directConversations as conversation (conversation.id)}
+								<button
+									class="sidebar-item {chatControls.row}"
+									title={conversation.other_name}
+									aria-label={conversation.other_name}
+									class:active={selectedDM?.id === conversation.id}
+									aria-current={selectedDM?.id === conversation.id ? 'page' : undefined}
+									onclick={() => openDM(conversation)}
+								>
+									<div
+										class="sidebar-item-avatar"
+										style="background:{avatarColor(conversation.other_name)}"
+									>
+										{initials(conversation.other_name)}
+									</div>
+									<div class="sidebar-item-text">
+										<span class="sidebar-item-name">{conversation.other_name}</span>
+										<span class="sidebar-item-meta">Direct message</span>
+									</div>
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
 				<div class="sidebar-bottom">
 					<button
 						class="create-btn {chatControls.primary}"
@@ -1113,14 +1159,37 @@
 			</aside>
 
 			<!-- ── Main content ── -->
-			<div class="content" class:workspace-mode={!!selected || !!selectedDM}>
+			<div class="content" tabindex="-1" class:workspace-mode={!!selected || !!selectedDM}>
 				<header class="room-bar">
 					<button
 						class="chat-icon mobile-nav {chatControls.icon}"
 						aria-label="Toggle navigation"
+						title="Communities and direct messages"
+						aria-controls="community-navigation"
 						aria-expanded={navOpen}
-						onclick={() => (navOpen = !navOpen)}><PanelLeft size={18} /></button
+						onclick={async () => {
+							channelsOpen = false;
+							membersOpen = false;
+							navOpen = !navOpen;
+							await tick();
+							if (navOpen) document.getElementById('community-search')?.focus();
+						}}><PanelLeft size={18} /></button
 					>
+					{#if selected}<button
+							class="chat-icon mobile-nav {chatControls.icon}"
+							title="Channels"
+							aria-label="Toggle channels"
+							aria-controls="channel-navigation"
+							aria-expanded={channelsOpen}
+							onclick={async () => {
+								navOpen = false;
+								membersOpen = false;
+								channelsOpen = !channelsOpen;
+								await tick();
+								if (channelsOpen)
+									document.querySelector<HTMLElement>('#channel-navigation button')?.focus();
+							}}><Hash size={18} /></button
+						>{/if}
 					<button
 						class={chatControls.ghost}
 						onclick={() => {
@@ -1133,7 +1202,12 @@
 								class="chat-icon members-toggle {chatControls.icon}"
 								title="Toggle member list"
 								aria-label="Toggle member list"
-								onclick={() => (membersOpen = !membersOpen)}><Users size={18} /></button
+								aria-expanded={membersOpen}
+								onclick={() => {
+									channelsOpen = false;
+									navOpen = false;
+									membersOpen = !membersOpen;
+								}}><Users size={18} /></button
 							>{/if}<ChatInbox /><button
 							class="chat-icon {chatControls.icon}"
 							aria-label={'Switch to ' + (theme === 'light' ? 'dark' : 'light') + ' theme'}
@@ -1203,7 +1277,11 @@
 					<!-- Community workspace -->
 					<div class="workspace">
 						<!-- Channel rail (left) -->
-						<nav class="channel-rail" aria-label={`Channels in ${selected.name}`}>
+						<nav
+							id="channel-navigation"
+							class="channel-rail"
+							aria-label={`Channels in ${selected.name}`}
+						>
 							<div class="community-header">
 								<div
 									class="community-avatar"
@@ -1924,8 +2002,10 @@
 							{#each communities.slice(0, 6) as community (community.id)}
 								<button
 									class="community-card {chatControls.row}"
+									disabled={joining !== null}
+									aria-label={(community.role === 'visitor' ? 'Join ' : 'Open ') + community.name}
 									oncontextmenu={(e) => openCommunityMenu(e, community)}
-									onclick={() => void choose(community.id)}
+									onclick={() => void enterFromExplore(community)}
 								>
 									<div class="community-card-icon" style="background:{avatarColor(community.name)}">
 										{initials(community.name)}
@@ -1939,6 +2019,13 @@
 										<small
 											>{community.member_count}
 											{community.member_count === 1 ? 'member' : 'members'} · Public</small
+										>
+										<b class="card-action"
+											>{joining === community.id
+												? 'Opening…'
+												: community.role === 'visitor'
+													? 'Join community →'
+													: 'Open community →'}</b
 										>
 									</div>
 								</button>
@@ -1959,6 +2046,8 @@
 		background: white;
 	}
 	.site-navigation[data-theme='dark'] {
+		--site-menu-bg: #2b2d31;
+		--site-menu-border: #41434a;
 		background: #1e1f22;
 		--color-brand-hover: #a4acff;
 	}
@@ -2113,6 +2202,11 @@
 		color: var(--sb-text);
 	}
 
+	.sidebar-scroll {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+	}
 	.sidebar-section-label {
 		font-size: 10px;
 		text-transform: uppercase;
@@ -2128,7 +2222,7 @@
 		gap: 1px;
 		overflow-y: auto;
 		flex-shrink: 0;
-		max-height: 260px;
+
 		padding: 0 6px;
 	}
 	.sidebar-item {
@@ -3254,7 +3348,7 @@
 	}
 	.community-grid {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
 		gap: 12px;
 	}
 	.community-card {
@@ -3294,6 +3388,11 @@
 		min-width: 0;
 		display: grid;
 		gap: 3px;
+	}
+	.card-action {
+		color: var(--accent-text);
+		font-size: 13px;
+		margin-top: 5px;
 	}
 	.community-card-info strong {
 		font-size: 14px;
@@ -3357,47 +3456,6 @@
 		box-shadow: 0 4px 16px #0002;
 		z-index: 4;
 	}
-	@media (min-width: 741px) {
-		main.in-room {
-			grid-template-columns: 76px minmax(0, 1fr);
-		}
-		.in-room .sidebar {
-			align-items: center;
-			padding-top: 8px;
-		}
-		.in-room .sidebar-top,
-		.in-room .sidebar-list,
-		.in-room .sidebar-bottom {
-			width: 100%;
-			padding: 4px;
-		}
-		.in-room .sidebar-item {
-			justify-content: center;
-		}
-		.in-room .sidebar-item-text,
-		.in-room .sidebar-tabs,
-		.in-room .sidebar-search-row,
-		.in-room .sidebar-item-meta {
-			display: none;
-		}
-		.in-room .home-link,
-		.in-room .sidebar-section-label,
-		.in-room .create-btn {
-			font-size: 10px;
-			text-align: center;
-			white-space: normal;
-		}
-	}
-	@media (max-width: 740px) {
-		.in-room .sidebar {
-			max-height: 9rem;
-			overflow: auto;
-		}
-		.in-room .channel-rail {
-			max-height: 12rem;
-			overflow: auto;
-		}
-	}
 	/* ── Responsive ── */
 	@media (max-width: 1200px) {
 		.workspace {
@@ -3412,7 +3470,7 @@
 			padding: 40px 36px 60px;
 		}
 	}
-	@media (max-width: 900px) {
+	@media (max-width: 1120px) {
 		.workspace {
 			grid-template-columns: 180px minmax(0, 1fr);
 		}

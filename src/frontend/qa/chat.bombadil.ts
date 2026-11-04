@@ -14,7 +14,7 @@ const choices = extract(({ document }) => {
 			!/new message|community actions|options for #|cancel|inbox|navigation|theme|members|overview|manage|settings|close|browse communities|pinned messages|search conversation/i.test(
 				label
 			) &&
-			!element.matches('.sidebar-item, .community-card, .channel-btn')
+			!element.matches('.sidebar-item, .channel-btn')
 		)
 			continue;
 		const bounds = element.getBoundingClientRect();

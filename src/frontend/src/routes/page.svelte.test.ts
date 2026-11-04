@@ -412,7 +412,12 @@ describe('the Map tab in the header', () => {
 	 * Disambiguates it from the Map half of the segmented control over the
 	 * results, which is named the same thing and appears once there are any.
 	 */
-	const tab = () => page.getByRole('navigation').getByRole('button', { name: 'Map' });
+	async function openMap() {
+		const navigation = page.getByRole('navigation');
+		const menu = navigation.getByRole('button', { name: 'Site navigation' });
+		if (menu.query()) await menu.click();
+		await navigation.getByRole('button', { name: 'Map' }).click();
+	}
 
 	it('lists the city when nothing has been searched yet', async () => {
 		// An empty box means idle everywhere else on this page, and that is
@@ -422,7 +427,7 @@ describe('the Map tab in the header', () => {
 		// an empty page and look broken.
 		render(Home);
 
-		await tab().click();
+		await openMap();
 
 		await expect.element(page.getByText('1 place')).toBeInTheDocument();
 		expect(lastRequest().path).toBe('/api/spots');
@@ -432,7 +437,7 @@ describe('the Map tab in the header', () => {
 	it('puts those results on the map rather than in cards', async () => {
 		render(Home);
 
-		await tab().click();
+		await openMap();
 
 		// The pin is a button named for the place; a card's title is a link.
 		await expect
@@ -452,7 +457,7 @@ describe('the Map tab in the header', () => {
 		await searchButton().click();
 		await expect.element(page.getByText('Bobst Library')).toBeInTheDocument();
 
-		await tab().click();
+		await openMap();
 
 		await expect.element(page.getByRole('button', { name: 'Bobst Library' })).toBeInTheDocument();
 		expect(lastRequest().path).toBe('/api/spots/search');
