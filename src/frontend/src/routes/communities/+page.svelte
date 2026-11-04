@@ -94,6 +94,8 @@
 	let renameInput = $state<HTMLInputElement>();
 	let deleteDialog = $state<HTMLDialogElement>();
 	let activeChannelId = $state<number | null>(null);
+	let guestPreview = $state(false);
+	let accessError = $state('');
 	let inviteLink = $state('');
 	let shareLink = $state('');
 	let copyStatus = $state('');
@@ -584,18 +586,21 @@
 	}
 
 	$effect(() => {
-		if (session.status !== 'signed-in') return;
+		if (!guestPreview && session.status !== 'signed-in') return;
 		void browse(query, false, viewMine);
 	});
 
 	onMount(() => {
 		const url = new URL(location.href);
-		void session.start().then(async () => {
-			if (session.status === 'signed-out') {
+		async function enter() {
+			const access = await communityRequest<{ guest_preview: boolean }>('/communities/access');
+			guestPreview = access.guest_preview;
+			if (!guestPreview) await session.start();
+			if (!guestPreview && session.status === 'signed-out') {
 				session.logIn(location.pathname + location.search + location.hash);
 				return;
 			}
-			if (session.status !== 'signed-in') return;
+			if (!guestPreview && session.status !== 'signed-in') return;
 			const token = url.searchParams.get('invite');
 			const channelId = Number(url.searchParams.get('channel')) || null;
 			const id = Number(url.searchParams.get('id'));
@@ -617,7 +622,8 @@
 			} catch (e) {
 				error = message(e);
 			}
-		});
+		}
+		void enter().catch((e) => (accessError = message(e)));
 	});
 </script>
 
@@ -631,11 +637,13 @@
 <div class="shell">
 	<SiteHeader />
 
-	{#if session.status === 'loading'}
+	{#if accessError}<p role="alert">
+			{accessError}
+		</p>{:else if !guestPreview && session.status === 'loading'}
 		<div class="auth-loading" aria-label="Loading…">
 			<span class="auth-spinner" aria-hidden="true"></span>
 		</div>
-	{:else if session.status === 'signed-out' || session.status === 'disabled' || session.status === 'error'}
+	{:else if !guestPreview && (session.status === 'signed-out' || session.status === 'disabled' || session.status === 'error')}
 		<!-- redirect fires in onMount; show nothing while it happens -->
 	{:else}
 		<dialog

@@ -249,3 +249,21 @@ def test_member_cap_is_enforced(monkeypatch):
     second = users.create_user(username="second", password="test-password")
     assert client_for(first).post(f"/communities/{community.pk}/join").status_code == 200
     assert client_for(second).post(f"/communities/{community.pk}/join").status_code == 422
+
+
+@pytest.mark.parametrize("preview", [True, False])
+def test_new_browser_guest_access_is_debug_only_and_requires_csrf(settings, preview):
+    settings.DEBUG = preview
+    guest = APIClient(enforce_csrf_checks=True)
+    assert guest.get("/communities/access").data["guest_preview"] is preview
+    assert guest.get("/communities").status_code == (200 if preview else 401)
+    assert guest.post("/communities", {"name": "Preview"}).status_code == 403
+    created = guest.post(
+        "/communities", {"name": "Preview"}, HTTP_X_CSRFTOKEN=guest.cookies["csrftoken"].value
+    )
+    if preview:
+        assert created.status_code == 201
+        assert created.data["role"] == "owner"
+        assert APIClient().get(f"/communities/{created.data['id']}").data["role"] == "visitor"
+    else:
+        assert created.status_code == 401

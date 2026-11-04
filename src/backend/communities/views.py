@@ -4,6 +4,7 @@ import hashlib
 import secrets
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
@@ -132,9 +133,17 @@ def page(request: Request) -> tuple[int, int]:
     return parsed.validated_data["limit"], parsed.validated_data["offset"]
 
 
+class CommunityAccess(CommunityView):
+    def get(self, request: Request) -> Response:
+        # First-time invite recipients need a CSRF cookie before redeeming.
+        get_token(request._request)
+        return Response({"guest_preview": settings.DEBUG})
+
+
 class CommunityList(CommunityView):
     def get(self, request: Request) -> Response:
-        actor(request)
+        if not settings.DEBUG or request.user:
+            actor(request)
         get_token(request._request)
         limit, offset = page(request)
         query = request.query_params.get("q", "").strip()
@@ -201,10 +210,19 @@ class CommunityList(CommunityView):
         )
 
     def post(self, request: Request) -> Response:
-        user = actor(request)
+        user = None if settings.DEBUG and not request.user else actor(request)
         parsed = CommunityWriteSerializer(data=request.data)
         parsed.is_valid(raise_exception=True)
-        created = services.create_community(user, parsed.validated_data)
+        if user is None:
+            owned = request.session.get("guest_communities", [])
+            if len(owned) >= services.MAX_OWNED:
+                raise serializers.ValidationError("Community ownership limit reached.")
+            created = services.create_guest_community(
+                parsed.validated_data, ensure_guest_id(request), guest_expiry(request)
+            )
+            request.session["guest_communities"] = [*owned, created.pk]
+        else:
+            created = services.create_community(user, parsed.validated_data)
         created.member_count = 1
         return Response(summary(created, viewer(request, created)), status=201)
 
