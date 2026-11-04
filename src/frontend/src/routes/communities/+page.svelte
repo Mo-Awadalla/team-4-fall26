@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { base, resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
+	import * as Card from '$lib/components/ui/card';
+	import X from '@lucide/svelte/icons/x';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Sun from '@lucide/svelte/icons/sun';
 	import Compass from '@lucide/svelte/icons/compass';
@@ -285,6 +287,7 @@
 	}
 
 	function openDM(conversation: DirectConversation) {
+		navOpen = false;
 		selectedDM = conversation;
 		selected = null;
 		creating = false;
@@ -297,6 +300,7 @@
 	}
 
 	function goHome() {
+		navOpen = false;
 		selected = null;
 		selectedDM = null;
 		creating = false;
@@ -868,6 +872,7 @@
 					<button
 						class="chat-icon mobile-nav"
 						aria-label="Toggle navigation"
+						aria-expanded={navOpen}
 						onclick={() => (navOpen = !navOpen)}><PanelLeft size={18} /></button
 					>
 					<a class="product-mark" href={resolve('/')}>
@@ -1120,6 +1125,7 @@
 										</div>{/if}
 									{#if editingChannelId === channel.id}
 										<div class="channel-edit-bar">
+											<h3>Channel settings</h3>
 											<form
 												onsubmit={(e) => {
 													e.preventDefault();
@@ -1455,96 +1461,132 @@
 								{/if}
 							{:else}
 								<!-- Settings panel -->
-								<div class="settings-panel">
-									<div class="settings-section">
-										<div class="settings-section-head">Community details</div>
-										{#if selected.role === 'owner'}
-											<p class="save-status" role="status">{detailsStatus || 'Auto-saves'}</p>
-											<label
-												>Name<input
-													required
-													maxlength="100"
-													bind:value={name}
-													onblur={() => void saveDetails()}
-												/></label
-											>
-											<label
-												>Description<textarea
-													maxlength="1000"
-													bind:value={description}
-													onblur={() => void saveDetails()}></textarea></label
-											>
-											<Autocomplete
-												id="edit-school"
-												label="School"
-												bind:value={school}
-												options={schools}
-												popular={popularSchools}
-												placeholder="Search US schools"
-												help="Choose a school or type another name."
-												onOpen={() => void loadSchools()}
-											/>
-											<Autocomplete
-												id="edit-course"
-												label="Course"
-												bind:value={course}
-												options={courseOptions}
-												popular={courseOptions}
-												placeholder="Search courses"
-												help="Course codes vary by school."
-											/>
-										{/if}
-									</div>
-									<div class="settings-section">
-										<div class="settings-section-head">Invite links</div>
-										<p class="rail-muted">Invite classmates to this community.</p>
-										<button class="btn-sm-primary" onclick={() => void createInvite()}
-											>Create 7-day invite to selected channel</button
-										>
-										{#if inviteLink}
-											<input
-												readonly
-												aria-label="New invite link"
-												value={inviteLink}
-												onclick={(e) => e.currentTarget.select()}
-												style="margin-top:8px"
-											/>
-										{/if}
-										{#each invites as invite (invite.id)}
-											<div class="invite-row">
-												<span
-													>#{invite.id} · {invite.uses}{invite.max_uses
-														? `/${invite.max_uses}`
-														: ''} uses{invite.revoked ? ' · Revoked' : ''}</span
-												>
-												{#if !invite.revoked}
-													<button
-														class="action-chip danger"
-														onclick={() =>
-															void action(
-																`/communities/${activeCommunityId()}/invites/${invite.id}`,
-																'DELETE'
-															)}>Revoke</button
-													>
-												{/if}
-											</div>
-										{/each}
-										{#if selected.role === 'owner' || selected.role === 'moderator'}
-											<div class="settings-share-row">
-												<button class="btn-sm-outline" onclick={() => void shareChannel()}
-													>Copy channel link</button
-												>
-											</div>
-										{/if}
-									</div>
-									{#if selected.role === 'owner'}
-										<div class="settings-section">
-											<button class="btn-danger-outline" onclick={() => void deleteCommunity()}
-												>Delete community</button
-											>
+								<dialog
+									class="manage-dialog"
+									aria-labelledby="manage-title"
+									{@attach (node) => {
+										node.showModal();
+									}}
+									onclose={() => (tab = 'main')}
+								>
+									<header class="manage-header">
+										<div>
+											<small>{selected.name}</small>
+											<h2 id="manage-title">Community settings</h2>
 										</div>
-									{/if}
-								</div>
+										<button
+											class="chat-icon"
+											aria-label="Close community settings"
+											onclick={(event) => event.currentTarget.closest('dialog')?.close()}
+											><X size={18} /></button
+										>
+									</header>
+									<div class="settings-panel">
+										{#if error}<p role="alert">{error}</p>{/if}
+										<Card.Root class="settings-section">
+											<div class="settings-section-head">Community details</div>
+											{#if selected.role === 'owner'}
+												<p class="save-status" role="status">{detailsStatus || 'Auto-saves'}</p>
+												<label
+													>Name<input
+														required
+														maxlength="100"
+														bind:value={name}
+														onblur={() => void saveDetails()}
+													/></label
+												>
+												<label
+													>Description<textarea
+														maxlength="1000"
+														bind:value={description}
+														onblur={() => void saveDetails()}></textarea></label
+												>
+												<Autocomplete
+													id="edit-school"
+													label="School"
+													bind:value={school}
+													options={schools}
+													popular={popularSchools}
+													placeholder="Search US schools"
+													help="Choose a school or type another name."
+													onOpen={() => void loadSchools()}
+												/>
+												<Autocomplete
+													id="edit-course"
+													label="Course"
+													bind:value={course}
+													options={courseOptions}
+													popular={courseOptions}
+													placeholder="Search courses"
+													help="Course codes vary by school."
+												/>
+											{:else}<p>{selected.description || selected.name}</p>
+												<small
+													>{[selected.school, selected.course].filter(Boolean).join(' · ')}</small
+												>{/if}
+										</Card.Root>
+										<Card.Root class="settings-section">
+											<div class="settings-section-head">Invite links</div>
+											<p class="rail-muted">Invite classmates to this community.</p>
+											<button class="btn-sm-primary" onclick={() => void createInvite()}
+												>Create 7-day invite to selected channel</button
+											>
+											{#if inviteLink}
+												<input
+													readonly
+													aria-label="New invite link"
+													value={inviteLink}
+													onclick={(e) => e.currentTarget.select()}
+													style="margin-top:8px"
+												/>
+											{/if}
+											{#each invites as invite (invite.id)}
+												<div class="invite-row">
+													<span
+														>#{invite.id} · {invite.uses}{invite.max_uses
+															? `/${invite.max_uses}`
+															: ''} uses{invite.revoked ? ' · Revoked' : ''}</span
+													>
+													{#if !invite.revoked}
+														<button
+															class="action-chip danger"
+															onclick={() =>
+																void action(
+																	`/communities/${activeCommunityId()}/invites/${invite.id}`,
+																	'DELETE'
+																)}>Revoke</button
+														>
+													{/if}
+												</div>
+											{/each}
+											{#if selected.role === 'owner' || selected.role === 'moderator'}
+												<div class="settings-share-row">
+													<button class="btn-sm-outline" onclick={() => void shareChannel()}
+														>Copy channel link</button
+													>
+													{#if copyStatus}<p role="status">{copyStatus}</p>{/if}
+													{#if shareLink}<input
+															aria-label="Shareable channel URL"
+															readonly
+															value={shareLink}
+															onclick={(e) => e.currentTarget.select()}
+														/>{/if}
+												</div>
+											{/if}
+										</Card.Root>
+										{#if selected.role === 'owner'}
+											<Card.Root class="settings-section">
+												<div class="settings-section-head">Danger zone</div>
+												<p class="rail-muted">
+													Deleting this community removes its channels and conversations.
+												</p>
+												<button class="btn-danger-outline" onclick={() => void deleteCommunity()}
+													>Delete community</button
+												>
+											</Card.Root>
+										{/if}
+									</div>
+								</dialog>
 							{/if}
 						</aside>
 					</div>
@@ -1564,7 +1606,11 @@
 								>
 								<button
 									class="landing-cta-secondary"
-									onclick={() => document.getElementById('community-search')?.focus()}
+									onclick={async () => {
+										navOpen = true;
+										await tick();
+										document.getElementById('community-search')?.focus();
+									}}
 								>
 									Browse communities
 								</button>
@@ -1572,21 +1618,21 @@
 						</div>
 
 						<div class="landing-features">
-							<div class="feature-card">
-								<span class="feature-icon" aria-hidden="true">#</span>
+							<Card.Root class="feature-card">
+								<span class="feature-icon" aria-hidden="true"><Hash size={20} /></span>
 								<strong>Organized channels</strong>
 								<p>Keep homework, exam prep, and casual chat in separate channels.</p>
-							</div>
-							<div class="feature-card">
-								<span class="feature-icon" aria-hidden="true">✉</span>
+							</Card.Root>
+							<Card.Root class="feature-card">
+								<span class="feature-icon" aria-hidden="true"><MessageCircle size={20} /></span>
 								<strong>Direct messages</strong>
 								<p>Message any member privately, outside of group channels.</p>
-							</div>
-							<div class="feature-card">
-								<span class="feature-icon" aria-hidden="true">🔗</span>
+							</Card.Root>
+							<Card.Root class="feature-card">
+								<span class="feature-icon" aria-hidden="true"><Link2 size={20} /></span>
 								<strong>Invite links</strong>
 								<p>Share a link to bring classmates into your public community.</p>
-							</div>
+							</Card.Root>
 						</div>
 
 						<h3 class="explore-heading">Explore communities</h3>
@@ -2537,7 +2583,7 @@
 		padding: 0 0 16px;
 		overflow-y: auto;
 	}
-	.settings-section {
+	:global(.settings-section) {
 		padding: 12px 12px;
 		border-bottom: 1px solid var(--sb-border);
 	}
@@ -2549,7 +2595,7 @@
 		color: var(--sb-muted);
 		margin-bottom: 10px;
 	}
-	.settings-section label {
+	:global(.settings-section) label {
 		display: block;
 		font-size: 11px;
 		font-weight: 700;
@@ -2558,8 +2604,8 @@
 		letter-spacing: 0.05em;
 		margin: 10px 0 4px;
 	}
-	.settings-section input,
-	.settings-section textarea {
+	:global(.settings-section) input,
+	:global(.settings-section) textarea {
 		width: 100%;
 		background: var(--panel);
 		border: 1px solid var(--sb-border);
@@ -2570,12 +2616,12 @@
 		font-size: 13px;
 		box-sizing: border-box;
 	}
-	.settings-section textarea {
+	:global(.settings-section) textarea {
 		min-height: 80px;
 		resize: vertical;
 	}
-	.settings-section input:focus,
-	.settings-section textarea:focus {
+	:global(.settings-section) input:focus,
+	:global(.settings-section) textarea:focus {
 		outline: none;
 		border-color: var(--accent);
 		box-shadow: 0 0 0 2px var(--selected);
@@ -2845,14 +2891,14 @@
 		gap: 16px;
 		margin-bottom: 56px;
 	}
-	.feature-card {
+	.landing :global(.feature-card) {
 		padding: 22px;
 		border: 1px solid var(--line);
 		border-radius: 4px;
 		background: var(--well);
 		transition: box-shadow 0.15s;
 	}
-	.feature-card:hover {
+	.landing :global(.feature-card):hover {
 		box-shadow:
 			0 0 0 1px rgba(0, 0, 0, 0.1),
 			0 4px 12px rgba(0, 0, 0, 0.06);
@@ -2863,13 +2909,13 @@
 		margin-bottom: 12px;
 		color: var(--accent);
 	}
-	.feature-card strong {
+	.landing :global(.feature-card strong) {
 		display: block;
 		font-size: 15px;
 		margin-bottom: 6px;
 		color: var(--ink);
 	}
-	.feature-card p {
+	.landing :global(.feature-card p) {
 		margin: 0;
 		font-size: 13px;
 		color: var(--muted);

@@ -32,6 +32,8 @@
 </script>
 
 <form
+	class="message-search"
+	aria-label="Message filters"
 	onsubmit={(e) => {
 		e.preventDefault();
 		void search();
@@ -42,3 +44,38 @@
 	<input aria-label="Date (UTC)" type="date" bind:value={date} />
 	<button disabled={!keyword.trim() && !sender.trim() && !date}>Search</button>
 </form>
+
+<style>
+	.message-search {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		padding: 12px 16px;
+		background: var(--side);
+		border-bottom: 1px solid var(--line);
+	}
+	input,
+	button {
+		min-height: 34px;
+		padding: 6px 9px;
+		border-radius: 7px;
+		border: 1px solid var(--line);
+		font: inherit;
+		font-size: 13px;
+		background: var(--panel);
+		color: var(--ink);
+	}
+	input {
+		flex: 1 1 110px;
+		width: 0;
+		min-width: 90px;
+	}
+	button {
+		background: var(--well);
+		font-weight: 600;
+	}
+	button:disabled {
+		opacity: 0.55;
+	}
+</style>

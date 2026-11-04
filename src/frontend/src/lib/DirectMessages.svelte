@@ -235,6 +235,7 @@
 	<section class="dm-panel" hidden={panel !== 'settings'}>
 		<h3>Conversation settings</h3>
 		<Presence
+			expanded
 			url={`/dms/${conversation.id}/presence`}
 			bind:this={presence}
 			onread={(id) => (lastRead = id)}

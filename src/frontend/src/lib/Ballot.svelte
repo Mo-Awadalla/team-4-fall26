@@ -16,7 +16,7 @@
 	}
 </script>
 
-<div role="group" aria-label="Poll options">
+<div class="ballot" role="group" aria-label="Poll options">
 	{#each poll.options as option, i (option)}<button
 			disabled={busy}
 			aria-pressed={poll.mine === i}
@@ -24,3 +24,26 @@
 		>{/each}
 </div>
 {#if error}<span role="alert">{error}</span>{/if}
+
+<style>
+	.ballot {
+		display: grid;
+		gap: 5px;
+		max-width: 380px;
+		margin-block: 8px;
+	}
+	.ballot button {
+		min-height: 34px;
+		text-align: left;
+		padding: 6px 12px;
+		border-radius: 7px;
+		border: 1px solid var(--line);
+		background: var(--well);
+		color: var(--ink);
+		overflow-wrap: anywhere;
+	}
+	.ballot button:hover,
+	.ballot button[aria-pressed='true'] {
+		border-color: var(--accent);
+	}
+</style>
