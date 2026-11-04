@@ -36,16 +36,11 @@
 	<summary>Inbox {items.length ? '· ' + items.length : ''}</summary>
 	{#if error}<small>{error}</small>{/if}
 	{#each items as item ((item.conversation_id ? 'dm' : 'ch') + item.id)}
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved route with room query and message fragment -->
 		<a
 			data-sveltekit-reload
-			href={resolve('/communities') +
-				'?' +
-				(item.conversation_id
-					? 'dm=' + item.conversation_id
-					: 'id=' + item.channel__community_id + '&channel=' + item.channel_id) +
-				'#message-' +
-				item.id}><b>{item.author_name}</b> {item.content.slice(0, 65) || 'Attachment'}</a
+			href={resolve(
+				`/communities?${item.conversation_id ? 'dm=' + item.conversation_id : 'id=' + item.channel__community_id + '&channel=' + item.channel_id}#message-${item.id}`
+			)}><b>{item.author_name}</b> {item.content.slice(0, 65) || 'Attachment'}</a
 		>{:else}<small>No unread notifications.</small>{/each}
 </details>
 
