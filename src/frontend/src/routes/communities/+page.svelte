@@ -3,6 +3,7 @@
 	import { onMount, tick } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
 	import Autocomplete from '$lib/Autocomplete.svelte';
+	import ChatInbox from '$lib/ChatInbox.svelte';
 	import ChannelChat from '$lib/ChannelChat.svelte';
 	import DirectMessages from '$lib/DirectMessages.svelte';
 	import {
@@ -653,6 +654,7 @@
 		<main>
 			<!-- ── Left sidebar ── -->
 			<aside class="sidebar">
+				<ChatInbox />
 				<div class="sidebar-top">
 					<button class="home-link" onclick={goHome}>Communities</button>
 					<div class="sidebar-search-row">

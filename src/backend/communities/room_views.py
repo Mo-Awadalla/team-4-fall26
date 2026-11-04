@@ -69,7 +69,8 @@ class RoomPresence(CommunityView):
         _, key = room_messages(request, **room)
         names = room_state(room).exclude(actor=key).filter(typing_until__gt=timezone.now()).order_by("-typing_until").values_list("name", flat=True)[:5]
         last_read = room_state(room).filter(actor=key).values_list("last_read", flat=True).first() or 0
-        return Response({"typing": list(names), "last_read": last_read})
+        mode = room_state(room).filter(actor=key).values_list("alerts", flat=True).first() or "all"
+        return Response({"typing": list(names), "last_read": last_read, "alerts": mode})
 
     def post(self, request, **room):
         _, key = room_messages(request, **room)
@@ -83,3 +84,14 @@ class RoomPresence(CommunityView):
         scope = {k:v for k,v in room.items() if k != "community_id"}
         RoomMemberState.objects.update_or_create(actor=key, **scope, defaults=defaults)
         return Response(status=204)
+
+
+class AlertPreference(CommunityView):
+    def put(self, request, **room):
+        _, key = room_messages(request, **room)
+        class Preference(serializers.Serializer):
+            alerts = serializers.ChoiceField(choices=RoomMemberState.Alerts.choices)
+        parsed = Preference(data=request.data)
+        parsed.is_valid(raise_exception=True)
+        RoomMemberState.objects.update_or_create(actor=key, **state_scope(room), defaults={"name": author_name(request), **parsed.validated_data})
+        return Response(parsed.validated_data)

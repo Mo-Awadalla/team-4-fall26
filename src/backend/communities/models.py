@@ -260,6 +260,12 @@ class RoomMemberState(models.Model):
     actor = models.CharField(max_length=128)
     name = models.CharField(max_length=150)
     last_active = models.DateTimeField(auto_now=True)
+    class Alerts(models.TextChoices):
+        ALL = "all"
+        MENTIONS = "mentions"
+        MUTED = "muted"
+
+    alerts = models.CharField(max_length=8, choices=Alerts.choices, default=Alerts.ALL)
     last_read = models.PositiveBigIntegerField(default=0)
     typing_until = models.DateTimeField(null=True)
 
