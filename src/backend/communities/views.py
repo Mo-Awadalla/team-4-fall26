@@ -209,13 +209,18 @@ class CommunityList(CommunityView):
         return Response(summary(created, viewer(request, created)), status=201)
 
 
+def visible_channels(community: Community, role: str):
+    channels = community.channels.all()
+    return channels if role in {"moderator", "owner"} else channels.filter(private=False)
+
+
 class CommunityDetail(CommunityView):
     def get(self, request: Request, community_id: int) -> Response:
         community = get_object_or_404(counted_communities(), pk=community_id)
         return Response(
             {
                 **summary(community, viewer(request, community)),
-                "channels": ChannelSerializer(community.channels.all(), many=True).data,
+                "channels": ChannelSerializer(visible_channels(community, role_for(community, viewer(request, community))), many=True).data,
             }
         )
 
@@ -348,7 +353,7 @@ class Transfer(CommunityView):
 class Channels(CommunityView):
     def get(self, request: Request, community_id: int) -> Response:
         community = community_for(community_id)
-        return Response(ChannelSerializer(community.channels.all(), many=True).data)
+        return Response(ChannelSerializer(visible_channels(community, role_for(community, viewer(request, community))), many=True).data)
 
     def post(self, request: Request, community_id: int) -> Response:
         parsed = ChannelWriteSerializer(data=request.data)
@@ -376,6 +381,8 @@ class ChannelDetail(CommunityView):
         class Update(serializers.Serializer):
             name = serializers.RegexField(r"^[a-z0-9][a-z0-9-]{0,49}$", required=False)
             position = serializers.IntegerField(min_value=0, max_value=19, required=False)
+            private = serializers.BooleanField(required=False)
+            read_only = serializers.BooleanField(required=False)
             topic = serializers.CharField(max_length=256, allow_blank=True, required=False)
             archived = serializers.BooleanField(required=False)
 

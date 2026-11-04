@@ -34,7 +34,7 @@ class CommunitySerializer(serializers.ModelSerializer):
 class ChannelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Channel
-        fields = ["id", "name", "position", "archived", "topic"]
+        fields = ["id", "name", "position", "archived", "topic", "private", "read_only"]
 
 
 class ChannelWriteSerializer(serializers.Serializer):

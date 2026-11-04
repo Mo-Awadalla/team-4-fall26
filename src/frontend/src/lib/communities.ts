@@ -17,6 +17,8 @@ export type Channel = {
 	id: number;
 	name: string;
 	position: number;
+	private?: boolean;
+	read_only?: boolean;
 	topic?: string;
 	archived: boolean;
 };

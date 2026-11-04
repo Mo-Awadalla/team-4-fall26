@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from .models import Channel, Community, Message, Reaction
 from .permissions import role_for
-from .views import CommunityView, community_for, guest_id, viewer
+from .views import CommunityView, community_for, guest_id, viewer, visible_channels
 
 
 class MessageInput(serializers.Serializer):
@@ -47,6 +47,8 @@ def channel_for(community_id: int, channel_id: int) -> Channel:
 def member_role(request: Request, channel: Channel) -> str:
     community = cast(Community, channel.community)
     role = role_for(community, viewer(request, community))
+    if channel.private and role not in {"owner", "moderator"}:
+        raise NotFound("Channel not found.")
     if role == "visitor":
         raise PermissionDenied("Join this community to read or send messages.")
     return role
@@ -138,6 +140,8 @@ class Messages(CommunityView):
     def post(self, request: Request, community_id: int, channel_id: int) -> Response:
         channel = channel_for(community_id, channel_id)
         role = member_role(request, channel)
+        if channel.read_only and role == "member":
+            raise PermissionDenied("This channel is read-only.")
         if channel.archived:
             raise PermissionDenied("This channel is archived.")
         parsed = MessageInput(data=request.data)
@@ -283,7 +287,7 @@ class MessageSearch(CommunityView):
         if not 2 <= len(query) <= 100:
             raise serializers.ValidationError({"q": "Use 2 to 100 characters."})
         found = (
-            Message.objects.filter(channel__community=community, deleted_at__isnull=True)
+            Message.objects.filter(channel__in=visible_channels(community, role), deleted_at__isnull=True)
             .annotate(search=SearchVector("content", config="english"))
             .filter(search=SearchQuery(query, config="english", search_type="websearch"))
             .order_by("-id")

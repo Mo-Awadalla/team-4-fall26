@@ -946,6 +946,24 @@
 															void updateChannel(channel.id, { topic: e.currentTarget.value })}
 													/></label
 												>
+												<label
+													><input
+														type="checkbox"
+														checked={channel.private}
+														onchange={(e) =>
+															void updateChannel(channel.id, { private: e.currentTarget.checked })}
+													/> Private to moderators and owner</label
+												>
+												<label
+													><input
+														type="checkbox"
+														checked={channel.read_only}
+														onchange={(e) =>
+															void updateChannel(channel.id, {
+																read_only: e.currentTarget.checked
+															})}
+													/> Only moderators and owner can post</label
+												>
 												<label for={`rename-channel-${channel.id}`}>Rename #</label>
 												<input
 													id={`rename-channel-${channel.id}`}

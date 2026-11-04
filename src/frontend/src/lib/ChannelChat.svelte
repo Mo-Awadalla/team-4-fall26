@@ -307,6 +307,7 @@
 	<div class="chat-header">
 		<span class="hash" aria-hidden="true">#</span>
 		<strong class="channel-title">{channel.name}</strong>
+		{#if channel.read_only}<span>Read-only</span>{/if}
 		{#if channel.archived}<span class="archived-badge">Archived</span>{/if}
 		<div class="header-actions">
 			<button
@@ -599,12 +600,15 @@
 				maxlength="2000"
 				rows="1"
 				bind:value={content}
-				disabled={channel.archived}
+				disabled={channel.archived || (channel.read_only && role === 'member')}
 				onkeydown={handleCompose}
 				oninput={resizeCompose}></textarea>
 			<button
 				class="send-btn"
-				disabled={channel.archived || sending || !content.trim()}
+				disabled={channel.archived ||
+					(channel.read_only && role === 'member') ||
+					sending ||
+					!content.trim()}
 				onclick={() => void send()}
 				aria-label="Send message"
 			>

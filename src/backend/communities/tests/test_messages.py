@@ -74,3 +74,20 @@ def test_message_paging_channel_boundary_and_archiving():
     assert client.patch(f"{channels}/{general_id}", {"archived": True}).status_code == 200
     assert client.post(base, {"content": "Late"}).status_code == 403
     assert len(client.get(base).data["items"]) == 3
+
+
+def test_private_channel_visibility_and_read_only(existing_guest_community):
+    owner, cid = existing_guest_community
+    channels = f"/communities/{cid}/channels"
+    channel = owner.get(channels).data[0]["id"]
+    base = f"{channels}/{channel}"
+    member = APIClient()
+    member.post(f"/communities/{cid}/join")
+    owner.post(f"{base}/messages", {"content": "classified"})
+    owner.patch(base, {"private": True})
+    assert member.get(channels).data == []
+    assert member.get(f"{base}/messages").status_code == 404
+    assert member.get(f"/communities/{cid}/messages/search?q=classified").data["items"] == []
+    owner.patch(base, {"private": False, "read_only": True})
+    assert member.get(f"{base}/messages").status_code == 200
+    assert member.post(f"{base}/messages", {"content": "hello"}).status_code == 403
