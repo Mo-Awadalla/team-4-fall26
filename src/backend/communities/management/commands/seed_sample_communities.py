@@ -10,6 +10,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from accounts.models import Account, AccountType
+from communities.guest_names import guest_name
 from communities.models import (
     Channel,
     Community,
@@ -872,6 +873,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser) -> None:
         parser.add_argument("--guest-community", type=int)
+        parser.add_argument(
+            "--demo-channel",
+            type=int,
+            help="Add a sample study conversation to this local channel.",
+        )
 
     @transaction.atomic
     def handle(self, *args, **options) -> None:
@@ -969,6 +975,40 @@ class Command(BaseCommand):
                     sender_key=sender_account_key,
                     content=content,
                     defaults={"author_name": PEOPLE[sender_key]},
+                )
+
+        if options["demo_channel"] is not None:
+            channel = Channel.objects.filter(pk=options["demo_channel"]).first()
+            if channel is None:
+                raise CommandError("Choose an existing demo channel.")
+            if not channel.topic:
+                channel.topic = "Study plans, library meetups, and a little accountability."
+                channel.save(update_fields=["topic"])
+            for handle, content in (
+                (
+                    "maya",
+                    "I grabbed a table on the second floor of Bobst. Anyone joining for the 4 pm study session?",
+                ),
+                ("jordan", "On my way! I printed a few extra copies of the practice set."),
+                (
+                    "priya",
+                    "Count me in. Can we start with question 6? The last step is still throwing me.",
+                ),
+                ("maya", "Absolutely. Look for the table by the windows 📚"),
+            ):
+                Membership.objects.get_or_create(community=channel.community, user=users[handle])
+                Message.objects.get_or_create(
+                    channel=channel,
+                    author=users[handle],
+                    content=content,
+                    defaults={"author_name": PEOPLE[handle]},
+                )
+            # Refresh legacy guest labels in this explicitly selected local demo.
+            for identity in (
+                channel.messages.exclude(guest_id="").values_list("guest_id", flat=True).distinct()
+            ):
+                channel.messages.filter(guest_id=identity, author_name__startswith="Guest ").update(
+                    author_name=guest_name(identity)
                 )
 
         # Guest community DM seeding

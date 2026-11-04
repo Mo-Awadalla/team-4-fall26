@@ -249,3 +249,41 @@ def test_member_cap_is_enforced(monkeypatch):
     second = users.create_user(username="second", password="test-password")
     assert client_for(first).post(f"/communities/{community.pk}/join").status_code == 200
     assert client_for(second).post(f"/communities/{community.pk}/join").status_code == 422
+
+
+@pytest.mark.parametrize("preview", [True, False])
+def test_new_browser_guest_access_is_debug_only_and_requires_csrf(settings, preview):
+    settings.CHAT_GUEST_DEMO = preview
+    guest = APIClient(enforce_csrf_checks=True)
+    assert guest.get("/communities/access").data["guest_preview"] is preview
+    assert guest.get("/communities").status_code == (200 if preview else 401)
+    assert guest.post("/communities", {"name": "Preview"}).status_code == 403
+    created = guest.post(
+        "/communities", {"name": "Preview"}, HTTP_X_CSRFTOKEN=guest.cookies["csrftoken"].value
+    )
+    if preview:
+        assert created.status_code == 201
+        assert created.data["role"] == "owner"
+        assert APIClient().get(f"/communities/{created.data['id']}").data["role"] == "visitor"
+    else:
+        assert created.status_code == 401
+
+
+def test_preview_does_not_join_or_consume_invite_and_demo_can_be_disabled(
+    existing_guest_community, settings
+):
+    owner, community = existing_guest_community
+    invite = owner.post(f"/communities/{community}/invites", {"max_uses": 1}).data
+    path = f"/communities/invites/{invite['token']}"
+    recipient = APIClient()
+    for _ in range(2):
+        assert recipient.get(path).data == {"name": "Study group", "member_count": 1}
+    assert recipient.get(f"/communities/{community}").data["role"] == "visitor"
+    assert recipient.post(path + "/redeem").status_code == 200
+    assert recipient.get(path).status_code == 404
+    settings.CHAT_GUEST_DEMO = False
+    for session in (owner, recipient):
+        assert session.get(f"/communities/{community}").status_code == 401
+        assert session.get("/dms").status_code == 401
+        assert session.post(f"/communities/{community}/join").status_code == 401
+        assert session.post(path + "/redeem").status_code == 401

@@ -31,6 +31,7 @@ const tilesProxyTarget = process.env.TILES_PROXY_TARGET;
 const adapter = staticAdapter({ fallback: '404.html' });
 
 export default defineConfig({
+	ssr: { noExternal: ['@lucide/svelte'] },
 	plugins: [
 		tailwindcss(),
 		sveltekit({
