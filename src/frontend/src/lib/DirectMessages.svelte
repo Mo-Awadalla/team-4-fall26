@@ -2,6 +2,7 @@
 	import SearchMessages from './SearchMessages.svelte';
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
+	import Stickers from './Stickers.svelte';
 	import Attachment from './Attachment.svelte';
 	import { composeMessage } from './communities';
 	import MessageBody from './MessageBody.svelte';
@@ -203,7 +204,11 @@
 			void send();
 		}}
 	>
-		<label>Attach file (2 MiB)<input type="file" bind:files /></label>
+		<Stickers
+			onpick={(s) => {
+				content = s;
+			}}
+		/><label>Attach file (2 MiB)<input type="file" bind:files /></label>
 		<input
 			aria-label={`Message ${conversation.other_name}`}
 			maxlength="2000"
