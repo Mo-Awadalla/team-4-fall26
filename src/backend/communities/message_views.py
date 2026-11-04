@@ -1,7 +1,6 @@
 """Channel text chat. Every read and write checks current community membership."""
 
 import base64
-import hashlib
 from datetime import UTC
 from math import ceil
 from typing import cast
@@ -16,6 +15,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied, Throttled
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from .guest_names import guest_name
 from .mentions import targets
 from .models import Channel, Community, Message, Poll, Reaction
 from .permissions import role_for
@@ -134,7 +134,7 @@ def author_name(request: Request) -> str:
     identity = guest_id(request)
     if identity is None:
         raise PermissionDenied("Join this community to send messages.")
-    return f"Guest {hashlib.sha256(identity.encode()).hexdigest()[:6]}"
+    return guest_name(identity)
 
 
 def is_author(request: Request, message: Message) -> bool:

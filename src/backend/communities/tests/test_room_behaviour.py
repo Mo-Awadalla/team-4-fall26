@@ -177,3 +177,14 @@ def test_direct_reactions_and_pins_are_idempotent_and_participant_only(members):
     first.delete(target)
     assert second.get(base + "/pins").data["items"] == []
     assert second.get(target).data["reactions"] == []
+
+
+def test_demo_guest_keeps_the_same_name_in_chat_roster_and_dm(settings, members):
+    settings.DEBUG = True
+    owner, guest, channel = members
+    message = guest.post(channel + "/messages", {"content": "See you at the library"}).data
+    name = message["author_name"]
+    assert len(name.split()) == 2 and not name.startswith("Guest ")
+    roster = owner.get(channel.split("/channels")[0] + "/members").data["guest_items"]
+    assert name in {member["display_name"] for member in roster}
+    assert owner.post(f"{channel}/messages/{message['id']}/dm").data["other_name"] == name

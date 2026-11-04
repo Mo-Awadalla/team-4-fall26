@@ -12,6 +12,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from .guest_names import guest_name
 from .mentions import targets
 from .message_views import (
     MessageInput,
@@ -170,7 +171,7 @@ class StartFromMember(CommunityView):
             ).first()
             if guest is None:
                 raise NotFound("Community member not found.")
-            target_name = f"Guest {hashlib.sha256(guest.guest_id.encode()).hexdigest()[:6]}"
+            target_name = guest_name(guest.guest_id)
             return start(request, f"g:{guest.guest_id}", target_name)
         user_id = user_id_for(parsed.validated_data["user_id"])
         if (

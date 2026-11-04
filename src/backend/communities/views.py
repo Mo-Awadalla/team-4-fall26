@@ -1,6 +1,5 @@
 """Public discovery and session-backed community management."""
 
-import hashlib
 import secrets
 from datetime import datetime
 
@@ -22,6 +21,7 @@ from rest_framework.views import APIView
 from accounts.authentication import Auth0Authentication
 
 from . import services
+from .guest_names import guest_name
 from .models import Ban, Channel, Community, GuestMembership, Invite, Membership, ModerationEvent
 from .permissions import Action, GuestMember, GuestOwner, require, role_for
 from .serializers import (
@@ -320,7 +320,7 @@ class Members(CommunityView):
                 "guest_items": [
                     {
                         "id": guest.pk,
-                        "display_name": f"Guest {hashlib.sha256(guest.guest_id.encode()).hexdigest()[:6]}",
+                        "display_name": guest_name(guest.guest_id),
                         "role": "owner"
                         if owns_as_guest and guest.guest_id == current_guest
                         else "member",
