@@ -167,6 +167,7 @@ class DirectConversation(models.Model):
 
 
 class DirectMessage(ChatMessage):
+    pinned_at = models.DateTimeField(null=True, blank=True)
     conversation = models.ForeignKey(
         DirectConversation, on_delete=models.CASCADE, related_name="messages"
     )

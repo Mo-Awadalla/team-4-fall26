@@ -55,6 +55,7 @@ def direct_message_data(message: DirectMessage, key: str) -> dict:
         "created_at": message.created_at,
         "edited_at": message.edited_at,
         "deleted_at": message.deleted_at,
+        "pinned_at": message.pinned_at,
         "mine": message.sender_key == key,
     }
 
@@ -255,7 +256,8 @@ class DirectMessageDetail(CommunityView):
         if message.deleted_at is None:
             message.content = ""
             message.deleted_at = timezone.now()
-            message.save(update_fields=["content", "deleted_at"])
+            message.pinned_at = None
+            message.save(update_fields=["content", "deleted_at", "pinned_at"])
         return Response(status=204)
 
 
@@ -264,3 +266,23 @@ class DirectSearch(CommunityView):
         conversation, key = conversation_for(request, conversation_id)
         found = search_messages(DirectMessage.objects.filter(conversation=conversation), request.query_params)
         return Response({"items": [direct_message_data(item, key) for item in found]})
+
+
+class DirectPin(CommunityView):
+    def put(self, request: Request, conversation_id: int, message_id: int) -> Response:
+        conversation, key = conversation_for(request, conversation_id)
+        class Input(serializers.Serializer):
+            pinned = serializers.BooleanField()
+        parsed = Input(data=request.data)
+        parsed.is_valid(raise_exception=True)
+        messages = DirectMessage.objects.filter(conversation=conversation, pk=message_id, deleted_at__isnull=True)
+        if not messages.update(pinned_at=timezone.now() if parsed.validated_data["pinned"] else None):
+            raise NotFound("Message unavailable.")
+        return Response(direct_message_data(messages.get(), key))
+
+
+class DirectPins(CommunityView):
+    def get(self, request: Request, conversation_id: int) -> Response:
+        conversation, key = conversation_for(request, conversation_id)
+        messages = DirectMessage.objects.filter(conversation=conversation, pinned_at__isnull=False, deleted_at__isnull=True).order_by("-pinned_at")[:50]
+        return Response({"items": [direct_message_data(item, key) for item in messages]})

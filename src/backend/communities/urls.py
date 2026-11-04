@@ -4,6 +4,8 @@ from . import dm_views, message_views, views
 
 urlpatterns = [
     path("dms/<int:conversation_id>/messages/search", dm_views.DirectSearch.as_view()),
+    path("dms/<int:conversation_id>/messages/<int:message_id>/pin", dm_views.DirectPin.as_view()),
+    path("dms/<int:conversation_id>/pins", dm_views.DirectPins.as_view()),
     path("dms", dm_views.DirectConversations.as_view()),
     path("dms/<int:conversation_id>/messages", dm_views.DirectMessages.as_view()),
     path(

@@ -10,6 +10,28 @@
 
 	let { conversation }: { conversation: DirectConversation } = $props();
 	let messages = $state<DirectMessage[]>([]);
+	let pins = $state<DirectMessage[]>([]);
+	async function showPins() {
+		try {
+			pins = (await communityRequest<{ items: DirectMessage[] }>(`/dms/${conversation.id}/pins`))
+				.items;
+		} catch (e) {
+			error = problem(e);
+		}
+	}
+	async function pin(item: DirectMessage) {
+		try {
+			const updated = await communityRequest<DirectMessage>(
+				base() + '/' + item.id + '/pin',
+				'PUT',
+				{ pinned: !item.pinned_at }
+			);
+			messages = messages.map((m) => (m.id === item.id ? updated : m));
+			await showPins();
+		} catch (e) {
+			error = problem(e);
+		}
+	}
 	let matches = $state<Pick<DirectMessage, 'id' | 'author_name' | 'content'>[]>([]);
 	let hasOlder = $state(false);
 	let content = $state('');
@@ -134,6 +156,15 @@
 
 <div class="dm">
 	<h2>Direct message with {conversation.other_name}</h2>
+	<details
+		ontoggle={(e) => {
+			if (e.currentTarget.open) void showPins();
+		}}
+	>
+		<summary>Pinned messages</summary>{#each pins as item (item.id)}<p>
+				{item.author_name} · {item.content}
+			</p>{:else}<p>No pins yet.</p>{/each}
+	</details>
 	<details>
 		<summary>Search conversation</summary><SearchMessages
 			url={base() + '/search'}
@@ -178,7 +209,8 @@
 								>(edited)</small
 							>{/if}{/if}{/if}
 				{#if !message.deleted_at}<div class="actions">
-						<MessageLink id={message.id} />
+						<button onclick={() => void pin(message)}>{message.pinned_at ? 'Unpin' : 'Pin'}</button
+						><MessageLink id={message.id} />
 						<button onclick={() => (replyTo = message)}>Reply</button>
 						{#if message.mine}<button
 								onclick={() => {
