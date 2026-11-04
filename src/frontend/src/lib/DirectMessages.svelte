@@ -10,6 +10,18 @@
 
 	let { conversation }: { conversation: DirectConversation } = $props();
 	let messages = $state<DirectMessage[]>([]);
+	async function react(item: DirectMessage, emoji: string) {
+		try {
+			const updated = await communityRequest<DirectMessage>(
+				base() + '/' + item.id + '/reactions',
+				'PUT',
+				{ emoji, active: !item.reactions?.find((r) => r.emoji === emoji)?.me }
+			);
+			messages = messages.map((m) => (m.id === item.id ? updated : m));
+		} catch (e) {
+			error = problem(e);
+		}
+	}
 	let pins = $state<DirectMessage[]>([]);
 	async function showPins() {
 		try {
@@ -209,8 +221,18 @@
 								>(edited)</small
 							>{/if}{/if}{/if}
 				{#if !message.deleted_at}<div class="actions">
-						<button onclick={() => void pin(message)}>{message.pinned_at ? 'Unpin' : 'Pin'}</button
-						><MessageLink id={message.id} />
+						<button onclick={() => void pin(message)}>{message.pinned_at ? 'Unpin' : 'Pin'}</button>
+						<details>
+							<summary>React</summary
+							>{#each ['👍', '❤️', '😂', '🎉', '😮', '🔥', '😢'] as emoji (emoji)}<button
+									onclick={() => void react(message, emoji)}>{emoji}</button
+								>{/each}
+						</details>
+						{#each message.reactions ?? [] as r (r.emoji)}<button
+								aria-pressed={r.me}
+								onclick={() => void react(message, r.emoji)}>{r.emoji} {r.count}</button
+							>{/each}
+						<MessageLink id={message.id} />
 						<button onclick={() => (replyTo = message)}>Reply</button>
 						{#if message.mine}<button
 								onclick={() => {

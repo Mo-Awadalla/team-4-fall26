@@ -61,6 +61,7 @@ export type Invite = {
 };
 export type DirectConversation = { id: number; other_name: string; updated_at: string };
 export type DirectMessage = {
+	reactions?: Message['reactions'];
 	pinned_at?: string | null;
 	id: number;
 	author_name: string;

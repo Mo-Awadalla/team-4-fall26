@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from .message_views import (
     MessageInput,
     MessagePage,
+    ReactionInput,
     NewMessageInput,
     download,
     upload_fields,
@@ -23,7 +24,7 @@ from .message_views import (
     member_role,
     search_messages,
 )
-from .models import DirectConversation, DirectMessage, GuestMembership, Membership, Message
+from .models import DirectConversation, DirectMessage, DirectReaction, GuestMembership, Membership, Message
 from .permissions import role_for
 from .views import CommunityView, community_for, guest_id, user_id_for, viewer
 
@@ -46,6 +47,12 @@ def conversation_data(conversation: DirectConversation, key: str) -> dict:
 
 
 def direct_message_data(message: DirectMessage, key: str) -> dict:
+    reactions = {}
+    if not message.deleted_at:
+        for reaction in message.reactions.all():
+            item = reactions.setdefault(reaction.emoji, {"emoji": reaction.emoji, "count": 0, "me": False})
+            item["count"] += 1
+            item["me"] |= reaction.actor == key
     return {
         "id": message.pk,
         "author_name": message.author_name,
@@ -55,6 +62,7 @@ def direct_message_data(message: DirectMessage, key: str) -> dict:
         "created_at": message.created_at,
         "edited_at": message.edited_at,
         "deleted_at": message.deleted_at,
+        "reactions": list(reactions.values()),
         "pinned_at": message.pinned_at,
         "mine": message.sender_key == key,
     }
@@ -177,7 +185,7 @@ class DirectMessages(CommunityView):
         parsed = MessagePage(data=request.query_params)
         parsed.is_valid(raise_exception=True)
         data = parsed.validated_data
-        query = DirectMessage.objects.filter(conversation=conversation)
+        query = DirectMessage.objects.filter(conversation=conversation).prefetch_related("reactions")
         if "after" in data:
             query = query.filter(pk__gt=data["after"]).order_by("id")
         else:
@@ -264,7 +272,7 @@ class DirectMessageDetail(CommunityView):
 class DirectSearch(CommunityView):
     def get(self, request: Request, conversation_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
-        found = search_messages(DirectMessage.objects.filter(conversation=conversation), request.query_params)
+        found = search_messages(DirectMessage.objects.filter(conversation=conversation).prefetch_related("reactions"), request.query_params)
         return Response({"items": [direct_message_data(item, key) for item in found]})
 
 
@@ -284,5 +292,21 @@ class DirectPin(CommunityView):
 class DirectPins(CommunityView):
     def get(self, request: Request, conversation_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
-        messages = DirectMessage.objects.filter(conversation=conversation, pinned_at__isnull=False, deleted_at__isnull=True).order_by("-pinned_at")[:50]
+        messages = DirectMessage.objects.filter(conversation=conversation, pinned_at__isnull=False, deleted_at__isnull=True).order_by("-pinned_at").prefetch_related("reactions")[:50]
         return Response({"items": [direct_message_data(item, key) for item in messages]})
+
+
+class DirectReactions(CommunityView):
+    def put(self, request: Request, conversation_id: int, message_id: int) -> Response:
+        conversation, key = conversation_for(request, conversation_id)
+        message = get_object_or_404(DirectMessage, conversation=conversation, pk=message_id, deleted_at__isnull=True)
+        class Input(ReactionInput):
+            active = serializers.BooleanField()
+        parsed = Input(data=request.data)
+        parsed.is_valid(raise_exception=True)
+        values = {"message": message, "actor": key, "emoji": parsed.validated_data["emoji"]}
+        if parsed.validated_data["active"]:
+            DirectReaction.objects.get_or_create(**values)
+        else:
+            DirectReaction.objects.filter(**values).delete()
+        return Response(direct_message_data(message, key))

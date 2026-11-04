@@ -186,6 +186,15 @@ class DirectMessage(ChatMessage):
         return f"Direct message {self.pk}"
 
 
+class DirectReaction(models.Model):
+    message = models.ForeignKey(DirectMessage, related_name="reactions", on_delete=models.CASCADE)
+    actor = models.CharField(max_length=128)
+    emoji = models.CharField(max_length=32)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["message", "actor", "emoji"], name="direct_reaction_once")]
+
+
 class Ban(models.Model):
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name="bans")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
