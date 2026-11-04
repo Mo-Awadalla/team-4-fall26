@@ -80,12 +80,26 @@ class Channel(models.Model):
         return f"{self.name}"
 
 
+class Poll(models.Model):
+    options = models.JSONField()
+
+
+class Vote(models.Model):
+    poll = models.ForeignKey(Poll, related_name="votes", on_delete=models.CASCADE)
+    actor = models.CharField(max_length=128)
+    choice = models.PositiveSmallIntegerField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["poll", "actor"], name="vote_once")]
+
+
 class ChatMessageQuery(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().defer("file_bytes")
+        return super().get_queryset().defer("file_bytes").select_related("poll").prefetch_related("poll__votes")
 
 
 class ChatMessage(models.Model):
+    poll = models.OneToOneField(Poll, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     thread_root = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="thread_messages")
     file_name = models.CharField(max_length=255, blank=True)
     file_bytes = models.BinaryField(null=True)

@@ -2,6 +2,8 @@
 	import SearchMessages from './SearchMessages.svelte';
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
+	import Ballot from './Ballot.svelte';
+	import PollComposer from './PollComposer.svelte';
 	import Stickers from './Stickers.svelte';
 	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
@@ -221,7 +223,12 @@
 							onclick={() => (editingId = null)}>Cancel</button
 						>
 					</form>
-				{:else}{#if message.deleted_at}Message deleted{:else}{#if message.file_name}<Attachment
+				{:else}{#if message.deleted_at}Message deleted{:else}{#if message.poll}<Ballot
+								poll={message.poll}
+								url={base() + '/' + message.id + '/vote'}
+								onvote={(poll) =>
+									(messages = messages.map((m) => (m.id === message.id ? { ...m, poll } : m)))}
+							/>{/if}{#if message.file_name}<Attachment
 								url={base() + '/' + message.id}
 								name={message.file_name}
 							/>{/if}<MessageBody content={message.content} />{#if message.edited_at}<small
@@ -267,7 +274,7 @@
 			void send();
 		}}
 	>
-		<Stickers
+		<PollComposer url={base()} onsent={() => void refresh()} /><Stickers
 			onpick={(s) => {
 				content = s;
 			}}

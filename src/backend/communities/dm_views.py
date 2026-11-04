@@ -3,6 +3,7 @@
 import hashlib
 
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -18,6 +19,8 @@ from .message_views import (
     NewMessageInput,
     download,
     upload_fields,
+    poll_fields,
+    poll_data,
     thread_root,
     authenticated,
     author_name,
@@ -58,6 +61,7 @@ def direct_message_data(message: DirectMessage, key: str) -> dict:
         "id": message.pk,
         "author_name": message.author_name,
         "content": message.content,
+        "poll": poll_data(message, key),
         "file_name": "" if message.deleted_at else message.file_name,
         "reply_to": message.reply_to_id,
         "created_at": message.created_at,
@@ -204,6 +208,7 @@ class DirectMessages(CommunityView):
             }
         )
 
+    @transaction.atomic
     def post(self, request: Request, conversation_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
         parsed = NewMessageInput(data=request.data)
@@ -220,6 +225,7 @@ class DirectMessages(CommunityView):
             conversation=conversation,
             sender_key=key,
             thread_root_id=thread_root(DirectMessage.objects.filter(conversation=conversation), parsed.validated_data),
+            **poll_fields(parsed.validated_data),
             **upload_fields(parsed.validated_data),
             author_name=author_name(request),
             content=parsed.validated_data["content"],

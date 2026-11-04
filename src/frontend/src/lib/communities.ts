@@ -28,6 +28,7 @@ export type Message = {
 	channel_id: number;
 	author_name: string;
 	content: string;
+	poll?: Poll | null;
 	file_name?: string;
 	reply_to: number | null;
 	created_at: string;
@@ -66,6 +67,7 @@ export type DirectMessage = {
 	id: number;
 	author_name: string;
 	content: string;
+	poll?: Poll | null;
 	file_name?: string;
 	reply_to: number | null;
 	created_at: string;
@@ -120,3 +122,5 @@ export function composeMessage(
 	form.set('file', file);
 	return form;
 }
+
+export type Poll = { options: string[]; counts: number[]; mine: number | null };

@@ -13,7 +13,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied, Throttled
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .models import Channel, Community, GuestMembership, Membership, Message, Reaction
+from .models import Channel, Community, GuestMembership, Membership, Message, Poll, Reaction
 from .permissions import role_for
 from .views import CommunityView, community_for, guest_id, viewer, visible_channels
 
@@ -28,6 +28,7 @@ class ReactionInput(serializers.Serializer):
 
 
 class NewMessageInput(MessageInput):
+    options = serializers.ListField(child=serializers.CharField(max_length=80), min_length=2, max_length=10, required=False)
     thread = serializers.IntegerField(min_value=1, required=False)
     content = serializers.CharField(max_length=2000, required=False, allow_blank=True, default="")
     file = serializers.FileField(required=False, max_length=255)
@@ -36,6 +37,8 @@ class NewMessageInput(MessageInput):
         upload = attrs.get("file")
         if upload and upload.size > 2 * 1024 * 1024:
             raise serializers.ValidationError("Attachments must be 2 MiB or smaller.")
+        if "options" in attrs and (not attrs["content"] or len(set(attrs["options"])) != len(attrs["options"])):
+            raise serializers.ValidationError("Enter a poll question and distinct choices.")
         if not upload and not attrs["content"]:
             raise serializers.ValidationError("Enter a message or attach a file.")
         return attrs
@@ -51,6 +54,22 @@ def thread_root(messages, data):
 def upload_fields(data):
     upload = data.get("file")
     return {"file_name": upload.name, "file_bytes": upload.read()} if upload else {}
+
+
+def poll_fields(data):
+    return {"poll": Poll.objects.create(options=data["options"])} if "options" in data else {}
+
+
+def poll_data(message, key):
+    if not message.poll_id or message.deleted_at:
+        return None
+    counts = [0] * len(message.poll.options)
+    mine = None
+    for vote in message.poll.votes.all():
+        counts[vote.choice] += 1
+        if vote.actor == key:
+            mine = vote.choice
+    return {"options": message.poll.options, "counts": counts, "mine": mine}
 
 
 def download(message):
@@ -129,6 +148,7 @@ def message_data(request: Request, message: Message, role: str) -> dict:
         "channel_id": message.channel_id,
         "author_name": message.author_name,
         "content": message.content,
+        "poll": poll_data(message, f"u:{request.user.pk}" if authenticated(request) else f"g:{identity}"),
         "file_name": "" if message.deleted_at else message.file_name,
         "reply_to": message.reply_to_id,
         "created_at": message.created_at,
@@ -208,6 +228,7 @@ class Messages(CommunityView):
         message = Message.objects.create(
             channel=channel,
             thread_root_id=thread_root(channel.messages, parsed.validated_data),
+            **poll_fields(parsed.validated_data),
             **upload_fields(parsed.validated_data),
             author=request.user if authenticated(request) else None,
             guest_id="" if authenticated(request) else guest_id(request) or "",
