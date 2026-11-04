@@ -7,10 +7,8 @@ from rest_framework.test import APIClient
 pytestmark = pytest.mark.django_db
 
 
-def test_guest_chat_reply_reaction_pin_search_and_moderation():
-    owner = APIClient()
-    created = owner.post("/communities", {"name": "Calculus"})
-    community_id = created.data["id"]
+def test_guest_chat_reply_reaction_pin_search_and_moderation(existing_guest_community):
+    owner, community_id = existing_guest_community
     channel_id = owner.get(f"/communities/{community_id}").data["channels"][0]["id"]
     base = f"/communities/{community_id}/channels/{channel_id}"
     visitor = APIClient()
