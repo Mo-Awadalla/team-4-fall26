@@ -65,6 +65,7 @@ def direct_message_data(message: DirectMessage, key: str) -> dict:
         "poll": poll_data(message, key),
         "file_name": "" if message.deleted_at else message.file_name,
         "reply_to": message.reply_to_id,
+        "thread_root": message.thread_root_id,
         "created_at": message.created_at,
         "edited_at": message.edited_at,
         "deleted_at": message.deleted_at,
@@ -212,6 +213,7 @@ class DirectMessages(CommunityView):
     @transaction.atomic
     def post(self, request: Request, conversation_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
+        DirectConversation.objects.select_for_update().only("pk").get(pk=conversation.pk)
         parsed = NewMessageInput(data=request.data)
         parsed.is_valid(raise_exception=True)
         reply_id = parsed.validated_data.get("reply_to")

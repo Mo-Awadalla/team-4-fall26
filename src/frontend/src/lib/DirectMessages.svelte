@@ -6,6 +6,7 @@
 	import PollComposer from './PollComposer.svelte';
 	import Presence from './Presence.svelte';
 	import MentionPicker from './MentionPicker.svelte';
+	import { pollMessages, mergeMessages } from './history';
 	import Stickers from './Stickers.svelte';
 	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
@@ -73,6 +74,8 @@
 	}
 	let presence = $state<Presence>();
 	let sending = $state(false);
+	let cursor: number | null = null,
+		refreshCount = 0;
 	let polling = false;
 	let generation = 0;
 	const base = () => `/dms/${conversation.id}/messages`;
@@ -85,6 +88,7 @@
 			const page = await communityRequest<{ items: DirectMessage[]; has_more: boolean }>(base());
 			if (current !== generation) return;
 			messages = page.items;
+			cursor = page.items.at(-1)?.id ?? 0;
 			hasOlder = page.has_more;
 			error = '';
 		} catch (cause) {
@@ -93,20 +97,25 @@
 	}
 
 	async function refresh() {
-		if (polling || document.visibilityState !== 'visible') return;
+		if (polling || document.hidden || cursor === null) return;
 		polling = true;
 		const current = generation;
 		try {
-			const page = await communityRequest<{ items: DirectMessage[] }>(base());
-			if (current === generation) {
-				const first = page.items[0]?.id;
-				const retained = first ? messages.filter((item) => item.id < first) : [];
-				const older = retained.slice(-200);
-				messages = [...older, ...page.items];
-				hasOlder ||= retained.length > older.length;
-			}
-		} catch (cause) {
-			if (current === generation) error = problem(cause);
+			const visible = ++refreshCount % 3 === 0 ? messages.slice(-250).map((m) => m.id) : [];
+			const page = await pollMessages<DirectMessage>(base(), cursor, visible);
+			if (current !== generation) return;
+
+			cursor = page.after;
+			const merged = mergeMessages(messages, page.updates);
+			hasOlder ||= merged.length > 250;
+			messages = merged.slice(-250);
+
+			if (page.more)
+				window.setTimeout(() => {
+					if (current === generation) void refresh();
+				}, 0);
+		} catch (e) {
+			if (current === generation) error = problem(e);
 		} finally {
 			polling = false;
 		}
@@ -140,7 +149,7 @@
 					files?.[0]
 				)
 			);
-			messages = [...messages, sent];
+			messages = mergeMessages(messages, [sent]);
 			files = new DataTransfer().files;
 			content = '';
 			replyTo = null;

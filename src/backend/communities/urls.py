@@ -16,6 +16,8 @@ urlpatterns = [
     path("chat/notifications", notifications.Notifications.as_view()),
     path("dms/<int:conversation_id>/alerts", room_views.AlertPreference.as_view()),
     path("communities/<int:community_id>/channels/<int:channel_id>/alerts", room_views.AlertPreference.as_view()),
+    path("dms/<int:conversation_id>/messages/snapshot", room_views.MessageSnapshot.as_view()),
+    path("communities/<int:community_id>/channels/<int:channel_id>/messages/snapshot", room_views.MessageSnapshot.as_view()),
     path("dms", dm_views.DirectConversations.as_view()),
     path("dms/<int:conversation_id>/messages", dm_views.DirectMessages.as_view()),
     path(

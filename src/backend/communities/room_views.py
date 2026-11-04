@@ -8,8 +8,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
-from .dm_views import conversation_for, person_key
-from .message_views import author_name, channel_for, member_role, poll_data
+from .dm_views import conversation_for, direct_message_data, person_key
+from .message_views import author_name, channel_for, member_role, message_data, poll_data
 from .models import DirectMessage, RoomMemberState, Vote
 from .views import CommunityView
 
@@ -95,3 +95,18 @@ class AlertPreference(CommunityView):
         parsed.is_valid(raise_exception=True)
         RoomMemberState.objects.update_or_create(actor=key, **state_scope(room), defaults={"name": author_name(request), **parsed.validated_data})
         return Response(parsed.validated_data)
+
+
+class MessageSnapshot(CommunityView):
+    def post(self, request, **room):
+        class Window(serializers.Serializer):
+            ids = serializers.ListField(child=serializers.IntegerField(min_value=1), max_length=250)
+        parsed = Window(data=request.data)
+        parsed.is_valid(raise_exception=True)
+        messages, key = room_messages(request, **room)
+        window = messages.filter(pk__in=parsed.validated_data["ids"]).prefetch_related("reactions")
+        if "conversation_id" in room:
+            return Response({"items": [direct_message_data(m, key) for m in window]})
+        channel = channel_for(room["community_id"], room["channel_id"])
+        role = member_role(request, channel)
+        return Response({"items": [message_data(request, m, role) for m in window]})

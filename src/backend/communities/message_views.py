@@ -147,6 +147,7 @@ def message_data(request: Request, message: Message, role: str) -> dict:
     return {
         "id": message.pk,
         "channel_id": message.channel_id,
+        "thread_root": message.thread_root_id,
         "author_name": message.author_name,
         "content": message.content,
         "poll": poll_data(message, f"u:{request.user.pk}" if authenticated(request) else f"g:{identity}"),
@@ -198,6 +199,8 @@ class Messages(CommunityView):
     def post(self, request: Request, community_id: int, channel_id: int) -> Response:
         channel = channel_for(community_id, channel_id)
         role = member_role(request, channel)
+        # Order message ID allocation and commit within this channel for after-ID polling.
+        Channel.objects.select_for_update().only("pk").get(pk=channel.pk)
         if channel.read_only and role == "member":
             raise PermissionDenied("This channel is read-only.")
         if channel.archived:

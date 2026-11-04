@@ -6,6 +6,7 @@
 	import PollComposer from './PollComposer.svelte';
 	import Presence from './Presence.svelte';
 	import MentionPicker from './MentionPicker.svelte';
+	import { pollMessages, mergeMessages } from './history';
 	import Stickers from './Stickers.svelte';
 	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
@@ -65,6 +66,8 @@
 	}
 	let presence = $state<Presence>();
 	let sending = $state(false);
+	let cursor: number | null = null,
+		refreshCount = 0;
 	let polling = false;
 	let generation = 0;
 	let messageList = $state<HTMLDivElement>();
@@ -162,6 +165,7 @@
 			);
 			if (current !== generation) return;
 			messages = page.items;
+			cursor = page.items.at(-1)?.id ?? 0;
 			hasOlder = page.has_more;
 			error = '';
 			await scrollToBottom();
@@ -171,24 +175,30 @@
 	}
 
 	async function refresh() {
-		if (polling || document.visibilityState !== 'visible') return;
+		if (polling || document.hidden || cursor === null) return;
 		polling = true;
 		const current = generation;
 		try {
-			const page = await communityRequest<{ items: Message[]; has_more: boolean }>(
-				`${base()}/messages`
-			);
-			if (current === generation) {
-				const first = page.items[0]?.id;
-				const retained = first ? messages.filter((item) => item.id < first) : [];
-				const older = retained.slice(-200);
-				const hadNew = page.items.some((m) => !messages.find((e) => e.id === m.id));
-				messages = [...older, ...page.items];
-				hasOlder ||= retained.length > older.length;
-				if (hadNew) await scrollToBottom();
-			}
-		} catch (cause) {
-			if (current === generation) error = problem(cause);
+			const visible = ++refreshCount % 3 === 0 ? messages.slice(-250).map((m) => m.id) : [];
+			const page = await pollMessages<Message>(base() + '/messages', cursor, visible);
+			if (current !== generation) return;
+			const previous = cursor;
+			cursor = page.after;
+			const merged = mergeMessages(messages, page.updates);
+			hasOlder ||= merged.length > 250;
+			messages = merged.slice(-250);
+			if (
+				cursor > previous &&
+				messageList &&
+				messageList.scrollHeight - messageList.scrollTop - messageList.clientHeight < 160
+			)
+				await scrollToBottom();
+			if (page.more)
+				window.setTimeout(() => {
+					if (current === generation) void refresh();
+				}, 0);
+		} catch (e) {
+			if (current === generation) error = problem(e);
 		} finally {
 			polling = false;
 		}
@@ -221,7 +231,7 @@
 				'POST',
 				composeMessage(body, files?.[0])
 			);
-			messages = [...messages, message];
+			messages = mergeMessages(messages, [message]);
 			files = new DataTransfer().files;
 			content = '';
 			replyTo = null;
