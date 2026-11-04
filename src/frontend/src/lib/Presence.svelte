@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { NativeSelect } from '$lib/components/ui/native-select';
 	import { onMount } from 'svelte';
 	import { communityRequest } from './communities';
 	let {
@@ -104,13 +105,13 @@
 	</fieldset>
 {:else}
 	<label
-		>Notifications<select
+		>Notifications<NativeSelect
 			aria-label="Notifications"
 			disabled={saving}
 			value={mode}
 			onchange={(e) => void setMode(e.currentTarget.value)}
 			>{#each options as option (option.value)}<option value={option.value}>{option.label}</option
-				>{/each}</select
+				>{/each}</NativeSelect
 		></label
 	>
 {/if}

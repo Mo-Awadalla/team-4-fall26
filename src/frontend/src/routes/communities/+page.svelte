@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { chatControls } from '$lib/chatControls';
+	import { Input } from '$lib/components/ui/input';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { NativeSelect } from '$lib/components/ui/native-select';
 	import { base, resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import * as Card from '$lib/components/ui/card';
@@ -740,8 +744,10 @@
 					This removes the channel and all its messages for everyone in the community.
 				</p>
 				<div class="form-actions">
-					<button onclick={() => deleteDialog?.close()}>Cancel</button>
-					<button class="btn-danger" onclick={() => void deleteChannel()}>Delete channel</button>
+					<button class={chatControls.ghost} onclick={() => deleteDialog?.close()}>Cancel</button>
+					<button class="btn-danger {chatControls.danger}" onclick={() => void deleteChannel()}
+						>Delete channel</button
+					>
 				</div>
 			{/if}
 		</dialog>
@@ -755,22 +761,27 @@
 			<aside class="sidebar">
 				<div class="sidebar-top">
 					<button
-						class="home-link"
+						class="home-link {chatControls.row}"
 						onclick={goHome}
 						title="Browse communities"
 						aria-label="Browse communities"><Compass size={23} /><span>Communities</span></button
 					>
 					<div class="sidebar-search-row">
-						<input
+						<Input
 							id="community-search"
 							bind:value={query}
-							maxlength="100"
+							maxlength={100}
 							aria-label="Search people and communities"
 							placeholder="Search people or communities…"
 						/>
 					</div>
 					<div class="sidebar-tabs">
-						<button class:chosen={!viewMine} onclick={() => (viewMine = false)}>All</button><button
+						<button
+							class={chatControls.ghost}
+							class:chosen={!viewMine}
+							onclick={() => (viewMine = false)}>All</button
+						><button
+							class={chatControls.ghost}
 							class:chosen={viewMine}
 							onclick={() => (viewMine = true)}>Mine</button
 						>
@@ -785,7 +796,7 @@
 					<div class="sidebar-list">
 						{#each people as person (person.community_id + JSON.stringify(person.target))}
 							<button
-								class="sidebar-item"
+								class="sidebar-item {chatControls.row}"
 								aria-label={'Message ' + person.name}
 								onclick={() => void messagePerson(person)}
 							>
@@ -803,7 +814,7 @@
 				<div class="sidebar-list">
 					{#each communities as community (community.id)}
 						<button
-							class="sidebar-item"
+							class="sidebar-item {chatControls.row}"
 							title={community.name}
 							aria-label={community.name}
 							class:active={selected?.id === community.id}
@@ -824,8 +835,9 @@
 					{/each}
 				</div>
 				{#if hasMore}
-					<button class="sidebar-load-more" onclick={() => void browse(query, true)}
-						>Show more</button
+					<button
+						class="sidebar-load-more {chatControls.ghost}"
+						onclick={() => void browse(query, true)}>Show more</button
 					>
 				{/if}
 
@@ -834,7 +846,7 @@
 					<div class="sidebar-list">
 						{#each directConversations as conversation (conversation.id)}
 							<button
-								class="sidebar-item"
+								class="sidebar-item {chatControls.row}"
 								title={conversation.other_name}
 								aria-label={conversation.other_name}
 								class:active={selectedDM?.id === conversation.id}
@@ -858,7 +870,7 @@
 
 				<div class="sidebar-bottom">
 					<button
-						class="create-btn"
+						class="create-btn {chatControls.primary}"
 						title="Create community"
 						aria-label="Create community"
 						onclick={showCreate}><Plus size={21} /><span>New community</span></button
@@ -870,7 +882,7 @@
 			<div class="content" class:workspace-mode={!!selected || !!selectedDM}>
 				<header class="room-bar">
 					<button
-						class="chat-icon mobile-nav"
+						class="chat-icon mobile-nav {chatControls.icon}"
 						aria-label="Toggle navigation"
 						aria-expanded={navOpen}
 						onclick={() => (navOpen = !navOpen)}><PanelLeft size={18} /></button
@@ -883,12 +895,12 @@
 					>
 					<div class="app-controls">
 						{#if selected}<button
-								class="chat-icon members-toggle"
+								class="chat-icon members-toggle {chatControls.icon}"
 								title="Toggle member list"
 								aria-label="Toggle member list"
 								onclick={() => (membersOpen = !membersOpen)}><Users size={18} /></button
 							>{/if}<ChatInbox /><button
-							class="chat-icon"
+							class="chat-icon {chatControls.icon}"
 							aria-label={'Switch to ' + (theme === 'light' ? 'dark' : 'light') + ' theme'}
 							title="Switch theme"
 							onclick={toggleTheme}
@@ -913,16 +925,16 @@
 							>
 								<label>
 									<span>Name</span>
-									<input
+									<Input
 										required
-										maxlength="100"
+										maxlength={100}
 										bind:value={name}
 										placeholder="Math 51A Study Group"
 									/>
 								</label>
 								<label>
 									<span>Description</span>
-									<textarea maxlength="1000" bind:value={description}></textarea>
+									<Textarea maxlength={1000} bind:value={description}></Textarea>
 								</label>
 								<Autocomplete
 									id="create-school"
@@ -944,8 +956,8 @@
 									help="Course codes vary by school; you can enter yours."
 								/>
 								<div class="form-actions">
-									<button class="btn-primary">Create community</button>
-									<button type="button" onclick={goHome}>Cancel</button>
+									<button class="btn-primary {chatControls.primary}">Create community</button>
+									<button class={chatControls.ghost} type="button" onclick={goHome}>Cancel</button>
 								</div>
 							</form>
 						</div>
@@ -976,7 +988,7 @@
 									<span>Text channels</span>
 									{#if selected.role === 'owner'}
 										<button
-											class="rail-add-btn"
+											class="rail-add-btn {chatControls.icon}"
 											id="add-channel-button"
 											aria-label="Add channel"
 											title={(selected.channels?.length ?? 0) >= 20
@@ -996,19 +1008,22 @@
 											void createChannel();
 										}}
 									>
-										<input
+										<Input
 											id="new-channel-name"
-											bind:this={channelNameInput}
+											bind:ref={channelNameInput}
 											required
 											pattern="[a-z0-9][a-z0-9-]*"
-											maxlength="50"
+											maxlength={50}
 											bind:value={channelName}
 											placeholder="channel-name"
 										/>
 										<p class="channel-name-hint">Lowercase, numbers, hyphens only.</p>
 										<div class="mini-actions">
-											<button class="btn-sm-primary">Create</button>
-											<button type="button" onclick={() => void closeChannelCreate()}>Cancel</button
+											<button class="btn-sm-primary {chatControls.primary}">Create</button>
+											<button
+												class={chatControls.ghost}
+												type="button"
+												onclick={() => void closeChannelCreate()}>Cancel</button
 											>
 										</div>
 									</form>
@@ -1023,7 +1038,7 @@
 												class:archived={channel.archived}
 											>
 												<button
-													class="channel-btn"
+													class="channel-btn {chatControls.row}"
 													id={`channel-select-${channel.id}`}
 													aria-current={activeChannelId === channel.id ? 'page' : undefined}
 													onclick={() => selectChannel(channel.id)}
@@ -1034,7 +1049,7 @@
 												</button>
 												{#if selected.role === 'owner'}
 													<button
-														class="ch-options-btn"
+														class="ch-options-btn {chatControls.icon}"
 														id={`channel-trigger-${channel.id}`}
 														aria-label={`Options for #${channel.name}`}
 														aria-expanded={channelMenuOpen === channel.id}
@@ -1050,29 +1065,33 @@
 													role="group"
 													aria-label={`Options for #${channel.name}`}
 												>
-													<button onclick={() => void startChannelRename(channel)}
-														>Rename channel</button
+													<button
+														class={chatControls.ghost}
+														onclick={() => void startChannelRename(channel)}>Rename channel</button
 													>
 													<button
+														class={chatControls.ghost}
 														disabled={channel.position === 0}
 														onclick={() =>
 															void updateChannel(channel.id, { position: channel.position - 1 })}
 														>↑ Move up</button
 													>
 													<button
+														class={chatControls.ghost}
 														disabled={channel.position >= (selected.channels?.length ?? 0) - 1}
 														onclick={() =>
 															void updateChannel(channel.id, { position: channel.position + 1 })}
 														>↓ Move down</button
 													>
 													<button
+														class={chatControls.ghost}
 														onclick={() =>
 															void updateChannel(channel.id, { archived: !channel.archived })}
 													>
 														{channel.archived ? 'Restore channel' : 'Archive channel'}
 													</button>
 													<button
-														class="menu-danger"
+														class="menu-danger {chatControls.danger}"
 														onclick={() => void confirmChannelDelete(channel)}
 														>Delete channel</button
 													>
@@ -1095,14 +1114,14 @@
 									</div>{/if}
 								{#if selected.role === 'visitor'}
 									<button
-										class="rail-join-btn"
+										class="rail-join-btn {chatControls.primary}"
 										onclick={() => void action(`/communities/${activeCommunityId()}/join`)}
 									>
 										Join community
 									</button>
 								{:else if selected.role !== 'owner'}
 									<button
-										class="rail-leave-btn"
+										class="rail-leave-btn {chatControls.ghost}"
 										onclick={() => void action(`/communities/${activeCommunityId()}/leave`)}
 									>
 										Leave community
@@ -1117,7 +1136,7 @@
 								<div class="channel-pane">
 									{#if selected.role === 'visitor'}<div class="visitor-channel">
 											<Hash size={20} /><strong>{channel.name}</strong><button
-												class="chat-icon"
+												class="chat-icon {chatControls.icon}"
 												title="Copy channel link"
 												aria-label="Copy channel link"
 												onclick={() => void shareChannel()}><Link2 size={18} /></button
@@ -1133,8 +1152,8 @@
 												}}
 											>
 												<label
-													>Topic <input
-														maxlength="256"
+													>Topic <Input
+														maxlength={256}
 														value={channel.topic ?? ''}
 														onchange={(e) =>
 															void updateChannel(channel.id, { topic: e.currentTarget.value })}
@@ -1159,7 +1178,7 @@
 													/> Only moderators and owner can post</label
 												>
 												<label
-													>Slowmode (seconds)<input
+													>Slowmode (seconds)<Input
 														type="number"
 														min="0"
 														max="21600"
@@ -1171,12 +1190,12 @@
 													/></label
 												>
 												<label for={`rename-channel-${channel.id}`}>Rename #</label>
-												<input
+												<Input
 													id={`rename-channel-${channel.id}`}
-													bind:this={renameInput}
+													bind:ref={renameInput}
 													required
 													pattern="[a-z0-9][a-z0-9-]*"
-													maxlength="50"
+													maxlength={50}
 													bind:value={renameValue}
 													aria-describedby={`rename-status-${channel.id}`}
 												/>
@@ -1184,11 +1203,17 @@
 													{channelStatus || 'Saves automatically'}
 												</span>
 												<div class="mini-actions">
-													<button class="btn-sm-primary" disabled={channelSaving}>Done</button>
-													<button type="button" onclick={() => void cancelChannelRename(channel.id)}
-														>Close</button
+													<button
+														class="btn-sm-primary {chatControls.primary}"
+														disabled={channelSaving}>Done</button
 													>
 													<button
+														class={chatControls.ghost}
+														type="button"
+														onclick={() => void cancelChannelRename(channel.id)}>Close</button
+													>
+													<button
+														class={chatControls.ghost}
 														type="button"
 														onclick={() =>
 															void updateChannel(channel.id, { archived: !channel.archived })}
@@ -1197,7 +1222,7 @@
 													</button>
 													<button
 														type="button"
-														class="btn-danger-sm"
+														class="btn-danger-sm {chatControls.danger}"
 														onclick={() => void confirmChannelDelete(channel)}>Delete</button
 													>
 												</div>
@@ -1209,7 +1234,7 @@
 										<div class="share-banner">
 											{#if copyStatus}<p class="share-msg">{copyStatus}</p>{/if}
 											{#if shareLink}
-												<input
+												<Input
 													class="share-link"
 													readonly
 													aria-label="Channel share link"
@@ -1232,7 +1257,7 @@
 											<h3>Join to participate</h3>
 											<p>Join this community to read and send messages in #{channel.name}.</p>
 											<button
-												class="btn-primary"
+												class="btn-primary {chatControls.primary}"
 												onclick={() => void action(`/communities/${activeCommunityId()}/join`)}
 											>
 												Join community
@@ -1255,8 +1280,9 @@
 									<h3>No channels yet</h3>
 									<p>Create a channel to start organizing conversations.</p>
 									{#if selected.role === 'owner'}
-										<button class="btn-primary" onclick={() => void openChannelCreate()}
-											>Add channel</button
+										<button
+											class="btn-primary {chatControls.primary}"
+											onclick={() => void openChannelCreate()}>Add channel</button
 										>
 									{/if}
 								</div>
@@ -1268,12 +1294,12 @@
 							<!-- Tab header -->
 							<div class="member-rail-header">
 								<button
-									class="tab-link"
+									class="tab-link {chatControls.ghost}"
 									class:chosen={tab === 'main'}
 									onclick={() => (tab = 'main')}>Overview</button
 								>
 								<button
-									class="tab-link"
+									class="tab-link {chatControls.ghost}"
 									class:chosen={tab === 'members'}
 									onclick={() => {
 										tab = 'members';
@@ -1282,7 +1308,7 @@
 								>
 								{#if selected.role === 'owner' || selected.role === 'moderator'}
 									<button
-										class="tab-link"
+										class="tab-link {chatControls.ghost}"
 										class:chosen={tab === 'settings'}
 										onclick={() => void loadSettings()}>Manage</button
 									>
@@ -1315,7 +1341,7 @@
 										</div>
 										{#if !member.is_me && selected.role !== 'visitor'}
 											<button
-												class="dm-btn"
+												class="dm-btn {chatControls.icon}"
 												title="Send DM"
 												onclick={() => void startMemberDM(member.user_id)}
 												aria-label="Send direct message"><MessageCircle size={15} /></button
@@ -1334,7 +1360,7 @@
 										</div>
 										{#if !guest.is_me && selected.role !== 'visitor'}
 											<button
-												class="dm-btn"
+												class="dm-btn {chatControls.icon}"
 												title="Send DM"
 												onclick={() => void startGuestDM(guest.id)}
 												aria-label="Send direct message"><MessageCircle size={15} /></button
@@ -1343,8 +1369,9 @@
 									</div>
 								{/each}
 								{#if hasMoreMembers}
-									<button class="load-more-members" onclick={() => void loadMembers(true)}
-										>Show more members</button
+									<button
+										class="load-more-members {chatControls.ghost}"
+										onclick={() => void loadMembers(true)}>Show more members</button
 									>
 								{/if}
 							{:else if tab === 'members'}
@@ -1377,13 +1404,13 @@
 										<div class="member-actions">
 											{#if !member.is_me && selected.role !== 'visitor'}
 												<button
-													class="action-chip"
+													class="action-chip {chatControls.ghost}"
 													onclick={() => void startMemberDM(member.user_id)}>DM</button
 												>
 											{/if}
 											{#if selected.role === 'owner' && member.user_id !== String(selected.owner_id)}
 												<button
-													class="action-chip"
+													class="action-chip {chatControls.ghost}"
 													onclick={() =>
 														void action(
 															`/communities/${activeCommunityId()}/members/${member.user_id}`,
@@ -1394,7 +1421,7 @@
 											{/if}
 											{#if (selected.role === 'owner' || selected.role === 'moderator') && member.user_id !== String(selected.owner_id) && (member.role !== 'moderator' || selected.role === 'owner')}
 												<button
-													class="action-chip danger"
+													class="action-chip danger {chatControls.danger}"
 													onclick={() =>
 														void action(
 															`/communities/${activeCommunityId()}/members/${member.user_id}`,
@@ -1402,7 +1429,7 @@
 														)}>Kick</button
 												>
 												<button
-													class="action-chip danger"
+													class="action-chip danger {chatControls.danger}"
 													onclick={() =>
 														void action(`/communities/${activeCommunityId()}/moderation`, 'POST', {
 															user_id: member.user_id,
@@ -1423,15 +1450,17 @@
 											<span>{guest.role === 'owner' ? 'Owner' : 'Guest'}</span>
 										</div>
 										{#if !guest.is_me && selected.role !== 'visitor'}
-											<button class="action-chip" onclick={() => void startGuestDM(guest.id)}
-												>DM</button
+											<button
+												class="action-chip {chatControls.ghost}"
+												onclick={() => void startGuestDM(guest.id)}>DM</button
 											>
 										{/if}
 									</div>
 								{/each}
 								{#if hasMoreMembers}
-									<button class="load-more-members" onclick={() => void loadMembers(true)}
-										>Load more</button
+									<button
+										class="load-more-members {chatControls.ghost}"
+										onclick={() => void loadMembers(true)}>Load more</button
 									>
 								{/if}
 								{#if selected.role === 'owner' && transferableMembers.length}
@@ -1447,13 +1476,13 @@
 													});
 											}}
 										>
-											<select required aria-label="New owner">
+											<NativeSelect required aria-label="New owner">
 												<option value="" disabled selected>Choose a member</option>
 												{#each transferableMembers as m (m.user_id)}<option value={m.user_id}
 														>{m.display_name}</option
 													>{/each}
-											</select>
-											<button class="btn-sm-primary" style="margin-top:8px"
+											</NativeSelect>
+											<button class="btn-sm-primary {chatControls.primary}" style="margin-top:8px"
 												>Transfer ownership</button
 											>
 										</form>
@@ -1475,7 +1504,7 @@
 											<h2 id="manage-title">Community settings</h2>
 										</div>
 										<button
-											class="chat-icon"
+											class="chat-icon {chatControls.icon}"
 											aria-label="Close community settings"
 											onclick={(event) => event.currentTarget.closest('dialog')?.close()}
 											><X size={18} /></button
@@ -1488,18 +1517,19 @@
 											{#if selected.role === 'owner'}
 												<p class="save-status" role="status">{detailsStatus || 'Auto-saves'}</p>
 												<label
-													>Name<input
+													>Name<Input
 														required
-														maxlength="100"
+														maxlength={100}
 														bind:value={name}
 														onblur={() => void saveDetails()}
 													/></label
 												>
 												<label
-													>Description<textarea
-														maxlength="1000"
+													>Description<Textarea
+														maxlength={1000}
 														bind:value={description}
-														onblur={() => void saveDetails()}></textarea></label
+														onblur={() => void saveDetails()}
+													></Textarea></label
 												>
 												<Autocomplete
 													id="edit-school"
@@ -1528,11 +1558,13 @@
 										<Card.Root class="settings-section">
 											<div class="settings-section-head">Invite links</div>
 											<p class="rail-muted">Invite classmates to this community.</p>
-											<button class="btn-sm-primary" onclick={() => void createInvite()}
+											<button
+												class="btn-sm-primary {chatControls.primary}"
+												onclick={() => void createInvite()}
 												>Create 7-day invite to selected channel</button
 											>
 											{#if inviteLink}
-												<input
+												<Input
 													readonly
 													aria-label="New invite link"
 													value={inviteLink}
@@ -1549,7 +1581,7 @@
 													>
 													{#if !invite.revoked}
 														<button
-															class="action-chip danger"
+															class="action-chip danger {chatControls.danger}"
 															onclick={() =>
 																void action(
 																	`/communities/${activeCommunityId()}/invites/${invite.id}`,
@@ -1561,11 +1593,12 @@
 											{/each}
 											{#if selected.role === 'owner' || selected.role === 'moderator'}
 												<div class="settings-share-row">
-													<button class="btn-sm-outline" onclick={() => void shareChannel()}
-														>Copy channel link</button
+													<button
+														class="btn-sm-outline {chatControls.outline}"
+														onclick={() => void shareChannel()}>Copy channel link</button
 													>
 													{#if copyStatus}<p role="status">{copyStatus}</p>{/if}
-													{#if shareLink}<input
+													{#if shareLink}<Input
 															aria-label="Shareable channel URL"
 															readonly
 															value={shareLink}
@@ -1580,8 +1613,9 @@
 												<p class="rail-muted">
 													Deleting this community removes its channels and conversations.
 												</p>
-												<button class="btn-danger-outline" onclick={() => void deleteCommunity()}
-													>Delete community</button
+												<button
+													class="btn-danger-outline {chatControls.danger}"
+													onclick={() => void deleteCommunity()}>Delete community</button
 												>
 											</Card.Root>
 										{/if}
@@ -1601,11 +1635,12 @@
 								the course you're working through.
 							</p>
 							<div class="landing-cta">
-								<button class="btn-primary landing-cta-primary" onclick={showCreate}
-									>Create a community</button
+								<button
+									class="btn-primary landing-cta-primary {chatControls.primary}"
+									onclick={showCreate}>Create a community</button
 								>
 								<button
-									class="landing-cta-secondary"
+									class="landing-cta-secondary {chatControls.outline}"
 									onclick={async () => {
 										navOpen = true;
 										await tick();
@@ -1638,7 +1673,10 @@
 						<h3 class="explore-heading">Explore communities</h3>
 						<div class="community-grid">
 							{#each communities.slice(0, 6) as community (community.id)}
-								<button class="community-card" onclick={() => void choose(community.id)}>
+								<button
+									class="community-card {chatControls.row}"
+									onclick={() => void choose(community.id)}
+								>
 									<div class="community-card-icon" style="background:{avatarColor(community.name)}">
 										{initials(community.name)}
 									</div>
@@ -1729,7 +1767,7 @@
 	.sidebar-search-row {
 		margin-bottom: 8px;
 	}
-	.sidebar-search-row input {
+	.sidebar-search-row :global(input) {
 		width: 100%;
 		background: var(--panel);
 		border: 1px solid var(--sb-border);
@@ -1741,10 +1779,10 @@
 		box-sizing: border-box;
 		transition: border-color 0.15s;
 	}
-	.sidebar-search-row input::placeholder {
+	.sidebar-search-row :global(input::placeholder) {
 		color: var(--sb-muted);
 	}
-	.sidebar-search-row input:focus {
+	.sidebar-search-row :global(input:focus) {
 		outline: none;
 		border-color: var(--accent);
 		box-shadow: 0 0 0 2px var(--selected);
@@ -2043,7 +2081,7 @@
 		background: rgba(0, 0, 0, 0.04);
 		border-radius: 8px;
 	}
-	.channel-create-form input {
+	.channel-create-form :global(input) {
 		width: 100%;
 		background: var(--panel);
 		border: 1px solid var(--sb-border);
@@ -2054,7 +2092,7 @@
 		color: var(--ink);
 		box-sizing: border-box;
 	}
-	.channel-create-form input:focus {
+	.channel-create-form :global(input:focus) {
 		outline: none;
 		border-color: var(--accent);
 		box-shadow: 0 0 0 2px var(--selected);
@@ -2292,7 +2330,7 @@
 		gap: 4px;
 		color: var(--ink);
 	}
-	.channel-edit-bar input {
+	.channel-edit-bar :global(input) {
 		border: 1px solid var(--line);
 		border-radius: 4px;
 		padding: 5px 8px;
@@ -2300,7 +2338,7 @@
 		font-size: 13px;
 		width: 160px;
 	}
-	.channel-edit-bar input:focus {
+	.channel-edit-bar :global(input:focus) {
 		outline: none;
 		border-color: var(--accent);
 		box-shadow: 0 0 0 2px var(--selected);
@@ -2567,7 +2605,7 @@
 		border-top: 1px solid var(--sb-border);
 		margin-top: 8px;
 	}
-	.transfer-section select {
+	.transfer-section :global(select) {
 		width: 100%;
 		background: var(--panel);
 		border: 1px solid var(--sb-border);
@@ -2604,8 +2642,8 @@
 		letter-spacing: 0.05em;
 		margin: 10px 0 4px;
 	}
-	:global(.settings-section) input,
-	:global(.settings-section) textarea {
+	.manage-dialog :global(.settings-section input),
+	.manage-dialog :global(.settings-section textarea) {
 		width: 100%;
 		background: var(--panel);
 		border: 1px solid var(--sb-border);
@@ -2616,12 +2654,12 @@
 		font-size: 13px;
 		box-sizing: border-box;
 	}
-	:global(.settings-section) textarea {
+	.manage-dialog :global(.settings-section textarea) {
 		min-height: 80px;
 		resize: vertical;
 	}
-	:global(.settings-section) input:focus,
-	:global(.settings-section) textarea:focus {
+	.manage-dialog :global(.settings-section input:focus),
+	.manage-dialog :global(.settings-section textarea:focus) {
 		outline: none;
 		border-color: var(--accent);
 		box-shadow: 0 0 0 2px var(--selected);
@@ -2724,8 +2762,8 @@
 		letter-spacing: 0.05em;
 		margin-bottom: 6px;
 	}
-	.form-page-inner input,
-	.form-page-inner textarea {
+	.form-page-inner :global(input),
+	.form-page-inner :global(textarea) {
 		width: 100%;
 		border: 1px solid var(--line);
 		border-radius: 4px;
@@ -2738,12 +2776,12 @@
 		box-sizing: border-box;
 		color: var(--ink);
 	}
-	.form-page-inner textarea {
+	.form-page-inner :global(textarea) {
 		min-height: 100px;
 		resize: vertical;
 	}
-	.form-page-inner input:focus,
-	.form-page-inner textarea:focus {
+	.form-page-inner :global(input:focus),
+	.form-page-inner :global(textarea:focus) {
 		outline: none;
 		border-color: var(--accent);
 		box-shadow: 0 0 0 2px var(--selected);
@@ -3008,9 +3046,9 @@
 
 	/* ── Focus ── */
 	button:focus-visible,
-	input:focus-visible,
-	textarea:focus-visible,
-	select:focus-visible {
+	.shell :global(input:focus-visible),
+	.shell :global(textarea:focus-visible),
+	.shell :global(select:focus-visible) {
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
 	}

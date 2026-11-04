@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { chatControls } from '$lib/chatControls';
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
 	import X from '@lucide/svelte/icons/x';
@@ -50,7 +51,7 @@
 </script>
 
 <button
-	class="chat-icon inbox-trigger"
+	class="chat-icon inbox-trigger {chatControls.icon}"
 	popovertarget={panelId}
 	aria-label="Notification inbox"
 	title="Inbox"
@@ -68,7 +69,7 @@
 		<Inbox size={19} />
 		<h2>Inbox</h2>
 		{#if items.length}<Badge variant="secondary">{items.length} unread</Badge>{/if}<button
-			class="chat-icon"
+			class="chat-icon {chatControls.icon}"
 			aria-label="Close inbox"
 			onclick={() => panel.hidePopover()}><X size={16} /></button
 		>

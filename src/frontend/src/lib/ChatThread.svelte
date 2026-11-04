@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 	import { onMount } from 'svelte';
 	import MessageLink from './MessageLink.svelte';
 	import { mergeMessages } from './history';
@@ -73,10 +75,14 @@
 </script>
 
 <aside class="thread">
-	<header><strong>Thread</strong><button onclick={onclose}>Close</button></header>
+	<header>
+		<strong>Thread</strong><Button variant="ghost" size="sm" onclick={onclose}>Close</Button>
+	</header>
 	<MessageBody content={root.content} />
 	<hr />
-	{#if more}<button onclick={() => void load(true)}>Earlier replies</button>{/if}
+	{#if more}<Button variant="ghost" size="sm" onclick={() => void load(true)}
+			>Earlier replies</Button
+		>{/if}
 	{#each items as item (item.id)}<p><strong>{item.author_name}</strong></p>
 		{#if editing === item.id}<form
 				onsubmit={(e) => {
@@ -84,21 +90,30 @@
 					void change(item, 'PATCH');
 				}}
 			>
-				<input aria-label="Edit thread reply" bind:value={draft} maxlength="2000" /><button
-					disabled={!draft.trim()}>Save</button
-				><button type="button" onclick={() => (editing = null)}>Cancel</button>
+				<Input aria-label="Edit thread reply" bind:value={draft} maxlength={2000} /><Button
+					variant="ghost"
+					size="sm"
+					type="submit"
+					disabled={!draft.trim()}>Save</Button
+				><Button variant="ghost" size="sm" type="button" onclick={() => (editing = null)}
+					>Cancel</Button
+				>
 			</form>
 		{:else}<MessageBody content={item.deleted_at ? 'Message deleted' : item.content} />{/if}
-		{#if !item.deleted_at}<MessageLink id={item.id} />{#if item.mine}<button
+		{#if !item.deleted_at}<MessageLink id={item.id} />{#if item.mine}<Button
+					variant="ghost"
+					size="sm"
 					onclick={() => {
 						draft = item.content;
 						editing = item.id;
-					}}>Edit</button
+					}}>Edit</Button
 				>{/if}
-			{#if item.mine || item.can_delete}<button
+			{#if item.mine || item.can_delete}<Button
+					variant="ghost"
+					size="sm"
 					onclick={() => {
 						if (confirm('Delete this reply?')) void change(item, 'DELETE');
-					}}>Delete</button
+					}}>Delete</Button
 				>{/if}{/if}{:else}<p>Start the discussion.</p>{/each}
 	<form
 		onsubmit={(e) => {
@@ -106,8 +121,11 @@
 			void send();
 		}}
 	>
-		<input aria-label="Thread reply" maxlength="2000" bind:value={content} /><button
-			disabled={busy || !content.trim()}>Reply in thread</button
+		<Input aria-label="Thread reply" maxlength={2000} bind:value={content} /><Button
+			variant="ghost"
+			size="sm"
+			type="submit"
+			disabled={busy || !content.trim()}>Reply in thread</Button
 		>
 	</form>
 	{#if error}<p role="alert">{error}</p>{/if}

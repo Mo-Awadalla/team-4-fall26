@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Input } from '$lib/components/ui/input';
+	import { Button } from '$lib/components/ui/button';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { communityRequest } from './communities';
 	let {
@@ -39,10 +41,15 @@
 		void search();
 	}}
 >
-	<input aria-label="Keyword" placeholder="Keyword" minlength="2" bind:value={keyword} />
-	<input aria-label="Sender" placeholder="Exact sender name" bind:value={sender} />
-	<input aria-label="Date (UTC)" type="date" bind:value={date} />
-	<button disabled={!keyword.trim() && !sender.trim() && !date}>Search</button>
+	<Input aria-label="Keyword" placeholder="Keyword" minlength={2} bind:value={keyword} />
+	<Input aria-label="Sender" placeholder="Exact sender name" bind:value={sender} />
+	<Input aria-label="Date (UTC)" type="date" bind:value={date} />
+	<Button
+		variant="ghost"
+		size="sm"
+		type="submit"
+		disabled={!keyword.trim() && !sender.trim() && !date}>Search</Button
+	>
 </form>
 
 <style>
@@ -55,8 +62,8 @@
 		background: var(--side);
 		border-bottom: 1px solid var(--line);
 	}
-	input,
-	button {
+	.message-search :global(input),
+	.message-search :global(button) {
 		min-height: 34px;
 		padding: 6px 9px;
 		border-radius: 7px;
@@ -66,16 +73,16 @@
 		background: var(--panel);
 		color: var(--ink);
 	}
-	input {
+	.message-search :global(input) {
 		flex: 1 1 110px;
 		width: 0;
 		min-width: 90px;
 	}
-	button {
+	.message-search :global(button) {
 		background: var(--well);
 		font-weight: 600;
 	}
-	button:disabled {
+	.message-search :global(button:disabled) {
 		opacity: 0.55;
 	}
 </style>

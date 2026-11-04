@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { chatControls } from '$lib/chatControls';
+	import { Input } from '$lib/components/ui/input';
+	import { NativeSelect } from '$lib/components/ui/native-select';
 	import Smile from '@lucide/svelte/icons/smile';
 	import SmilePlus from '@lucide/svelte/icons/smile-plus';
 	import Search from '@lucide/svelte/icons/search';
@@ -6,7 +9,8 @@
 	import { tick } from 'svelte';
 	let { onpick, reaction = false }: { onpick: (value: string) => void; reaction?: boolean } =
 		$props();
-	let panel: HTMLDivElement, trigger: HTMLButtonElement, input: HTMLInputElement;
+	let panel: HTMLDivElement, trigger: HTMLButtonElement;
+	let input = $state<HTMLInputElement>();
 	let catalog = $state.raw<Record<string, string[][]>>({}),
 		query = $state(''),
 		group = $state('Smileys & Emotion'),
@@ -28,7 +32,7 @@
 			Math.max(8, Math.min(rect.top > 360 ? rect.top - 352 : rect.bottom + 6, innerHeight - 352)) +
 			'px';
 		panel.showPopover();
-		input.focus();
+		input?.focus();
 		catalog = (await import('./emoji/catalog.json')).default;
 	}
 	function select(glyph: string) {
@@ -46,7 +50,7 @@
 </script>
 
 <button
-	class="chat-icon"
+	class="chat-icon {chatControls.icon}"
 	bind:this={trigger}
 	type="button"
 	aria-label={reaction ? 'Add reaction' : 'Choose emoji'}
@@ -57,34 +61,38 @@
 <div class="emoji-panel" bind:this={panel} popover="auto" role="dialog" aria-label="Emoji picker">
 	<header>
 		<strong>Emoji</strong><button
-			class="chat-icon"
+			class="chat-icon {chatControls.icon}"
 			aria-label="Close emoji picker"
 			onclick={() => panel.hidePopover()}><X size={16} /></button
 		>
 	</header>
 	<label class="search"
-		><Search size={16} /><input
-			bind:this={input}
+		><Search size={16} /><Input
+			bind:ref={input}
 			aria-label="Search all emoji"
 			placeholder="Search all emoji"
 			bind:value={query}
 			oninput={() => (limit = 80)}
 		/></label
 	>
-	<select
+	<NativeSelect
 		aria-label="Emoji category"
 		value={group}
 		onchange={(e) => void changeGroup(e.currentTarget.value)}
-		>{#each Object.keys(catalog) as category (category)}<option>{category}</option>{/each}</select
+		>{#each Object.keys(catalog) as category (category)}<option>{category}</option
+			>{/each}</NativeSelect
 	>
 	<div class="grid">
 		{#each found.slice(0, limit) as [glyph, name] (glyph)}<button
+				class={chatControls.icon}
 				type="button"
 				title={name}
 				aria-label={name}
 				onclick={() => select(glyph)}>{glyph}</button
 			>{:else}<small>{Object.keys(catalog).length ? 'No matching emoji' : 'Loading…'}</small>{/each}
-		{#if found.length > limit}<button class="more" onclick={() => (limit += 120)}>Show more</button
+		{#if found.length > limit}<button
+				class="more {chatControls.ghost}"
+				onclick={() => (limit += 120)}>Show more</button
 			>{/if}
 	</div>
 </div>
@@ -122,14 +130,14 @@
 		border-radius: 6px;
 		background: var(--well);
 	}
-	input {
+	.emoji-panel :global(input) {
 		min-width: 0;
 		background: none;
 		outline: none;
 		border: 0;
 		color: inherit;
 	}
-	select {
+	.emoji-panel :global(select) {
 		background: var(--panel);
 		color: var(--muted);
 		font: inherit;

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Input } from '$lib/components/ui/input';
+	import { chatControls } from '$lib/chatControls';
 	let {
 		id,
 		label,
@@ -68,11 +70,11 @@
 	}}
 >
 	<label for={id}>{label}</label>
-	<input
+	<Input
 		{id}
-		bind:this={input}
+		bind:ref={input}
 		bind:value
-		maxlength="100"
+		maxlength={100}
 		{placeholder}
 		autocomplete="off"
 		role="combobox"
@@ -98,6 +100,7 @@
 			<div id={`${id}-list`} role="listbox" aria-label={`${label} suggestions`}>
 				{#each matches as choice, index (choice)}
 					<button
+						class={chatControls.ghost}
 						id={`${id}-option-${index}`}
 						type="button"
 						role="option"
@@ -123,7 +126,7 @@
 		font-weight: 700;
 		margin-bottom: 8px;
 	}
-	input {
+	.picker :global(input) {
 		width: 100%;
 		border: 1px solid var(--line, #d8cdd0);
 		background: var(--panel, white);
@@ -131,7 +134,7 @@
 		padding: 11px 12px;
 		font: inherit;
 	}
-	input:focus-visible,
+	.picker :global(input:focus-visible),
 	button:focus-visible {
 		outline: 3px solid var(--accent, #2458a6);
 		outline-offset: 2px;

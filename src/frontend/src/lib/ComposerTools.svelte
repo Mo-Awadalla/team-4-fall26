@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { chatControls } from '$lib/chatControls';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Paperclip from '@lucide/svelte/icons/paperclip';
 	import CheckCheck from '@lucide/svelte/icons/check-check';
@@ -43,7 +44,7 @@
 
 <button
 	type="button"
-	class="chat-icon"
+	class="chat-icon {chatControls.icon}"
 	aria-label="More message options"
 	title="More message options"
 	bind:this={trigger}
@@ -80,6 +81,7 @@
 			ontyping={(items) => (typingNames = items)}
 		/>{/if}
 	<button
+		class={chatControls.ghost}
 		type="button"
 		onclick={() => {
 			onmark();

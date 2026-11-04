@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { chatControls } from '$lib/chatControls';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import SearchMessages from './SearchMessages.svelte';
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
@@ -353,13 +355,13 @@
 		{#if channel.topic}<span class="header-topic">{channel.topic}</span>{/if}
 		<div class="header-actions">
 			<button
-				class="icon-btn"
+				class="icon-btn {chatControls.icon}"
 				title="Copy channel link"
 				aria-label="Copy channel link"
 				onclick={onShare}><Link2 size={18} /></button
 			>
 			<button
-				class="icon-btn"
+				class="icon-btn {chatControls.icon}"
 				class:active={showSearch}
 				aria-label="Search messages"
 				title="Search"
@@ -375,7 +377,7 @@
 				<Search size={18} />
 			</button>
 			<button
-				class="icon-btn"
+				class="icon-btn {chatControls.icon}"
 				class:active={showPinsPanel}
 				aria-label="Pinned messages"
 				title="Pins"
@@ -412,7 +414,9 @@
 		<div class="overlay-panel">
 			<div class="overlay-header">
 				<h4>{results !== null ? 'Search results' : 'Pinned messages'}</h4>
-				<button class="icon-btn" onclick={closeOverlay} aria-label="Close">✕</button>
+				<button class="icon-btn {chatControls.icon}" onclick={closeOverlay} aria-label="Close"
+					>✕</button
+				>
 			</div>
 			<div class="overlay-list">
 				{#each results ?? pins ?? [] as item (item.id)}
@@ -431,7 +435,9 @@
 	{:else}
 		<div class="messages" bind:this={messageList} aria-live="polite">
 			{#if hasOlder}
-				<button class="load-older" onclick={() => void older()}>Load older messages</button>
+				<button class="load-older {chatControls.ghost}" onclick={() => void older()}
+					>Load older messages</button
+				>
 			{/if}
 			{#if !messages.length && !hasOlder}
 				<div class="channel-start">
@@ -500,22 +506,27 @@
 									void change(message, 'PATCH', '', { content: draft });
 								}}
 							>
-								<textarea
+								<Textarea
 									aria-label="Edit message"
-									maxlength="2000"
+									maxlength={2000}
 									bind:value={draft}
-									rows="2"
+									rows={2}
 									onkeydown={(e) => {
 										if (e.key === 'Enter' && !e.shiftKey) {
 											e.preventDefault();
 											void change(message, 'PATCH', '', { content: draft });
 										}
 										if (e.key === 'Escape') editingId = null;
-									}}></textarea>
+									}}
+								></Textarea>
 								<div class="edit-actions">
 									<span class="hint">Enter to save · Escape to cancel</span>
-									<button disabled={!draft.trim()}>Save</button>
-									<button type="button" onclick={() => (editingId = null)}>Cancel</button>
+									<button class={chatControls.ghost} disabled={!draft.trim()}>Save</button>
+									<button
+										class={chatControls.ghost}
+										type="button"
+										onclick={() => (editingId = null)}>Cancel</button
+									>
 								</div>
 							</form>
 						{:else}
@@ -535,7 +546,7 @@
 							<div class="reactions">
 								{#each message.reactions as reaction (reaction.emoji)}
 									<button
-										class="reaction"
+										class="reaction {chatControls.ghost}"
 										class:reacted={reaction.me}
 										onclick={() =>
 											void change(
@@ -556,27 +567,31 @@
 								reaction
 								onpick={(emoji) => void change(message, 'POST', '/reactions', { emoji })}
 							/><button
+								class={chatControls.icon}
 								onclick={() => (thread = message)}
 								title="Open thread"
 								aria-label="Open thread"><MessageSquare size={16} /></button
 							><button
+								class={chatControls.icon}
 								onclick={() => void mark(message.id)}
 								title="Mark unread"
 								aria-label="Mark unread"><CheckCheck size={16} /></button
 							><MessageLink id={message.id} />
-							<button class="action-btn" title="Reply" onclick={() => (replyTo = message)}
-								><Reply size={16} /></button
+							<button
+								class="action-btn {chatControls.icon}"
+								title="Reply"
+								onclick={() => (replyTo = message)}><Reply size={16} /></button
 							>
 							{#if !message.mine}
 								<button
-									class="action-btn"
+									class="action-btn {chatControls.icon}"
 									title="Direct message"
 									onclick={() => void startDM(message)}><Mail size={16} /></button
 								>
 							{/if}
 							{#if message.mine}
 								<button
-									class="action-btn"
+									class="action-btn {chatControls.icon}"
 									title="Edit message"
 									onclick={() => {
 										editingId = message.id;
@@ -586,7 +601,7 @@
 							{/if}
 							{#if role === 'owner' || role === 'moderator'}
 								<button
-									class="action-btn"
+									class="action-btn {chatControls.icon}"
 									title={message.pinned_at ? 'Unpin' : 'Pin message'}
 									onclick={() =>
 										void change(message, message.pinned_at ? 'DELETE' : 'POST', '/pin')}
@@ -595,7 +610,7 @@
 							{/if}
 							{#if message.can_delete}
 								<button
-									class="action-btn danger"
+									class="action-btn danger {chatControls.danger}"
 									title="Delete message"
 									onclick={() => {
 										if (confirm('Delete this message?')) void change(message, 'DELETE');
@@ -617,13 +632,16 @@
 						60
 					)}{replyTo.content.length > 60 ? '…' : ''}</span
 				>
-				<button onclick={() => (replyTo = null)} aria-label="Cancel reply">✕</button>
+				<button class={chatControls.icon} onclick={() => (replyTo = null)} aria-label="Cancel reply"
+					>✕</button
+				>
 			</div>
 		{/if}
 
 		{#if files?.length}<p class="attachment-chip">
 				{files[0].name}
 				<button
+					class={chatControls.icon}
 					type="button"
 					aria-label="Remove attachment"
 					onclick={() => (files = new DataTransfer().files)}>×</button
@@ -641,21 +659,22 @@
 				onmark={() => void mark()}
 				onsent={() => void refresh()}
 			/>
-			<textarea
-				bind:this={composeEl}
+			<Textarea
+				bind:ref={composeEl}
 				aria-label={channel.archived ? 'Channel is archived' : `Message #${channel.name}`}
 				placeholder={channel.archived ? 'This channel is archived.' : `Message #${channel.name}`}
-				maxlength="2000"
-				rows="1"
+				maxlength={2000}
+				rows={1}
 				bind:value={content}
 				disabled={channel.archived || (channel.read_only && role === 'member')}
 				onkeydown={handleCompose}
 				oninput={() => {
 					resizeCompose();
 					presence?.typing();
-				}}></textarea>
+				}}
+			></Textarea>
 			<EmojiPicker onpick={(v) => (content += v)} /><button
-				class="send-btn"
+				class="send-btn {chatControls.icon}"
 				disabled={channel.archived ||
 					(channel.read_only && role === 'member') ||
 					sending ||
@@ -1007,7 +1026,7 @@
 	.edit-form {
 		margin: 4px 0;
 	}
-	.edit-form textarea {
+	.edit-form :global(textarea) {
 		width: 100%;
 		border: 1px solid var(--accent);
 		border-radius: 4px;
@@ -1161,7 +1180,7 @@
 		flex-shrink: 0;
 		background: var(--panel);
 	}
-	.composer textarea {
+	.composer :global(textarea) {
 		flex: 1;
 		min-width: 0;
 		border: 1px solid var(--line);
@@ -1180,16 +1199,16 @@
 		background: var(--well);
 		color: var(--ink);
 	}
-	.composer textarea:focus {
+	.composer :global(textarea:focus) {
 		outline: none;
 		border-color: var(--accent);
 		background: var(--panel);
 		box-shadow: 0 0 0 2px var(--selected);
 	}
-	.composer textarea::placeholder {
+	.composer :global(textarea::placeholder) {
 		color: var(--muted);
 	}
-	.composer.archived textarea {
+	.composer.archived :global(textarea) {
 		background: var(--hover);
 		color: var(--muted);
 	}
@@ -1260,7 +1279,7 @@
 
 	/* Focus styles */
 	button:focus-visible,
-	textarea:focus-visible {
+	.chat :global(textarea:focus-visible) {
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
 	}

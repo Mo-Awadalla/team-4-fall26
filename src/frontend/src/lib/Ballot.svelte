@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { chatControls } from '$lib/chatControls';
 	import { communityRequest, type Poll } from './communities';
 	let { poll, url, onvote }: { poll: Poll; url: string; onvote: (poll: Poll) => void } = $props();
 	let error = $state(''),
@@ -18,6 +19,7 @@
 
 <div class="ballot" role="group" aria-label="Poll options">
 	{#each poll.options as option, i (option)}<button
+			class={chatControls.ghost}
 			disabled={busy}
 			aria-pressed={poll.mine === i}
 			onclick={() => void vote(i)}>{poll.mine === i ? '✓ ' : ''}{option} · {poll.counts[i]}</button

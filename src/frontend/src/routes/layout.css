@@ -52,3 +52,12 @@ a {
 	--color-secondary-foreground: var(--ink, #232428);
 	--color-muted-foreground: var(--muted, #5c6068);
 }
+
+@theme inline {
+	--color-primary: var(--control-primary, #5865f2);
+	--color-primary-foreground: white;
+	--color-background: var(--panel, white);
+	--color-input: var(--line, #d9dce1);
+	--color-ring: var(--accent, #5865f2);
+	--color-destructive: var(--danger, #ba3041);
+}

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Input } from '$lib/components/ui/input';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { Button } from '$lib/components/ui/button';
 	import { communityRequest } from './communities';
 	let { url, onsent }: { url: string; onsent: () => void } = $props();
 	let question = $state(''),
@@ -30,10 +33,12 @@
 
 <details bind:open={opened}>
 	<summary>Create poll</summary><label
-		>Question<input bind:value={question} maxlength="2000" /></label
-	><label>Choices (one per line)<textarea bind:value={choices}></textarea></label><button
+		>Question<Input bind:value={question} maxlength={2000} /></label
+	><label>Choices (one per line)<Textarea bind:value={choices}></Textarea></label><Button
+		variant="ghost"
+		size="sm"
 		type="button"
 		disabled={busy || !question.trim()}
-		onclick={create}>Post poll</button
+		onclick={create}>Post poll</Button
 	>{#if error}<span role="alert">{error}</span>{/if}
 </details>

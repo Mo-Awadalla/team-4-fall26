@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
 	import { communityRequest } from './communities';
 	import { onDestroy } from 'svelte';
 	let { url, name }: { url: string; name: string } = $props();
@@ -40,7 +41,7 @@
 		>{/if}
 	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- authenticated blob download -->
 	<a href={source} download={name}>Download {name}</a>
-{:else}<button disabled={loading} onclick={load}>Open {name}</button>{/if}
+{:else}<Button variant="ghost" size="sm" disabled={loading} onclick={load}>Open {name}</Button>{/if}
 {#if error}<span role="alert">{error}</span>{/if}
 
 <style>

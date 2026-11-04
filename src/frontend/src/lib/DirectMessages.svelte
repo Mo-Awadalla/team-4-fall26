@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { chatControls } from '$lib/chatControls';
+	import { Input } from '$lib/components/ui/input';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Pin from '@lucide/svelte/icons/pin';
 	import Search from '@lucide/svelte/icons/search';
@@ -207,7 +209,7 @@
 		<AtSign size={21} />
 		<h2>{conversation.other_name}</h2>
 		<button
-			class="chat-icon"
+			class="chat-icon {chatControls.icon}"
 			title="Pinned messages"
 			aria-label="Pinned messages"
 			aria-expanded={panel === 'pins'}
@@ -217,14 +219,14 @@
 			}}><Pin size={18} /></button
 		>
 		<button
-			class="chat-icon"
+			class="chat-icon {chatControls.icon}"
 			title="Search conversation"
 			aria-label="Search conversation"
 			aria-expanded={panel === 'search'}
 			onclick={() => (panel = panel === 'search' ? null : 'search')}><Search size={18} /></button
 		>
 		<button
-			class="chat-icon"
+			class="chat-icon {chatControls.icon}"
 			title="Conversation settings"
 			aria-label="Conversation settings"
 			aria-expanded={panel === 'settings'}
@@ -269,7 +271,9 @@
 	<LinkedMessage loaded={messages} url={base()} />
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	<div class="messages" aria-live="polite">
-		{#if hasOlder}<button onclick={() => void older()}>Load older messages</button>{/if}
+		{#if hasOlder}<button class={chatControls.ghost} onclick={() => void older()}
+				>Load older messages</button
+			>{/if}
 		{#each messages as message (message.id)}
 			{#if message.id > lastRead && messages.find((m) => m.id > lastRead)?.id === message.id}<div
 					class="unread-divider"
@@ -291,8 +295,9 @@
 							void change(message, 'PATCH');
 						}}
 					>
-						<input aria-label="Edit direct message" maxlength="2000" bind:value={draft} />
-						<button disabled={!draft.trim()}>Save</button><button
+						<Input aria-label="Edit direct message" maxlength={2000} bind:value={draft} />
+						<button class={chatControls.ghost} disabled={!draft.trim()}>Save</button><button
+							class={chatControls.ghost}
 							type="button"
 							onclick={() => (editingId = null)}>Cancel</button
 						>
@@ -309,22 +314,28 @@
 								>(edited)</small
 							>{/if}{/if}{/if}
 				{#if !message.deleted_at}<div class="actions">
-						<button onclick={() => void pin(message)}>{message.pinned_at ? 'Unpin' : 'Pin'}</button>
+						<button class={chatControls.ghost} onclick={() => void pin(message)}
+							>{message.pinned_at ? 'Unpin' : 'Pin'}</button
+						>
 						<EmojiPicker reaction onpick={(emoji) => void react(message, emoji)} />
 						{#each message.reactions ?? [] as r (r.emoji)}<button
+								class={chatControls.ghost}
 								aria-pressed={r.me}
 								onclick={() => void react(message, r.emoji)}>{r.emoji} {r.count}</button
 							>{/each}
-						<button onclick={() => (thread = message)}>Thread</button><button
-							onclick={() => void mark(message.id)}>Mark unread</button
+						<button class={chatControls.ghost} onclick={() => (thread = message)}>Thread</button
+						><button class={chatControls.ghost} onclick={() => void mark(message.id)}
+							>Mark unread</button
 						><MessageLink id={message.id} />
-						<button onclick={() => (replyTo = message)}>Reply</button>
+						<button class={chatControls.ghost} onclick={() => (replyTo = message)}>Reply</button>
 						{#if message.mine}<button
+								class={chatControls.ghost}
 								onclick={() => {
 									editingId = message.id;
 									draft = message.content;
 								}}>Edit</button
 							><button
+								class={chatControls.ghost}
 								onclick={() => {
 									if (confirm('Delete this message?')) void change(message, 'DELETE');
 								}}>Delete</button
@@ -344,12 +355,14 @@
 			</div>{/each}
 	</div>
 	{#if replyTo}<p class="replying">
-			Replying to {replyTo.author_name} <button onclick={() => (replyTo = null)}>Cancel</button>
+			Replying to {replyTo.author_name}
+			<button class={chatControls.ghost} onclick={() => (replyTo = null)}>Cancel</button>
 		</p>{/if}
 
 	{#if files?.length}<p class="attachment-chip">
 			{files[0].name}
 			<button
+				class={chatControls.icon}
 				type="button"
 				aria-label="Remove attachment"
 				onclick={() => (files = new DataTransfer().files)}>×</button
@@ -372,14 +385,15 @@
 			onmark={() => void mark()}
 			onsent={() => void refresh()}
 		/>
-		<input
+		<Input
 			aria-label={`Message ${conversation.other_name}`}
-			maxlength="2000"
+			maxlength={2000}
 			placeholder={`Message ${conversation.other_name}`}
 			oninput={() => presence?.typing()}
 			bind:value={content}
 		/>
 		<EmojiPicker onpick={(v) => (content += v)} /><button
+			class={chatControls.icon}
 			disabled={(!content.trim() && !files?.length) || sending}
 			aria-label="Send message"><Send size={18} /></button
 		>
@@ -439,11 +453,11 @@
 		font-size: 12px;
 		padding: 3px 7px;
 	}
-	.composer input,
-	.edit input {
+	.composer :global(input),
+	.edit :global(input) {
 		flex: 1;
 	}
-	input {
+	.dm :global(input) {
 		border: 1px solid var(--line);
 		border-radius: 7px;
 		padding: 9px;

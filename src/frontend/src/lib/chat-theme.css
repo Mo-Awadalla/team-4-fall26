@@ -644,3 +644,24 @@
 		z-index: 9;
 	}
 }
+
+.chat-shell {
+	--control-primary: #515eca;
+	--secondary: var(--well);
+	--foreground: var(--ink);
+	--radius-md: 8px;
+}
+.chat-shell [data-slot='native-select-wrapper'] {
+	max-width: 100%;
+	min-width: 0;
+}
+.chat-shell [data-slot='native-select'] {
+	color: var(--ink);
+	background-color: var(--well);
+}
+.chat-shell [data-slot='native-select-icon'] {
+	color: var(--muted);
+}
+.chat-shell .composer [data-slot='textarea'] {
+	min-height: 32px;
+}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { NativeSelect } from '$lib/components/ui/native-select';
 	let {
 		names,
 		groups = false,
@@ -8,7 +9,7 @@
 
 <label
 	>Mention
-	<select
+	<NativeSelect
 		onchange={(e) => {
 			const s = e.currentTarget;
 			if (s.value) onpick(s.value);
@@ -21,5 +22,5 @@
 		{#if groups}{#each ['owner', 'moderator', 'member', 'here', 'everyone'] as role (role)}<option
 					value={'@' + role}>@{role}</option
 				>{/each}{/if}
-	</select></label
+	</NativeSelect></label
 >
