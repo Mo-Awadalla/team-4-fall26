@@ -2,6 +2,8 @@
 	import SearchMessages from './SearchMessages.svelte';
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
+	import Attachment from './Attachment.svelte';
+	import { composeMessage } from './communities';
 	import MessageBody from './MessageBody.svelte';
 	import { communityRequest, type DirectConversation, type DirectMessage } from './communities';
 
@@ -14,6 +16,7 @@
 	let editingId = $state<number | null>(null);
 	let draft = $state('');
 	let error = $state('');
+	let files = $state<FileList>();
 	let sending = $state(false);
 	let polling = false;
 	let generation = 0;
@@ -68,14 +71,22 @@
 	}
 
 	async function send() {
-		if (!content.trim() || sending) return;
+		if ((!content.trim() && !files?.length) || sending) return;
 		sending = true;
 		try {
-			const sent = await communityRequest<DirectMessage>(base(), 'POST', {
-				content,
-				...(replyTo ? { reply_to: replyTo.id } : {})
-			});
+			const sent = await communityRequest<DirectMessage>(
+				base(),
+				'POST',
+				composeMessage(
+					{
+						content,
+						...(replyTo ? { reply_to: replyTo.id } : {})
+					},
+					files?.[0]
+				)
+			);
 			messages = [...messages, sent];
+			files = new DataTransfer().files;
 			content = '';
 			replyTo = null;
 			error = '';
@@ -159,9 +170,12 @@
 							onclick={() => (editingId = null)}>Cancel</button
 						>
 					</form>
-				{:else}{#if message.deleted_at}Message deleted{:else}<MessageBody
-							content={message.content}
-						/>{#if message.edited_at}<small>(edited)</small>{/if}{/if}{/if}
+				{:else}{#if message.deleted_at}Message deleted{:else}{#if message.file_name}<Attachment
+								url={base() + '/' + message.id}
+								name={message.file_name}
+							/>{/if}<MessageBody content={message.content} />{#if message.edited_at}<small
+								>(edited)</small
+							>{/if}{/if}{/if}
 				{#if !message.deleted_at}<div class="actions">
 						<MessageLink id={message.id} />
 						<button onclick={() => (replyTo = message)}>Reply</button>
@@ -189,13 +203,14 @@
 			void send();
 		}}
 	>
+		<label>Attach file (2 MiB)<input type="file" bind:files /></label>
 		<input
 			aria-label={`Message ${conversation.other_name}`}
 			maxlength="2000"
 			placeholder={`Message ${conversation.other_name}`}
 			bind:value={content}
 		/>
-		<button disabled={!content.trim() || sending}>Send</button>
+		<button disabled={(!content.trim() && !files?.length) || sending}>Send</button>
 	</form>
 </div>
 

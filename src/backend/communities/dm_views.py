@@ -14,6 +14,9 @@ from rest_framework.response import Response
 from .message_views import (
     MessageInput,
     MessagePage,
+    NewMessageInput,
+    download,
+    upload_fields,
     authenticated,
     author_name,
     channel_for,
@@ -47,6 +50,7 @@ def direct_message_data(message: DirectMessage, key: str) -> dict:
         "id": message.pk,
         "author_name": message.author_name,
         "content": message.content,
+        "file_name": "" if message.deleted_at else message.file_name,
         "reply_to": message.reply_to_id,
         "created_at": message.created_at,
         "edited_at": message.edited_at,
@@ -192,7 +196,7 @@ class DirectMessages(CommunityView):
 
     def post(self, request: Request, conversation_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
-        parsed = MessageInput(data=request.data)
+        parsed = NewMessageInput(data=request.data)
         parsed.is_valid(raise_exception=True)
         reply_id = parsed.validated_data.get("reply_to")
         if (
@@ -205,6 +209,7 @@ class DirectMessages(CommunityView):
         message = DirectMessage.objects.create(
             conversation=conversation,
             sender_key=key,
+            **upload_fields(parsed.validated_data),
             author_name=author_name(request),
             content=parsed.validated_data["content"],
             reply_to_id=reply_id,
@@ -217,6 +222,8 @@ class DirectMessageDetail(CommunityView):
     def get(self, request: Request, conversation_id: int, message_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
         message = get_object_or_404(DirectMessage, conversation=conversation, pk=message_id)
+        if "attachment" in request.query_params:
+            return download(message)
         return Response(direct_message_data(message, key))
 
 

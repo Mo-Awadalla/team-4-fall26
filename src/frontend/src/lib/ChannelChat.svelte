@@ -2,6 +2,8 @@
 	import SearchMessages from './SearchMessages.svelte';
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
+	import Attachment from './Attachment.svelte';
+	import { composeMessage } from './communities';
 	import MessageBody from './MessageBody.svelte';
 	import { tick } from 'svelte';
 	import {
@@ -38,6 +40,7 @@
 	let showPinsPanel = $state(false);
 	let pins = $state<Message[] | null>(null);
 	let error = $state('');
+	let files = $state<FileList>();
 	let sending = $state(false);
 	let polling = false;
 	let generation = 0;
@@ -186,12 +189,17 @@
 	}
 
 	async function send() {
-		if (!content.trim() || sending) return;
+		if ((!content.trim() && !files?.length) || sending) return;
 		sending = true;
 		const body = { content: content.trim(), ...(replyTo ? { reply_to: replyTo.id } : {}) };
 		try {
-			const message = await communityRequest<Message>(`${base()}/messages`, 'POST', body);
+			const message = await communityRequest<Message>(
+				`${base()}/messages`,
+				'POST',
+				composeMessage(body, files?.[0])
+			);
 			messages = [...messages, message];
+			files = new DataTransfer().files;
 			content = '';
 			replyTo = null;
 			error = '';
@@ -478,9 +486,12 @@
 								</div>
 							</form>
 						{:else}
-							{#if message.deleted_at}This message was deleted.{:else}<MessageBody
-									content={message.content}
-								/>{#if message.edited_at}<small>(edited)</small>{/if}{/if}
+							{#if message.deleted_at}This message was deleted.{:else}{#if message.file_name}<Attachment
+										url={base() + '/messages/' + message.id}
+										name={message.file_name}
+									/>{/if}<MessageBody content={message.content} />{#if message.edited_at}<small
+										>(edited)</small
+									>{/if}{/if}
 						{/if}
 						{#if message.reactions.length}
 							<div class="reactions">
@@ -576,6 +587,7 @@
 			</div>
 		{/if}
 
+		<label>Attach file (2 MiB)<input type="file" bind:files /></label>
 		<div class="composer" class:archived={channel.archived}>
 			<textarea
 				bind:this={composeEl}
@@ -592,7 +604,7 @@
 				disabled={channel.archived ||
 					(channel.read_only && role === 'member') ||
 					sending ||
-					!content.trim()}
+					(!content.trim() && !files?.length)}
 				onclick={() => void send()}
 				aria-label="Send message"
 			>

@@ -80,7 +80,21 @@ class Channel(models.Model):
         return f"{self.name}"
 
 
-class Message(models.Model):
+class ChatMessageQuery(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().defer("file_bytes")
+
+
+class ChatMessage(models.Model):
+    file_name = models.CharField(max_length=255, blank=True)
+    file_bytes = models.BinaryField(null=True)
+    objects = ChatMessageQuery()
+
+    class Meta:
+        abstract = True
+
+
+class Message(ChatMessage):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="messages")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     guest_id = models.CharField(max_length=32, blank=True)
@@ -152,7 +166,7 @@ class DirectConversation(models.Model):
         return f"Direct conversation {self.pk}"
 
 
-class DirectMessage(models.Model):
+class DirectMessage(ChatMessage):
     conversation = models.ForeignKey(
         DirectConversation, on_delete=models.CASCADE, related_name="messages"
     )

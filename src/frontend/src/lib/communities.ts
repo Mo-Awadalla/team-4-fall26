@@ -28,6 +28,7 @@ export type Message = {
 	channel_id: number;
 	author_name: string;
 	content: string;
+	file_name?: string;
 	reply_to: number | null;
 	created_at: string;
 	edited_at: string | null;
@@ -63,6 +64,7 @@ export type DirectMessage = {
 	id: number;
 	author_name: string;
 	content: string;
+	file_name?: string;
 	reply_to: number | null;
 	created_at: string;
 	edited_at: string | null;
@@ -88,10 +90,10 @@ export async function communityRequest<T>(path: string, method = 'GET', body?: o
 			accept: 'application/json',
 			...(credentials ? { authorization: `Bearer ${credentials.access}` } : {}),
 			...(credentials?.id ? { 'x-id-token': credentials.id } : {}),
-			...(body ? { 'content-type': 'application/json' } : {}),
+			...(body && !(body instanceof FormData) ? { 'content-type': 'application/json' } : {}),
 			...(method !== 'GET' ? { 'x-csrftoken': csrfToken() } : {})
 		},
-		...(body ? { body: JSON.stringify(body) } : {})
+		...(body ? { body: body instanceof FormData ? body : JSON.stringify(body) } : {})
 	});
 	if (!response.ok) {
 		const result = await response.json().catch(() => null);
@@ -104,4 +106,15 @@ export async function communityRequest<T>(path: string, method = 'GET', body?: o
 		throw new Error(result?.error?.message ?? `Request failed (${response.status}).`);
 	}
 	return response.status === 204 ? (undefined as T) : await response.json();
+}
+
+export function composeMessage(
+	body: { content: string; reply_to?: number },
+	file: File | undefined
+) {
+	if (!file) return body;
+	const form = new FormData();
+	for (const [key, value] of Object.entries(body)) form.set(key, String(value));
+	form.set('file', file);
+	return form;
 }

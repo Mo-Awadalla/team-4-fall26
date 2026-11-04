@@ -1,5 +1,6 @@
 """Channel text chat. Every read and write checks current community membership."""
 
+import base64
 import hashlib
 from math import ceil
 from typing import cast
@@ -24,6 +25,30 @@ class MessageInput(serializers.Serializer):
 
 class ReactionInput(serializers.Serializer):
     emoji = serializers.CharField(max_length=32, trim_whitespace=True)
+
+
+class NewMessageInput(MessageInput):
+    content = serializers.CharField(max_length=2000, required=False, allow_blank=True, default="")
+    file = serializers.FileField(required=False, max_length=255)
+
+    def validate(self, attrs):
+        upload = attrs.get("file")
+        if upload and upload.size > 2 * 1024 * 1024:
+            raise serializers.ValidationError("Attachments must be 2 MiB or smaller.")
+        if not upload and not attrs["content"]:
+            raise serializers.ValidationError("Enter a message or attach a file.")
+        return attrs
+
+
+def upload_fields(data):
+    upload = data.get("file")
+    return {"file_name": upload.name, "file_bytes": upload.read()} if upload else {}
+
+
+def download(message):
+    if message.deleted_at or not message.file_name:
+        raise NotFound("Attachment unavailable.")
+    return Response({"name": message.file_name, "data": base64.b64encode(message.file_bytes).decode("ascii")})
 
 
 class MessagePage(serializers.Serializer):
@@ -95,6 +120,7 @@ def message_data(request: Request, message: Message, role: str) -> dict:
         "channel_id": message.channel_id,
         "author_name": message.author_name,
         "content": message.content,
+        "file_name": "" if message.deleted_at else message.file_name,
         "reply_to": message.reply_to_id,
         "created_at": message.created_at,
         "edited_at": message.edited_at,
@@ -146,7 +172,7 @@ class Messages(CommunityView):
             raise PermissionDenied("This channel is read-only.")
         if channel.archived:
             raise PermissionDenied("This channel is archived.")
-        parsed = MessageInput(data=request.data)
+        parsed = NewMessageInput(data=request.data)
         parsed.is_valid(raise_exception=True)
         reply_id = parsed.validated_data.get("reply_to")
         if (
@@ -172,6 +198,7 @@ class Messages(CommunityView):
                     raise Throttled(wait=ceil(remaining), detail="Slowmode is enabled.")
         message = Message.objects.create(
             channel=channel,
+            **upload_fields(parsed.validated_data),
             author=request.user if authenticated(request) else None,
             guest_id="" if authenticated(request) else guest_id(request) or "",
             author_name=author_name(request),
@@ -185,7 +212,10 @@ class MessageDetail(CommunityView):
     def get(self, request: Request, community_id: int, channel_id: int, message_id: int) -> Response:
         channel = channel_for(community_id, channel_id)
         role = member_role(request, channel)
-        return Response(message_data(request, message_for(channel, message_id), role))
+        message = message_for(channel, message_id)
+        if "attachment" in request.query_params:
+            return download(message)
+        return Response(message_data(request, message, role))
 
 
     def patch(
