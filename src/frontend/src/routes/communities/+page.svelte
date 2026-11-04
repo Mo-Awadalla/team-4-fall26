@@ -778,10 +778,12 @@
 					<div class="sidebar-tabs">
 						<button
 							class={chatControls.ghost}
+							aria-pressed={!viewMine}
 							class:chosen={!viewMine}
 							onclick={() => (viewMine = false)}>All</button
 						><button
 							class={chatControls.ghost}
+							aria-pressed={viewMine}
 							class:chosen={viewMine}
 							onclick={() => (viewMine = true)}>Mine</button
 						>
@@ -1629,14 +1631,14 @@
 					<div class="landing">
 						<div class="landing-hero">
 							<p class="landing-eyebrow">StudySpot Communities</p>
-							<h2>Find your people.<br />Make progress<br />together.</h2>
+							<h1>Find your people.<br />Make progress<br />together.</h1>
 							<p class="landing-lead">
 								Join a public study group, pick a channel, and start talking. Or create a space for
 								the course you're working through.
 							</p>
 							<div class="landing-cta">
 								<button
-									class="btn-primary landing-cta-primary {chatControls.primary}"
+									class="btn-primary {chatControls.primary}"
 									onclick={showCreate}>Create a community</button
 								>
 								<button
@@ -1670,7 +1672,7 @@
 							</Card.Root>
 						</div>
 
-						<h3 class="explore-heading">Explore communities</h3>
+						<h2 class="explore-heading">Explore communities</h2>
 						<div class="community-grid">
 							{#each communities.slice(0, 6) as community (community.id)}
 								<button
@@ -1811,7 +1813,7 @@
 			color 0.12s;
 	}
 	.sidebar-tabs button.chosen {
-		color: var(--accent);
+		color: var(--accent-text);
 		background: var(--panel);
 	}
 	.sidebar-tabs button:hover:not(.chosen) {
@@ -1939,7 +1941,7 @@
 		padding: 9px 14px;
 		border: 0;
 		border-radius: 8px;
-		background: var(--accent);
+		background: var(--control-primary);
 		color: white;
 		font: inherit;
 		font-size: 13px;
@@ -1949,7 +1951,7 @@
 		text-align: center;
 	}
 	.create-btn:hover {
-		background: var(--accent-h);
+		background: var(--control-primary-hover);
 	}
 
 	/* ── Content area ── */
@@ -2812,13 +2814,13 @@
 		background: var(--well);
 	}
 	.btn-primary {
-		background: var(--accent) !important;
+		background: var(--control-primary) !important;
 		color: white !important;
-		border-color: var(--accent) !important;
+		border-color: var(--control-primary) !important;
 	}
 	.btn-primary:hover {
-		background: var(--accent-h) !important;
-		border-color: var(--accent-h) !important;
+		background: var(--control-primary-hover) !important;
+		border-color: var(--control-primary-hover) !important;
 	}
 	.btn-danger {
 		background: var(--danger) !important;
@@ -2849,7 +2851,7 @@
 		margin: 0 0 20px;
 	}
 
-	/* ── Landing page — Slack aesthetic ── */
+	/* Communities landing page */
 	.landing {
 		padding: 60px 56px 80px;
 		max-width: 1000px;
@@ -2859,10 +2861,10 @@
 		font-weight: 800;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
-		color: var(--accent);
+		color: var(--accent-text);
 		margin: 0 0 16px;
 	}
-	.landing h2 {
+	.landing h1 {
 		font-size: clamp(38px, 5vw, 64px);
 		line-height: 1.02;
 		letter-spacing: -0.04em;
@@ -2884,55 +2886,31 @@
 		gap: 10px;
 		margin-bottom: 56px;
 	}
-	.landing-cta-primary {
-		padding: 13px 26px !important;
-		font-size: 15px !important;
-		font-weight: 700 !important;
-		border-radius: 4px !important;
-		cursor: pointer;
-		border: 0 !important;
-		background: var(--accent) !important;
-		color: white !important;
-		transition:
-			background 0.15s,
-			transform 0.1s !important;
-	}
-	.landing-cta-primary:hover {
-		background: var(--accent-h) !important;
-		transform: translateY(-1px);
-	}
-	.landing-cta-primary:active {
-		transform: none;
+	.landing-cta button {
+		min-height: 44px;
+		padding-inline: 22px;
+		font-size: 15px;
 	}
 	.landing-cta-secondary {
-		padding: 13px 26px;
-		border: 1px solid var(--line);
-		border-radius: 4px;
-		font: inherit;
-		font-size: 15px;
-		font-weight: 600;
-		cursor: pointer;
 		background: var(--panel);
+		border-color: var(--line);
 		color: var(--ink);
-		transition:
-			background 0.15s,
-			border-color 0.15s;
 	}
 	.landing-cta-secondary:hover {
 		background: var(--well);
-		border-color: var(--muted);
 	}
 
 	.landing-features {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
 		gap: 16px;
 		margin-bottom: 56px;
 	}
 	.landing :global(.feature-card) {
 		padding: 22px;
 		border: 1px solid var(--line);
-		border-radius: 4px;
+		border-radius: 12px;
+		gap: 8px;
 		background: var(--well);
 		transition: box-shadow 0.15s;
 	}
@@ -2942,15 +2920,19 @@
 			0 4px 12px rgba(0, 0, 0, 0.06);
 	}
 	.feature-icon {
-		display: block;
-		font-size: 22px;
-		margin-bottom: 12px;
+		display: inline-grid;
+		place-items: center;
+		inline-size: 32px;
+		block-size: 32px;
+		background: var(--side);
+		border-radius: 8px;
+		margin-bottom: 4px;
 		color: var(--accent);
 	}
 	.landing :global(.feature-card strong) {
 		display: block;
 		font-size: 15px;
-		margin-bottom: 6px;
+		margin: 0;
 		color: var(--ink);
 	}
 	.landing :global(.feature-card p) {
@@ -3134,9 +3116,6 @@
 		.member-rail {
 			display: none;
 		}
-		.landing-features {
-			grid-template-columns: 1fr;
-		}
 	}
 	@media (max-width: 740px) {
 		main {
@@ -3154,9 +3133,6 @@
 			padding: 28px 22px 48px;
 		}
 		.community-grid {
-			grid-template-columns: 1fr;
-		}
-		.landing-features {
 			grid-template-columns: 1fr;
 		}
 	}

@@ -6,9 +6,10 @@
 	--hover: #e3e5e8;
 	--selected: #dfe2e8;
 	--ink: #232428;
-	--muted: #5c6068;
+	--muted: #545861;
 	--line: #d9dce1;
 	--accent: #5865f2;
+	--accent-text: #4552bd;
 	--accent-h: #4752c4;
 	--danger: #ba3041;
 	--success: #248046;
@@ -41,6 +42,7 @@
 	--muted: #b5bac1;
 	--line: #41434a;
 	--accent: #7783ff;
+	--accent-text: #a4acff;
 	--accent-h: #6571ed;
 	--danger: #fa777c;
 	--success: #58bf87;
@@ -590,14 +592,6 @@
 .chat-shell .community-card {
 	border-radius: 12px;
 }
-.chat-shell .feature-icon {
-	display: grid;
-	place-items: center;
-	width: 32px;
-	height: 32px;
-	background: var(--side);
-	border-radius: 8px;
-}
 .chat-shell :focus-visible {
 	outline: 2px solid var(--accent);
 	outline-offset: 2px;
@@ -647,6 +641,7 @@
 
 .chat-shell {
 	--control-primary: #515eca;
+	--control-primary-hover: #4551b5;
 	--secondary: var(--well);
 	--foreground: var(--ink);
 	--radius-md: 8px;

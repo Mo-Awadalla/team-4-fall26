@@ -37,3 +37,17 @@ const inbox = extract(({ document, window }) => {
 	return b.left >= 0 && b.right <= window.innerWidth + 1 && b.bottom <= window.innerHeight + 1;
 });
 export const inboxStaysOnScreen = always(() => inbox.current);
+
+const centeredFeatureIcons = extract(({ document }) =>
+	Array.from(document.querySelectorAll('.feature-icon')).every((badge) => {
+		const svg = badge.querySelector('svg');
+		if (!svg) return false;
+		const outer = badge.getBoundingClientRect();
+		const inner = svg.getBoundingClientRect();
+		return (
+			Math.abs(inner.left + inner.width / 2 - outer.left - outer.width / 2) <= 1 &&
+			Math.abs(inner.top + inner.height / 2 - outer.top - outer.height / 2) <= 1
+		);
+	})
+);
+export const featureIconsStayCentered = always(() => centeredFeatureIcons.current);
