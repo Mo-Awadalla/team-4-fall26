@@ -299,14 +299,29 @@ class MessageSearch(CommunityView):
         role = role_for(community, viewer(request, community))
         if role == "visitor":
             raise PermissionDenied("Join this community to search messages.")
-        query = request.query_params.get("q", "").strip()
-        if not 2 <= len(query) <= 100:
-            raise serializers.ValidationError({"q": "Use 2 to 100 characters."})
-        found = (
-            Message.objects.filter(channel__in=visible_channels(community, role), deleted_at__isnull=True)
-            .annotate(search=SearchVector("content", config="english"))
-            .filter(search=SearchQuery(query, config="english", search_type="websearch"))
-            .order_by("-id")
-            .prefetch_related("reactions")[:50]
-        )
+        messages = Message.objects.filter(channel__in=visible_channels(community, role))
+        found = search_messages(messages, request.query_params).prefetch_related("reactions")
         return Response({"items": [message_data(request, item, role) for item in found]})
+
+
+def search_messages(messages, params):
+    class Filters(serializers.Serializer):
+        q = serializers.CharField(min_length=2, max_length=100, required=False)
+        sender = serializers.CharField(max_length=150, required=False)
+        date = serializers.DateField(required=False)
+
+    parsed = Filters(data=params)
+    parsed.is_valid(raise_exception=True)
+    filters = parsed.validated_data
+    if not filters:
+        raise serializers.ValidationError("Enter a keyword, sender or date.")
+    found = messages.filter(deleted_at__isnull=True)
+    if "q" in filters:
+        found = found.annotate(search=SearchVector("content", config="english")).filter(
+            search=SearchQuery(filters["q"], config="english", search_type="websearch")
+        )
+    if "sender" in filters:
+        found = found.filter(author_name__iexact=filters["sender"])
+    if "date" in filters:
+        found = found.filter(created_at__date=filters["date"])
+    return found.order_by("-id")[:50]

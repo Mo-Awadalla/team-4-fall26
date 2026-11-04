@@ -17,6 +17,7 @@ from .message_views import (
     author_name,
     channel_for,
     member_role,
+    search_messages,
 )
 from .models import DirectConversation, DirectMessage, GuestMembership, Membership, Message
 from .permissions import role_for
@@ -242,3 +243,10 @@ class DirectMessageDetail(CommunityView):
             message.deleted_at = timezone.now()
             message.save(update_fields=["content", "deleted_at"])
         return Response(status=204)
+
+
+class DirectSearch(CommunityView):
+    def get(self, request: Request, conversation_id: int) -> Response:
+        conversation, key = conversation_for(request, conversation_id)
+        found = search_messages(DirectMessage.objects.filter(conversation=conversation), request.query_params)
+        return Response({"items": [direct_message_data(item, key) for item in found]})

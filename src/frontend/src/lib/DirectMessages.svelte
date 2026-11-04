@@ -1,9 +1,11 @@
 <script lang="ts">
+	import SearchMessages from './SearchMessages.svelte';
 	import MessageBody from './MessageBody.svelte';
 	import { communityRequest, type DirectConversation, type DirectMessage } from './communities';
 
 	let { conversation }: { conversation: DirectConversation } = $props();
 	let messages = $state<DirectMessage[]>([]);
+	let matches = $state<Pick<DirectMessage, 'id' | 'author_name' | 'content'>[]>([]);
 	let hasOlder = $state(false);
 	let content = $state('');
 	let replyTo = $state<DirectMessage | null>(null);
@@ -118,6 +120,16 @@
 
 <div class="dm">
 	<h2>Direct message with {conversation.other_name}</h2>
+	<details>
+		<summary>Search conversation</summary><SearchMessages
+			url={base() + '/search'}
+			onresults={(items) => (matches = items)}
+			onerror={(s) => (error = s)}
+		/>{#each matches as item (item.id)}<p>
+				<strong>{item.author_name}</strong>
+				{item.content}
+			</p>{/each}
+	</details>
 	<p class="muted">Only the two of you can read this conversation.</p>
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	<div class="messages" aria-live="polite">

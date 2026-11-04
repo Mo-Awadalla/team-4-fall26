@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SearchMessages from './SearchMessages.svelte';
 	import MessageBody from './MessageBody.svelte';
 	import { tick } from 'svelte';
 	import {
@@ -28,8 +29,10 @@
 	let draft = $state('');
 	let reactionFor = $state<number | null>(null);
 	let showSearch = $state(false);
-	let search = $state('');
-	let results = $state<Message[] | null>(null);
+
+	let results = $state<Pick<Message, 'id' | 'author_name' | 'created_at' | 'content'>[] | null>(
+		null
+	);
 	let showPinsPanel = $state(false);
 	let pins = $state<Message[] | null>(null);
 	let error = $state('');
@@ -230,20 +233,6 @@
 		}
 	}
 
-	async function find() {
-		if (search.trim().length < 2) return;
-		try {
-			const found = await communityRequest<{ items: Message[] }>(
-				`/communities/${communityId}/messages/search?q=${encodeURIComponent(search.trim())}`
-			);
-			results = found.items;
-			pins = null;
-			error = '';
-		} catch (cause) {
-			error = problem(cause);
-		}
-	}
-
 	async function loadPins() {
 		try {
 			pins = (await communityRequest<{ items: Message[] }>(`${base()}/pins`)).items;
@@ -320,7 +309,6 @@
 				onclick={() => {
 					showSearch = !showSearch;
 					if (!showSearch) {
-						search = '';
 						results = null;
 					}
 					pins = null;
@@ -369,22 +357,14 @@
 	</div>
 
 	{#if showSearch}
-		<form
-			class="search-bar"
-			onsubmit={(e) => {
-				e.preventDefault();
-				void find();
+		<SearchMessages
+			url={`/communities/${communityId}/messages/search`}
+			onresults={(items) => {
+				results = items;
+				pins = null;
 			}}
-		>
-			<input
-				aria-label="Search messages in this channel"
-				placeholder="Search messages…"
-				bind:value={search}
-				autofocus
-			/>
-			<button type="submit">Search</button>
-			<button type="button" onclick={closeOverlay}>✕</button>
-		</form>
+			onerror={(s) => (error = s)}
+		/>
 	{/if}
 
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
