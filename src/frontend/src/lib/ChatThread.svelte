@@ -1,13 +1,32 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { communityRequest } from './communities';
+	import MessageLink from './MessageLink.svelte';
+	import { mergeMessages } from './history';
+	import { communityRequest, type DirectMessage } from './communities';
 	import MessageBody from './MessageBody.svelte';
 	let {
 		url,
 		root,
 		onclose
 	}: { url: string; root: { id: number; content: string }; onclose: () => void } = $props();
-	type Reply = { id: number; content: string; author_name: string; deleted_at: string | null };
+	type Reply = DirectMessage & { can_delete?: boolean };
+	let editing = $state<number | null>(null),
+		draft = $state('');
+	async function change(item: Reply, method: 'PATCH' | 'DELETE') {
+		try {
+			await communityRequest(
+				url + '/' + item.id,
+				method,
+				method === 'PATCH' ? { content: draft } : undefined
+			);
+			const fresh = await communityRequest<Reply>(url + '/' + item.id);
+			items = mergeMessages(items, [fresh]);
+			editing = null;
+			error = '';
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Message update failed';
+		}
+	}
 	let items = $state<Reply[]>([]),
 		content = $state(''),
 		error = $state(''),
@@ -19,12 +38,12 @@
 				url + '?thread=' + root.id + (older && items.length ? '&before=' + items[0].id : '')
 			);
 			if (older) {
-				items = [...page.items, ...items];
+				items = mergeMessages(items, page.items);
 				more = page.has_more;
 			} else {
 				const first = page.items[0]?.id;
 				const kept = first ? items.filter((i) => i.id < first) : [];
-				items = [...kept, ...page.items];
+				items = mergeMessages(kept, page.items);
 				if (!kept.length) more = page.has_more;
 			}
 		} catch (e) {
@@ -59,9 +78,28 @@
 	<hr />
 	{#if more}<button onclick={() => void load(true)}>Earlier replies</button>{/if}
 	{#each items as item (item.id)}<p><strong>{item.author_name}</strong></p>
-		<MessageBody content={item.deleted_at ? 'Message deleted' : item.content} />{:else}<p>
-			Start the discussion.
-		</p>{/each}
+		{#if editing === item.id}<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					void change(item, 'PATCH');
+				}}
+			>
+				<input aria-label="Edit thread reply" bind:value={draft} maxlength="2000" /><button
+					disabled={!draft.trim()}>Save</button
+				><button type="button" onclick={() => (editing = null)}>Cancel</button>
+			</form>
+		{:else}<MessageBody content={item.deleted_at ? 'Message deleted' : item.content} />{/if}
+		{#if !item.deleted_at}<MessageLink id={item.id} />{#if item.mine}<button
+					onclick={() => {
+						draft = item.content;
+						editing = item.id;
+					}}>Edit</button
+				>{/if}
+			{#if item.mine || item.can_delete}<button
+					onclick={() => {
+						if (confirm('Delete this reply?')) void change(item, 'DELETE');
+					}}>Delete</button
+				>{/if}{/if}{:else}<p>Start the discussion.</p>{/each}
 	<form
 		onsubmit={(e) => {
 			e.preventDefault();
