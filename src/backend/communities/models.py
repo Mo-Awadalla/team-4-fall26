@@ -86,6 +86,7 @@ class ChatMessageQuery(models.Manager):
 
 
 class ChatMessage(models.Model):
+    thread_root = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="thread_messages")
     file_name = models.CharField(max_length=255, blank=True)
     file_bytes = models.BinaryField(null=True)
     objects = ChatMessageQuery()

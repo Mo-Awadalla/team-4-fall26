@@ -3,6 +3,7 @@
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
 	import Stickers from './Stickers.svelte';
+	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
 	import { composeMessage } from './communities';
 	import MessageBody from './MessageBody.svelte';
@@ -42,6 +43,7 @@
 	let pins = $state<Message[] | null>(null);
 	let error = $state('');
 	let files = $state<FileList>();
+	let thread = $state<{ id: number; content: string } | null>(null);
 	let sending = $state(false);
 	let polling = false;
 	let generation = 0;
@@ -378,6 +380,11 @@
 		/>
 	{/if}
 
+	{#if thread}{#key thread.id}<ChatThread
+				url={base() + '/messages'}
+				root={thread}
+				onclose={() => (thread = null)}
+			/>{/key}{/if}
 	<LinkedMessage url={base() + '/messages'} />
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 
@@ -521,7 +528,9 @@
 								onclick={() => (reactionFor = reactionFor === message.id ? null : message.id)}
 								>😊</button
 							>
-							<MessageLink id={message.id} />
+							<button onclick={() => (thread = message)}>Thread</button><MessageLink
+								id={message.id}
+							/>
 							<button class="action-btn" title="Reply" onclick={() => (replyTo = message)}>↩</button
 							>
 							{#if !message.mine}
@@ -622,6 +631,9 @@
 </div>
 
 <style>
+	.chat {
+		position: relative;
+	}
 	.chat {
 		display: flex;
 		flex-direction: column;

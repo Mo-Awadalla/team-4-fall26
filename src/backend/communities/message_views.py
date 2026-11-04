@@ -28,6 +28,7 @@ class ReactionInput(serializers.Serializer):
 
 
 class NewMessageInput(MessageInput):
+    thread = serializers.IntegerField(min_value=1, required=False)
     content = serializers.CharField(max_length=2000, required=False, allow_blank=True, default="")
     file = serializers.FileField(required=False, max_length=255)
 
@@ -38,6 +39,13 @@ class NewMessageInput(MessageInput):
         if not upload and not attrs["content"]:
             raise serializers.ValidationError("Enter a message or attach a file.")
         return attrs
+
+
+def thread_root(messages, data):
+    root_id = data.get("thread")
+    if root_id and not messages.filter(pk=root_id, thread_root__isnull=True, deleted_at__isnull=True).exists():
+        raise NotFound("Thread starter unavailable.")
+    return root_id
 
 
 def upload_fields(data):
@@ -52,6 +60,7 @@ def download(message):
 
 
 class MessagePage(serializers.Serializer):
+    thread = serializers.IntegerField(min_value=1, required=False)
     limit = serializers.IntegerField(default=50, min_value=1, max_value=50)
     before = serializers.IntegerField(min_value=1, required=False)
     after = serializers.IntegerField(min_value=0, required=False)
@@ -146,7 +155,7 @@ class Messages(CommunityView):
         parsed = MessagePage(data=request.query_params)
         parsed.is_valid(raise_exception=True)
         data = parsed.validated_data
-        query = Message.objects.filter(channel=channel).prefetch_related("reactions")
+        query = Message.objects.filter(channel=channel, thread_root_id=data.get("thread")).prefetch_related("reactions")
         if "after" in data:
             query = query.filter(pk__gt=data["after"]).order_by("id")
         else:
@@ -198,6 +207,7 @@ class Messages(CommunityView):
                     raise Throttled(wait=ceil(remaining), detail="Slowmode is enabled.")
         message = Message.objects.create(
             channel=channel,
+            thread_root_id=thread_root(channel.messages, parsed.validated_data),
             **upload_fields(parsed.validated_data),
             author=request.user if authenticated(request) else None,
             guest_id="" if authenticated(request) else guest_id(request) or "",

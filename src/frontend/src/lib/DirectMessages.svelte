@@ -3,6 +3,7 @@
 	import MessageLink from './MessageLink.svelte';
 	import LinkedMessage from './LinkedMessage.svelte';
 	import Stickers from './Stickers.svelte';
+	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
 	import { composeMessage } from './communities';
 	import MessageBody from './MessageBody.svelte';
@@ -52,6 +53,7 @@
 	let draft = $state('');
 	let error = $state('');
 	let files = $state<FileList>();
+	let thread = $state<{ id: number; content: string } | null>(null);
 	let sending = $state(false);
 	let polling = false;
 	let generation = 0;
@@ -188,6 +190,11 @@
 			</p>{/each}
 	</details>
 	<p class="muted">Only the two of you can read this conversation.</p>
+	{#if thread}{#key thread.id}<ChatThread
+				url={base()}
+				root={thread}
+				onclose={() => (thread = null)}
+			/>{/key}{/if}
 	<LinkedMessage url={base()} />
 	{#if error}<p class="error" role="alert">{error}</p>{/if}
 	<div class="messages" aria-live="polite">
@@ -232,7 +239,9 @@
 								aria-pressed={r.me}
 								onclick={() => void react(message, r.emoji)}>{r.emoji} {r.count}</button
 							>{/each}
-						<MessageLink id={message.id} />
+						<button onclick={() => (thread = message)}>Thread</button><MessageLink
+							id={message.id}
+						/>
 						<button onclick={() => (replyTo = message)}>Reply</button>
 						{#if message.mine}<button
 								onclick={() => {
@@ -274,6 +283,9 @@
 </div>
 
 <style>
+	.dm {
+		position: relative;
+	}
 	.dm {
 		border: 1px solid #eee1e4;
 		border-radius: 12px;

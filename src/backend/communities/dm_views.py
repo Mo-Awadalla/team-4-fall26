@@ -18,6 +18,7 @@ from .message_views import (
     NewMessageInput,
     download,
     upload_fields,
+    thread_root,
     authenticated,
     author_name,
     channel_for,
@@ -185,7 +186,7 @@ class DirectMessages(CommunityView):
         parsed = MessagePage(data=request.query_params)
         parsed.is_valid(raise_exception=True)
         data = parsed.validated_data
-        query = DirectMessage.objects.filter(conversation=conversation).prefetch_related("reactions")
+        query = DirectMessage.objects.filter(conversation=conversation, thread_root_id=data.get("thread")).prefetch_related("reactions")
         if "after" in data:
             query = query.filter(pk__gt=data["after"]).order_by("id")
         else:
@@ -218,6 +219,7 @@ class DirectMessages(CommunityView):
         message = DirectMessage.objects.create(
             conversation=conversation,
             sender_key=key,
+            thread_root_id=thread_root(DirectMessage.objects.filter(conversation=conversation), parsed.validated_data),
             **upload_fields(parsed.validated_data),
             author_name=author_name(request),
             content=parsed.validated_data["content"],
