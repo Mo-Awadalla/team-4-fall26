@@ -184,6 +184,12 @@ class StartFromMember(CommunityView):
         return start(request, f"u:{user_id}", target_name)
 
 
+class DirectDetail(CommunityView):
+    def get(self, request: Request, conversation_id: int) -> Response:
+        conversation, key = conversation_for(request, conversation_id)
+        return Response(conversation_data(conversation, key))
+
+
 class DirectConversations(CommunityView):
     def get(self, request: Request) -> Response:
         key = person_key(request)

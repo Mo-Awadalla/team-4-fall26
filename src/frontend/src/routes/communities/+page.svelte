@@ -582,36 +582,35 @@
 	});
 
 	onMount(() => {
-		const dmId = Number(new URL(location.href).searchParams.get('dm'));
+		const url = new URL(location.href);
 		void session.start().then(async () => {
 			if (session.status === 'signed-out') {
-				session.logIn(location.pathname + location.search);
+				session.logIn(location.pathname + location.search + location.hash);
 				return;
 			}
-			if (session.status === 'disabled' || session.status === 'error') {
-				return;
+			if (session.status !== 'signed-in') return;
+			const token = url.searchParams.get('invite');
+			const channelId = Number(url.searchParams.get('channel')) || null;
+			const id = Number(url.searchParams.get('id'));
+			const dmId = Number(url.searchParams.get('dm'));
+			try {
+				if (token) {
+					const result = await communityRequest<{ community_id: number }>(
+						`/communities/invites/${encodeURIComponent(token)}/redeem`,
+						'POST'
+					);
+					await choose(result.community_id, channelId);
+				} else if (dmId) {
+					openDM(await communityRequest<DirectConversation>(`/dms/${dmId}`));
+					return;
+				} else if (id) {
+					await choose(id, channelId);
+				}
+				await loadDMs();
+			} catch (e) {
+				error = message(e);
 			}
-			if (selected) void choose(selected.id, activeChannelId);
-			const items = await loadDMs();
-			const conversation = items.find((item) => item.id === dmId);
-			if (conversation) openDM(conversation);
 		});
-		const url = new URL(location.href);
-		const id = Number(url.searchParams.get('id'));
-		const channelId = Number(url.searchParams.get('channel'));
-		const requestedChannel = Number.isSafeInteger(channelId) && channelId > 0 ? channelId : null;
-		if (Number.isSafeInteger(id) && id > 0) void choose(id, requestedChannel);
-		const token = url.searchParams.get('invite');
-		if (token) {
-			void communityRequest<{ community_id: number }>(
-				`/communities/invites/${encodeURIComponent(token)}/redeem`,
-				'POST'
-			)
-				.then((result) => choose(result.community_id, requestedChannel))
-				.catch((cause) => {
-					error = message(cause);
-				});
-		}
 	});
 </script>
 
@@ -651,10 +650,9 @@
 			{/if}
 		</dialog>
 
-		<main>
+		<main class:in-room={!!selected || !!selectedDM}>
 			<!-- ── Left sidebar ── -->
 			<aside class="sidebar">
-				<ChatInbox />
 				<div class="sidebar-top">
 					<button class="home-link" onclick={goHome}>Communities</button>
 					<div class="sidebar-search-row">
@@ -675,6 +673,8 @@
 					{#each communities as community (community.id)}
 						<button
 							class="sidebar-item"
+							title={community.name}
+							aria-label={community.name}
 							class:active={selected?.id === community.id}
 							aria-current={selected?.id === community.id ? 'page' : undefined}
 							onclick={() => void choose(community.id)}
@@ -704,6 +704,8 @@
 						{#each directConversations as conversation (conversation.id)}
 							<button
 								class="sidebar-item"
+								title={conversation.other_name}
+								aria-label={conversation.other_name}
 								class:active={selectedDM?.id === conversation.id}
 								aria-current={selectedDM?.id === conversation.id ? 'page' : undefined}
 								onclick={() => openDM(conversation)}
@@ -729,7 +731,11 @@
 			</aside>
 
 			<!-- ── Main content ── -->
-			<div class="content" class:workspace-mode={!!selected}>
+			<div class="content" class:workspace-mode={!!selected || !!selectedDM}>
+				<header class="room-bar">
+					<span>StudySpot / {selected?.name ?? selectedDM?.other_name ?? 'Communities'}</span
+					><ChatInbox />
+				</header>
 				{#if error}<p class="error-banner" role="alert">{error}</p>{/if}
 
 				{#if creating}
@@ -2819,6 +2825,62 @@
 		cursor: default;
 	}
 
+	/* Keep the active conversation wide while retaining one-click room switching. */
+	.room-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0 1rem;
+		border-bottom: 1px solid var(--sb-border);
+		font-size: 0.85rem;
+	}
+	.room-bar :global(details[open]) {
+		background: white;
+		box-shadow: 0 4px 16px #0002;
+		z-index: 4;
+	}
+	@media (min-width: 741px) {
+		main.in-room {
+			grid-template-columns: 76px minmax(0, 1fr);
+		}
+		.in-room .sidebar {
+			align-items: center;
+			padding-top: 8px;
+		}
+		.in-room .sidebar-top,
+		.in-room .sidebar-list,
+		.in-room .sidebar-bottom {
+			width: 100%;
+			padding: 4px;
+		}
+		.in-room .sidebar-item {
+			justify-content: center;
+		}
+		.in-room .sidebar-item-text,
+		.in-room .sidebar-tabs,
+		.in-room .sidebar-search-row,
+		.in-room .sidebar-item-meta {
+			display: none;
+		}
+		.in-room .home-link,
+		.in-room .sidebar-section-label,
+		.in-room .create-btn {
+			font-size: 10px;
+			text-align: center;
+			white-space: normal;
+		}
+	}
+	@media (max-width: 740px) {
+		.in-room .sidebar {
+			max-height: 9rem;
+			overflow: auto;
+		}
+		.in-room .channel-rail {
+			max-height: 12rem;
+			overflow: auto;
+		}
+	}
 	/* ── Responsive ── */
 	@media (max-width: 1200px) {
 		.workspace {

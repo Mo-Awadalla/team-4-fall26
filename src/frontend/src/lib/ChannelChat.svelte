@@ -637,22 +637,24 @@
 			</div>
 		{/if}
 
-		<PollComposer url={base() + '/messages'} onsent={() => void refresh()} /><button
-			type="button"
-			onclick={() => void mark()}>Mark as read</button
-		><Presence
-			onread={(id) => (lastRead = id)}
-			bind:this={presence}
-			url={base() + '/presence'}
-		/><MentionPicker
-			{names}
-			groups={role === 'owner' || role === 'moderator'}
-			onpick={(s) => (content = (content ? content + ' ' : '') + s + ' ')}
-		/><Stickers
-			onpick={(s) => {
-				content = s;
-			}}
-		/><label>Attach file (2 MiB)<input type="file" bind:files /></label>
+		<div class="compose-tools">
+			<PollComposer url={base() + '/messages'} onsent={() => void refresh()} /><button
+				type="button"
+				onclick={() => void mark()}>Mark as read</button
+			><Presence
+				onread={(id) => (lastRead = id)}
+				bind:this={presence}
+				url={base() + '/presence'}
+			/><MentionPicker
+				{names}
+				groups={role === 'owner' || role === 'moderator'}
+				onpick={(s) => (content = (content ? content + ' ' : '') + s + ' ')}
+			/><Stickers
+				onpick={(s) => {
+					content = s;
+				}}
+			/><label>Attach file (2 MiB)<input type="file" bind:files /></label>
+		</div>
 		<div class="composer" class:archived={channel.archived}>
 			<textarea
 				bind:this={composeEl}
@@ -685,6 +687,31 @@
 </div>
 
 <style>
+	.compose-tools {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem 0.75rem;
+		flex-wrap: wrap;
+		padding: 0.45rem 0.85rem;
+		border-top: 1px solid #e1dce4;
+		color: #514653;
+		font-size: 0.78rem;
+		background: #faf8fa;
+	}
+	.compose-tools :global(summary),
+	.compose-tools :global(button) {
+		cursor: pointer;
+	}
+	.compose-tools :global(input[type='file']) {
+		display: block;
+		max-width: 11rem;
+		font-size: 0.72rem;
+	}
+	.compose-tools :global(details[open]) {
+		padding: 0.35rem;
+		background: white;
+	}
+
 	.unread-divider {
 		border-top: 1px solid #99354e;
 		color: #93314b;

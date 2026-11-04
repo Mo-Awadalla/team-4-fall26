@@ -297,13 +297,7 @@
 	{#if replyTo}<p class="replying">
 			Replying to {replyTo.author_name} <button onclick={() => (replyTo = null)}>Cancel</button>
 		</p>{/if}
-	<form
-		class="composer"
-		onsubmit={(event) => {
-			event.preventDefault();
-			void send();
-		}}
-	>
+	<div class="compose-tools">
 		<PollComposer url={base()} onsent={() => void refresh()} /><button
 			type="button"
 			onclick={() => void mark()}>Mark as read</button
@@ -319,6 +313,14 @@
 				content = s;
 			}}
 		/><label>Attach file (2 MiB)<input type="file" bind:files /></label>
+	</div>
+	<form
+		class="composer"
+		onsubmit={(event) => {
+			event.preventDefault();
+			void send();
+		}}
+	>
 		<input
 			aria-label={`Message ${conversation.other_name}`}
 			maxlength="2000"
@@ -331,6 +333,31 @@
 </div>
 
 <style>
+	.compose-tools {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem 0.75rem;
+		flex-wrap: wrap;
+		padding: 0.45rem 0.85rem;
+		border-top: 1px solid #e1dce4;
+		color: #514653;
+		font-size: 0.78rem;
+		background: #faf8fa;
+	}
+	.compose-tools :global(summary),
+	.compose-tools :global(button) {
+		cursor: pointer;
+	}
+	.compose-tools :global(input[type='file']) {
+		display: block;
+		max-width: 11rem;
+		font-size: 0.72rem;
+	}
+	.compose-tools :global(details[open]) {
+		padding: 0.35rem;
+		background: white;
+	}
+
 	.unread-divider {
 		border-top: 1px solid #99354e;
 		color: #93314b;
@@ -341,6 +368,10 @@
 		position: relative;
 	}
 	.dm {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
 		border: 1px solid #eee1e4;
 		border-radius: 12px;
 		padding: 20px;
@@ -365,8 +396,8 @@
 		gap: 10px;
 	}
 	.messages {
-		min-height: 260px;
-		max-height: 520px;
+		min-height: 160px;
+		flex: 1;
 		overflow-y: auto;
 		margin: 20px 0;
 	}
@@ -378,6 +409,9 @@
 		margin: 6px 0;
 		white-space: pre-wrap;
 		overflow-wrap: anywhere;
+	}
+	.actions {
+		flex-wrap: wrap;
 	}
 	.actions button {
 		font-size: 12px;
