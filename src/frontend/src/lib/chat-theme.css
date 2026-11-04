@@ -470,5 +470,10 @@
 	color: white;
 	font-weight: 650;
 }
-.chat-shell .join-wall .btn-primary:hover { background: #4752c4; }
-.chat-shell .join-wall .btn-primary:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.chat-shell .join-wall .btn-primary:hover {
+	background: #4752c4;
+}
+.chat-shell .join-wall .btn-primary:focus-visible {
+	outline: 2px solid var(--ink);
+	outline-offset: 3px;
+}

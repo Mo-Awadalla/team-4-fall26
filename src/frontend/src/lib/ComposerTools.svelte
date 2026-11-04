@@ -9,6 +9,7 @@
 		room,
 		names,
 		groups = false,
+		withPresence = true,
 		files = $bindable(),
 		onmention,
 		onread,
@@ -18,6 +19,7 @@
 		room: string;
 		names: string[];
 		groups?: boolean;
+		withPresence?: boolean;
 		files?: FileList;
 		onmention: (s: string) => void;
 		onread: (id: number) => void;
@@ -71,12 +73,12 @@
 			menu.hidePopover();
 		}}
 	/>
-	<Presence
-		url={room + '/presence'}
-		bind:this={presence}
-		{onread}
-		ontyping={(items) => (typingNames = items)}
-	/>
+	{#if withPresence}<Presence
+			url={room + '/presence'}
+			bind:this={presence}
+			{onread}
+			ontyping={(items) => (typingNames = items)}
+		/>{/if}
 	<button
 		type="button"
 		onclick={() => {
