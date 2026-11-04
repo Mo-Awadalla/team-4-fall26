@@ -5,6 +5,7 @@
 	import Ballot from './Ballot.svelte';
 	import PollComposer from './PollComposer.svelte';
 	import Presence from './Presence.svelte';
+	import MentionPicker from './MentionPicker.svelte';
 	import Stickers from './Stickers.svelte';
 	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
@@ -301,6 +302,9 @@
 			onread={(id) => (lastRead = id)}
 			bind:this={presence}
 			url={`/dms/${conversation.id}` + '/presence'}
+		/><MentionPicker
+			names={[conversation.other_name]}
+			onpick={(s) => (content = (content ? content + ' ' : '') + s + ' ')}
 		/><Stickers
 			onpick={(s) => {
 				content = s;

@@ -13,6 +13,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied, Throttled
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from .mentions import targets
 from .models import Channel, Community, GuestMembership, Membership, Message, Poll, Reaction
 from .permissions import role_for
 from .views import CommunityView, community_for, guest_id, viewer, visible_channels
@@ -227,6 +228,7 @@ class Messages(CommunityView):
                     raise Throttled(wait=ceil(remaining), detail="Slowmode is enabled.")
         message = Message.objects.create(
             channel=channel,
+            mentions=targets(parsed.validated_data["content"], channel=channel, role=role),
             thread_root_id=thread_root(channel.messages, parsed.validated_data),
             **poll_fields(parsed.validated_data),
             **upload_fields(parsed.validated_data),

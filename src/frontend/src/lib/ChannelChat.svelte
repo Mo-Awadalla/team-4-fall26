@@ -5,6 +5,7 @@
 	import Ballot from './Ballot.svelte';
 	import PollComposer from './PollComposer.svelte';
 	import Presence from './Presence.svelte';
+	import MentionPicker from './MentionPicker.svelte';
 	import Stickers from './Stickers.svelte';
 	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
@@ -22,10 +23,12 @@
 		communityId,
 		channel,
 		role,
+		names = [],
 		onDirectMessage
 	}: {
 		communityId: number;
 		channel: Channel;
+		names?: string[];
 		role: string;
 		onDirectMessage: (conversation: DirectConversation) => void;
 	} = $props();
@@ -631,6 +634,10 @@
 			onread={(id) => (lastRead = id)}
 			bind:this={presence}
 			url={base() + '/presence'}
+		/><MentionPicker
+			{names}
+			groups={role === 'owner' || role === 'moderator'}
+			onpick={(s) => (content = (content ? content + ' ' : '') + s + ' ')}
 		/><Stickers
 			onpick={(s) => {
 				content = s;

@@ -12,6 +12,7 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from .mentions import targets
 from .message_views import (
     MessageInput,
     MessagePage,
@@ -224,6 +225,7 @@ class DirectMessages(CommunityView):
         message = DirectMessage.objects.create(
             conversation=conversation,
             sender_key=key,
+            mentions=targets(parsed.validated_data["content"]),
             thread_root_id=thread_root(DirectMessage.objects.filter(conversation=conversation), parsed.validated_data),
             **poll_fields(parsed.validated_data),
             **upload_fields(parsed.validated_data),

@@ -1059,6 +1059,7 @@
 											communityId={selected.id}
 											{channel}
 											role={selected.role}
+											names={[...members, ...guestMembers].map((m) => m.display_name)}
 											onDirectMessage={openDM}
 										/>
 									{/if}

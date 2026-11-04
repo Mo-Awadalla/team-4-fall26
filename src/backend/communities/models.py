@@ -1,6 +1,7 @@
 """Public communities and their membership boundaries."""
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVector
 from django.db import models
@@ -99,6 +100,7 @@ class ChatMessageQuery(models.Manager):
 
 
 class ChatMessage(models.Model):
+    mentions = ArrayField(models.CharField(max_length=180), default=list, blank=True)
     poll = models.OneToOneField(Poll, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     thread_root = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="thread_messages")
     file_name = models.CharField(max_length=255, blank=True)
