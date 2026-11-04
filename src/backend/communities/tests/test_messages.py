@@ -1,5 +1,8 @@
 """Channel messages are scoped to current members and their authors."""
 
+from datetime import UTC, datetime, timedelta
+from unittest.mock import patch
+
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
@@ -107,3 +110,30 @@ def test_slowmode_survives_deleting_last_post(existing_guest_community):
     assert limited.status_code == 429
     assert 0 < int(limited["Retry-After"]) <= 60
     assert owner.post(url, {"content": "announcement"}).status_code == 201
+
+
+def test_slowmode_deadline_is_per_member(existing_guest_community):
+    owner, community = existing_guest_community
+    channels = f"/communities/{community}/channels"
+    channel = f"{channels}/{owner.get(channels).data[0]['id']}"
+    owner.patch(channel, {"slowmode_seconds": 10})
+    first, second = APIClient(), APIClient()
+    for member in (first, second):
+        member.post(f"/communities/{community}/join")
+
+    start = datetime.now(UTC)
+    messages = f"{channel}/messages"
+    with patch("django.utils.timezone.now", return_value=start):
+        assert first.post(messages, {"content": "First"}).status_code == 201
+    with patch(
+        "django.utils.timezone.now", return_value=start + timedelta(seconds=9, microseconds=999999)
+    ):
+        assert first.post(messages, {"content": "Too soon"}).status_code == 429
+        assert second.post(messages, {"content": "Independent clock"}).status_code == 201
+    with patch("django.utils.timezone.now", return_value=start + timedelta(seconds=10)):
+        assert first.post(messages, {"content": "At deadline"}).status_code == 201
+    assert [row["content"] for row in first.get(messages).data["items"]] == [
+        "First",
+        "Independent clock",
+        "At deadline",
+    ]
