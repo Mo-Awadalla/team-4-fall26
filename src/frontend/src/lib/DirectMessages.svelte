@@ -4,6 +4,7 @@
 	import LinkedMessage from './LinkedMessage.svelte';
 	import Ballot from './Ballot.svelte';
 	import PollComposer from './PollComposer.svelte';
+	import Presence from './Presence.svelte';
 	import Stickers from './Stickers.svelte';
 	import ChatThread from './ChatThread.svelte';
 	import Attachment from './Attachment.svelte';
@@ -56,6 +57,7 @@
 	let error = $state('');
 	let files = $state<FileList>();
 	let thread = $state<{ id: number; content: string } | null>(null);
+	let presence = $state<Presence>();
 	let sending = $state(false);
 	let polling = false;
 	let generation = 0;
@@ -274,7 +276,10 @@
 			void send();
 		}}
 	>
-		<PollComposer url={base()} onsent={() => void refresh()} /><Stickers
+		<PollComposer url={base()} onsent={() => void refresh()} /><Presence
+			bind:this={presence}
+			url={`/dms/${conversation.id}` + '/presence'}
+		/><Stickers
 			onpick={(s) => {
 				content = s;
 			}}
@@ -283,6 +288,7 @@
 			aria-label={`Message ${conversation.other_name}`}
 			maxlength="2000"
 			placeholder={`Message ${conversation.other_name}`}
+			oninput={() => presence?.typing()}
 			bind:value={content}
 		/>
 		<button disabled={(!content.trim() && !files?.length) || sending}>Send</button>

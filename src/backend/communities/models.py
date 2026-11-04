@@ -250,3 +250,19 @@ class ModerationEvent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.action} in {self.community_id}"
+
+
+class RoomMemberState(models.Model):
+    channel = models.ForeignKey(Channel, null=True, on_delete=models.CASCADE)
+    conversation = models.ForeignKey(DirectConversation, null=True, on_delete=models.CASCADE)
+    actor = models.CharField(max_length=128)
+    name = models.CharField(max_length=150)
+    last_active = models.DateTimeField(auto_now=True)
+    typing_until = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(condition=(models.Q(channel__isnull=True, conversation__isnull=False) | models.Q(channel__isnull=False, conversation__isnull=True)), name="one_chat_room"),
+            models.UniqueConstraint(fields=["channel", "actor"], name="channel_actor_state"),
+            models.UniqueConstraint(fields=["conversation", "actor"], name="dm_actor_state"),
+        ]

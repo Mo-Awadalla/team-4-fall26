@@ -1,13 +1,16 @@
 """Interactions shared by channel members and direct conversation participants."""
 
+from datetime import timedelta
+
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from .dm_views import conversation_for, person_key
-from .message_views import channel_for, member_role, poll_data
-from .models import DirectMessage, Vote
+from .message_views import author_name, channel_for, member_role, poll_data
+from .models import DirectMessage, RoomMemberState, Vote
 from .views import CommunityView
 
 
@@ -32,3 +35,29 @@ class PollVote(CommunityView):
         parsed.is_valid(raise_exception=True)
         Vote.objects.update_or_create(poll=message.poll, actor=key, defaults=parsed.validated_data)
         return Response(poll_data(messages.get(pk=message_id), key))
+
+
+def room_state(room):
+    if "conversation_id" in room:
+        return RoomMemberState.objects.filter(conversation_id=room["conversation_id"])
+    return RoomMemberState.objects.filter(channel_id=room["channel_id"])
+
+
+class RoomPresence(CommunityView):
+    def get(self, request, **room):
+        _, key = room_messages(request, **room)
+        names = room_state(room).exclude(actor=key).filter(typing_until__gt=timezone.now()).order_by("-typing_until").values_list("name", flat=True)[:5]
+        return Response({"typing": list(names)})
+
+    def post(self, request, **room):
+        _, key = room_messages(request, **room)
+        class Signal(serializers.Serializer):
+            typing = serializers.BooleanField(required=False)
+        parsed = Signal(data=request.data)
+        parsed.is_valid(raise_exception=True)
+        defaults = {"name": author_name(request), "last_active": timezone.now()}
+        if "typing" in parsed.validated_data:
+            defaults["typing_until"] = timezone.now() + timedelta(seconds=7) if parsed.validated_data["typing"] else None
+        scope = {k:v for k,v in room.items() if k != "community_id"}
+        RoomMemberState.objects.update_or_create(actor=key, **scope, defaults=defaults)
+        return Response(status=204)
