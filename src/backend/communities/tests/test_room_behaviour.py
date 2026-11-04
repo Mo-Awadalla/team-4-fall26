@@ -154,3 +154,26 @@ def test_channel_metadata_changes_require_owner_and_preserve_links(members):
         ch for ch in member.get(base.rsplit("/", 1)[0]).data if base.endswith("/" + str(ch["id"]))
     )
     assert (channel["name"], channel["topic"]) == ("exam-prep", "x" * 256)
+
+
+def test_direct_reactions_and_pins_are_idempotent_and_participant_only(members):
+    first, second, channel = members
+    posted = second.post(channel + "/messages", {"content": "Start"}).data["id"]
+    conversation = first.post(f"{channel}/messages/{posted}/dm").data["id"]
+    base = f"/dms/{conversation}"
+    message = first.post(base + "/messages", {"content": "Pin this"}).data["id"]
+    target = f"{base}/messages/{message}"
+    outsider = APIClient()
+    outsider.post(channel.split("/channels")[0] + "/join")
+    assert outsider.put(target + "/pin", {"pinned": True}).status_code == 404
+    for client in (first, first, second):
+        client.put(target + "/reactions", {"emoji": "🎉", "active": True})
+        client.put(target + "/pin", {"pinned": True})
+    assert second.get(target).data["reactions"] == [{"emoji": "🎉", "count": 2, "me": True}]
+    assert [m["id"] for m in first.get(base + "/pins").data["items"]] == [message]
+    for _ in range(2):
+        first.put(target + "/reactions", {"emoji": "🎉", "active": False})
+    assert first.get(target).data["reactions"] == [{"emoji": "🎉", "count": 1, "me": False}]
+    first.delete(target)
+    assert second.get(base + "/pins").data["items"] == []
+    assert second.get(target).data["reactions"] == []

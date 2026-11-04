@@ -5,6 +5,7 @@
 	let source = $state(''),
 		error = $state(''),
 		loading = $state(false);
+	let disposed = false;
 	let kind = $derived(
 		/\.(png|jpe?g|gif|webp)$/i.test(name) ? 'image' : /\.(mp4|webm)$/i.test(name) ? 'video' : 'file'
 	);
@@ -13,7 +14,13 @@
 		try {
 			const { data } = await communityRequest<{ data: string }>(url + '?attachment=1');
 			const bytes = Uint8Array.from(atob(data), (ch) => ch.charCodeAt(0));
-			source = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+			if (disposed) return;
+			const extension = name.split('.').at(-1)?.toLowerCase();
+			const mime =
+				kind === 'file'
+					? 'application/octet-stream'
+					: kind + '/' + (extension === 'jpg' ? 'jpeg' : extension);
+			source = URL.createObjectURL(new Blob([bytes], { type: mime }));
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Download failed';
 		} finally {
@@ -21,6 +28,7 @@
 		}
 	}
 	onDestroy(() => {
+		disposed = true;
 		if (source) URL.revokeObjectURL(source);
 	});
 </script>
