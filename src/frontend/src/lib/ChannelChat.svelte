@@ -1154,6 +1154,15 @@
 		background: #7d1630;
 	}
 
+	@media (hover: none) {
+		.message .msg-actions {
+			position: static;
+			grid-column: 2/-1;
+			opacity: 1;
+			pointer-events: auto;
+			flex-wrap: wrap;
+		}
+	}
 	/* Floating action toolbar */
 	.msg-actions {
 		display: flex;
@@ -1174,6 +1183,7 @@
 			0 0 0 1px rgba(0, 0, 0, 0.06);
 		z-index: 2;
 	}
+	.message:focus-within .msg-actions,
 	.message:hover .msg-actions {
 		opacity: 1;
 		pointer-events: all;

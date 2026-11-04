@@ -7,6 +7,7 @@ from typing import cast
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db import IntegrityError, transaction
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, PermissionDenied, Throttled
@@ -14,7 +15,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .mentions import targets
-from .models import Channel, Community, GuestMembership, Membership, Message, Poll, Reaction
+from .models import Channel, Community, Message, Poll, Reaction
 from .permissions import role_for
 from .views import CommunityView, community_for, guest_id, viewer, visible_channels
 
@@ -212,10 +213,11 @@ class Messages(CommunityView):
 
     @transaction.atomic
     def post(self, request: Request, community_id: int, channel_id: int) -> Response:
-        channel = channel_for(community_id, channel_id)
+        # ID cursors depend on sends committing in order within each room.
+        channel = get_object_or_404(
+            Channel.objects.select_for_update(), community_id=community_id, pk=channel_id
+        )
         role = member_role(request, channel)
-        # Order message ID allocation and commit within this channel for after-ID polling.
-        Channel.objects.select_for_update().only("pk").get(pk=channel.pk)
         if channel.read_only and role == "member":
             raise PermissionDenied("This channel is read-only.")
         if channel.archived:
@@ -231,18 +233,11 @@ class Messages(CommunityView):
         ):
             raise NotFound("Reply target not found in this channel.")
         if channel.slowmode_seconds and role == "member":
-            # Serialize concurrent sends by this member before checking their last post.
-            if authenticated(request):
-                Membership.objects.select_for_update().get(
-                    community=channel.community, user=request.user
-                )
-                previous = channel.messages.filter(author=request.user)
-            else:
-                identity = guest_id(request)
-                GuestMembership.objects.select_for_update().get(
-                    community=channel.community, guest_id=identity
-                )
-                previous = channel.messages.filter(guest_id=identity)
+            previous = (
+                channel.messages.filter(author=request.user)
+                if authenticated(request)
+                else channel.messages.filter(guest_id=guest_id(request))
+            )
             latest = previous.order_by("-id").values_list("created_at", flat=True).first()
             if latest:
                 remaining = channel.slowmode_seconds - (timezone.now() - latest).total_seconds()
@@ -303,7 +298,11 @@ class MessageDetail(CommunityView):
             message.content = ""
             message.deleted_at = timezone.now()
             message.pinned_at = None
-            message.save(update_fields=["content", "deleted_at", "pinned_at"])
+            message.file_bytes = None
+            message.file_name = ""
+            message.save(
+                update_fields=["content", "deleted_at", "pinned_at", "file_name", "file_bytes"]
+            )
             Reaction.objects.filter(message=message).delete()
         return Response(status=204)
 

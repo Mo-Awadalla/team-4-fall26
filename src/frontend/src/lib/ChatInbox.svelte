@@ -35,7 +35,9 @@
 <details>
 	<summary>Inbox {items.length ? '· ' + items.length : ''}</summary>
 	{#if error}<small>{error}</small>{/if}
-	{#each items as item ((item.conversation_id ? 'dm' : 'ch') + item.id)}<a
+	{#each items as item ((item.conversation_id ? 'dm' : 'ch') + item.id)}
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved route with room query and message fragment -->
+		<a
 			data-sveltekit-reload
 			href={resolve('/communities') +
 				'?' +

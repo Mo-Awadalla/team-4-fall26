@@ -295,7 +295,11 @@ class DirectMessageDetail(CommunityView):
             message.content = ""
             message.deleted_at = timezone.now()
             message.pinned_at = None
-            message.save(update_fields=["content", "deleted_at", "pinned_at"])
+            message.file_bytes = None
+            message.file_name = ""
+            message.save(
+                update_fields=["content", "deleted_at", "pinned_at", "file_name", "file_bytes"]
+            )
         return Response(status=204)
 
 
