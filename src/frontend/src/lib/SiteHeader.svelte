@@ -4,8 +4,18 @@
 	import { displayName } from './accounts';
 	import { session as shared, type Session } from './session.svelte';
 
-	/** Replaceable so a test can render the header in any state. */
-	let { session = shared }: { session?: Session } = $props();
+	type Props = {
+		/** Replaceable so a test can render the header in any state. */
+		session?: Session;
+		/**
+		 * What the Map tab should do on a page that is already showing
+		 * results. Given, the tab switches them to the map; left out, it is a
+		 * link to the homepage's map view.
+		 */
+		onMap?: () => void;
+	};
+
+	let { session = shared, onMap }: Props = $props();
 
 	/** Back to this page after logging in, rather than to the homepage. */
 	const here = $derived(page.url.pathname + page.url.search);
@@ -22,8 +32,20 @@
 	<nav aria-label="Main navigation">
 		<a class="nav-link" href={resolve('/')}>Explore</a>
 		<a class="nav-link" href={resolve('/communities')}>Communities</a>
-		<!-- svelte-ignore a11y_invalid_attribute -->
-		<a class="nav-link" href="#">Map</a>
+		{#if onMap}
+			<!--
+				A button, because from here it goes nowhere: the results are on
+				this page already and navigating would lose the search.
+			-->
+			<button class="nav-link" type="button" onclick={onMap}>Map</button>
+		{:else}
+			<!--
+				From anywhere else it is a real link home, and says in the URL
+				what it is going there for -- which also makes the map view
+				something that can be sent to someone.
+			-->
+			<a class="nav-link" href="{resolve('/')}?view=map">Map</a>
+		{/if}
 		<!-- svelte-ignore a11y_invalid_attribute -->
 		<a class="nav-link" href="#">Saved</a>
 		<!-- svelte-ignore a11y_invalid_attribute -->
