@@ -3,6 +3,7 @@ from django.urls import path
 from . import dm_views, message_views, notifications, room_views, views
 
 urlpatterns = [
+    path("chat/people", dm_views.PeopleSearch.as_view()),
     path("communities/access", views.CommunityAccess.as_view()),
     path("dms/<int:conversation_id>/messages/search", dm_views.DirectSearch.as_view()),
     path("dms/<int:conversation_id>/messages/<int:message_id>/pin", dm_views.DirectPin.as_view()),

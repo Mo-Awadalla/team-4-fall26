@@ -65,3 +65,18 @@ def test_member_list_includes_guests_and_can_start_private_conversation(existing
     started = owner.post(f"/communities/{community_id}/dms", {"guest_member_id": other["id"]})
     assert started.status_code == 201
     assert second.get("/dms").data["items"][0]["id"] == started.data["id"]
+
+
+def test_people_search_returns_only_other_shared_members(existing_guest_community):
+    owner, community_id = existing_guest_community
+    user = get_user_model().objects.create_user(username="MayaChen")
+    member = APIClient()
+    member.force_authenticate(user=user)
+    path = "/chat/people?q=AYA"
+    assert owner.get(path).data["items"] == []
+    member.post(f"/communities/{community_id}/join")
+    [person] = owner.get(path).data["items"]
+    assert person["name"] == "MayaChen"
+    assert owner.post(f"/communities/{community_id}/dms", person["target"]).status_code == 201
+    assert member.get(path).data["items"] == []
+    assert APIClient().get(path).data["items"] == []

@@ -27,6 +27,58 @@
 	} from '$lib/communities';
 	import { session } from '$lib/session.svelte';
 
+	type Person = {
+		name: string;
+		community: string;
+		community_id: number;
+		target: { user_id: string } | { guest_member_id: number };
+	};
+	let people = $state<Person[]>([]);
+	let peopleStatus = $state('');
+	$effect(() => {
+		const term = query.trim();
+		people = [];
+		peopleStatus = '';
+		if (
+			term.length < 2 ||
+			selected ||
+			selectedDM ||
+			(!guestPreview && session.status !== 'signed-in')
+		)
+			return;
+		let current = true;
+		peopleStatus = 'Searching…';
+		const timer = setTimeout(async () => {
+			try {
+				const result = await communityRequest<{ items: Person[] }>(
+					`/chat/people?q=${encodeURIComponent(term)}`
+				);
+				if (current) {
+					people = result.items;
+					peopleStatus = result.items.length ? '' : 'No matching people in your communities.';
+				}
+			} catch (cause) {
+				if (current) peopleStatus = message(cause);
+			}
+		}, 180);
+		return () => {
+			current = false;
+			clearTimeout(timer);
+		};
+	});
+	async function messagePerson(person: Person) {
+		try {
+			const chat = await communityRequest<DirectConversation>(
+				`/communities/${person.community_id}/dms`,
+				'POST',
+				person.target
+			);
+			query = '';
+			openDM(chat);
+		} catch (cause) {
+			peopleStatus = message(cause);
+		}
+	}
 	let communities = $state<Community[]>([]);
 	let selected = $state<Community | null>(null);
 	let directConversations = $state<DirectConversation[]>([]);
@@ -705,7 +757,13 @@
 						aria-label="Browse communities"><Compass size={23} /><span>Communities</span></button
 					>
 					<div class="sidebar-search-row">
-						<input id="community-search" bind:value={query} placeholder="Search communities…" />
+						<input
+							id="community-search"
+							bind:value={query}
+							maxlength="100"
+							aria-label="Search people and communities"
+							placeholder="Search people or communities…"
+						/>
 					</div>
 					<div class="sidebar-tabs">
 						<button class:chosen={!viewMine} onclick={() => (viewMine = false)}>All</button><button
@@ -717,6 +775,26 @@
 
 				{#if loading}<p class="sidebar-muted">Loading…</p>{/if}
 
+				{#if query.trim().length >= 2 && !selected && !selectedDM}
+					<div class="sidebar-section-label">People in your communities</div>
+					{#if peopleStatus}<p role="status" class="sidebar-muted">{peopleStatus}</p>{/if}
+					<div class="sidebar-list">
+						{#each people as person (person.community_id + JSON.stringify(person.target))}
+							<button
+								class="sidebar-item"
+								aria-label={'Message ' + person.name}
+								onclick={() => void messagePerson(person)}
+							>
+								<span class="sidebar-item-avatar" style="background:{avatarColor(person.name)}"
+									>{initials(person.name)}</span
+								>
+								<span class="sidebar-item-text"
+									><strong class="sidebar-item-name">{person.name}</strong><small
+										class="sidebar-item-meta">{person.community}</small
+									></span
+								>
+							</button>{/each}
+					</div>{/if}
 				<div class="sidebar-section-label">Communities</div>
 				<div class="sidebar-list">
 					{#each communities as community (community.id)}

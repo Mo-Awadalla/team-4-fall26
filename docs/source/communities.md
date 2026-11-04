@@ -43,6 +43,9 @@ The `/communities` landing page shows public communities and a creation action. 
 
 ## Using chat
 
+- **Find a person.** On Communities, type at least two characters in **Search people and communities**. Choose a name under **People in your communities** to open a private conversation. Results include current account and guest members of groups you have joined.
+- **Set up a DM.** Use the gear in the conversation header to choose all messages, mentions only, or muted. The pin and search buttons open their respective panels.
+
 - **Share a destination.** Copy channel link opens the selected channel. Create a seven-day invite from community settings to join and open that channel. Copy link on a message opens it directly, including messages outside the latest history page. Access checks still apply.
 - **Compose a message.** Use Markdown for emphasis, backticks for inline code, triple backticks for code blocks and `||hidden text||` for a spoiler. Attach one file up to 2 MiB from the **+** menu or use the smile button to search emoji by name. Members open attachments on demand. Supported image, GIF and video formats have previews.
 - **Respond.** Reply quotes a message in the current conversation. Thread opens a separate discussion attached to its starter. Either DM participant can pin a message. In channels, owners and moderators can pin. A poll takes a question and two to ten distinct choices. A voter can change their selection.

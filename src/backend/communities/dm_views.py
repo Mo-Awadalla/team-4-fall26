@@ -4,7 +4,8 @@ import hashlib
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import F, Q, Value
+from django.db.models.functions import Coalesce, NullIf
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import serializers
@@ -144,6 +145,62 @@ class StartFromMessage(CommunityView):
         if not still_member:
             raise PermissionDenied("This person is no longer a community member.")
         return start(request, target_key, message.author_name)
+
+
+class PeopleSearch(CommunityView):
+    """Find DM recipients in the caller's current communities by display name."""
+
+    def get(self, request: Request) -> Response:
+        query = request.query_params.get("q", "").strip().casefold()
+        if not 2 <= len(query) <= 100:
+            raise serializers.ValidationError({"q": "Enter 2 to 100 characters."})
+        active = GuestMembership.objects.filter(expires_at__gt=timezone.now())
+        accounts = Membership.objects.annotate(
+            display_name=Coalesce(
+                NullIf(F("user__account__username"), Value("")), F("user__username")
+            )
+        ).filter(display_name__icontains=query)
+        guests = active.select_related("community")
+        if authenticated(request):
+            groups = Membership.objects.filter(user=request.user).values("community_id")
+            accounts = accounts.exclude(user=request.user)
+        else:
+            identity = guest_id(request)
+            if not identity:
+                return Response({"items": []})
+            groups = active.filter(guest_id=identity).values("community_id")
+            guests = guests.exclude(guest_id=identity)
+
+        people = {}
+        for member in (
+            accounts.filter(community_id__in=groups)
+            .order_by("id")
+            .values("user_id", "community_id", "community__name", "display_name")
+            .iterator()
+        ):
+            people.setdefault(
+                ("account", member["user_id"]),
+                {
+                    "name": member["display_name"],
+                    "community": member["community__name"],
+                    "community_id": member["community_id"],
+                    "target": {"user_id": str(member["user_id"])},
+                },
+            )
+        for guest in guests.filter(community_id__in=groups).order_by("id").iterator():
+            name = guest_name(guest.guest_id)
+            if query in name.casefold():
+                people.setdefault(
+                    ("guest", guest.guest_id),
+                    {
+                        "name": name,
+                        "community": guest.community.name,
+                        "community_id": guest.community_id,
+                        "target": {"guest_member_id": guest.pk},
+                    },
+                )
+        items = sorted(people.values(), key=lambda item: item["name"].casefold())
+        return Response({"items": items[:25]})
 
 
 class StartFromMember(CommunityView):
