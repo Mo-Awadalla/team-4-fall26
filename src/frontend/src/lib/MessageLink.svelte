@@ -1,16 +1,15 @@
 <script lang="ts">
-	import { SvelteURL } from 'svelte/reactivity';
+	import { messageLink } from './chatLinks';
 	let { id }: { id: number } = $props();
 	let fallback = $state(''),
 		copied = $state(false);
 	async function copy() {
-		const url = new SvelteURL(location.href);
-		url.hash = 'message-' + id;
+		const url = messageLink(location.href, id);
 		try {
-			await navigator.clipboard.writeText(url.href);
+			await navigator.clipboard.writeText(url);
 			copied = true;
 		} catch {
-			fallback = url.href;
+			fallback = url;
 		}
 	}
 </script>

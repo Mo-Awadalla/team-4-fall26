@@ -3,6 +3,7 @@
 	import { onMount, tick } from 'svelte';
 	import SiteHeader from '$lib/SiteHeader.svelte';
 	import Autocomplete from '$lib/Autocomplete.svelte';
+	import { channelLink } from '$lib/chatLinks';
 	import ChatInbox from '$lib/ChatInbox.svelte';
 	import ChannelChat from '$lib/ChannelChat.svelte';
 	import DirectMessages from '$lib/DirectMessages.svelte';
@@ -459,10 +460,13 @@
 
 	async function shareChannel() {
 		if (!selected || !activeChannelId) return;
-		shareLink = `${location.origin}${resolve('/communities')}?id=${selected.id}&channel=${activeChannelId}`;
+		shareLink = channelLink(location.origin + resolve('/communities'), {
+			community: selected.id,
+			channel: activeChannelId
+		});
 		try {
 			await navigator.clipboard.writeText(shareLink);
-			copyStatus = 'Link copied! Anyone can use it to join this community.';
+			copyStatus = 'Channel link copied.';
 		} catch {
 			copyStatus = 'Select and copy the link below to share this channel.';
 		}
@@ -569,7 +573,10 @@
 				'POST',
 				{ expires_in_hours: 168, max_uses: 100 }
 			);
-			inviteLink = `${location.origin}${resolve('/communities')}?invite=${result.token}${activeChannelId ? `&channel=${activeChannelId}` : ''}`;
+			inviteLink = channelLink(location.origin + resolve('/communities'), {
+				invite: result.token,
+				channel: activeChannelId
+			});
 			await loadSettings();
 		} catch (cause) {
 			error = message(cause);
