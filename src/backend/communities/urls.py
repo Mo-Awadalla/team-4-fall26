@@ -6,18 +6,36 @@ urlpatterns = [
     path("dms/<int:conversation_id>/messages/search", dm_views.DirectSearch.as_view()),
     path("dms/<int:conversation_id>/messages/<int:message_id>/pin", dm_views.DirectPin.as_view()),
     path("dms/<int:conversation_id>/pins", dm_views.DirectPins.as_view()),
-    path("dms/<int:conversation_id>/messages/<int:message_id>/reactions", dm_views.DirectReactions.as_view()),
+    path(
+        "dms/<int:conversation_id>/messages/<int:message_id>/reactions",
+        dm_views.DirectReactions.as_view(),
+    ),
     path("dms/<int:conversation_id>/messages/<int:message_id>/vote", room_views.PollVote.as_view()),
-    path("communities/<int:community_id>/channels/<int:channel_id>/messages/<int:message_id>/vote", room_views.PollVote.as_view()),
+    path(
+        "communities/<int:community_id>/channels/<int:channel_id>/messages/<int:message_id>/vote",
+        room_views.PollVote.as_view(),
+    ),
     path("dms/<int:conversation_id>/presence", room_views.RoomPresence.as_view()),
-    path("communities/<int:community_id>/channels/<int:channel_id>/presence", room_views.RoomPresence.as_view()),
+    path(
+        "communities/<int:community_id>/channels/<int:channel_id>/presence",
+        room_views.RoomPresence.as_view(),
+    ),
     path("dms/<int:conversation_id>/read", room_views.ReadMarker.as_view()),
-    path("communities/<int:community_id>/channels/<int:channel_id>/read", room_views.ReadMarker.as_view()),
+    path(
+        "communities/<int:community_id>/channels/<int:channel_id>/read",
+        room_views.ReadMarker.as_view(),
+    ),
     path("chat/notifications", notifications.Notifications.as_view()),
     path("dms/<int:conversation_id>/alerts", room_views.AlertPreference.as_view()),
-    path("communities/<int:community_id>/channels/<int:channel_id>/alerts", room_views.AlertPreference.as_view()),
+    path(
+        "communities/<int:community_id>/channels/<int:channel_id>/alerts",
+        room_views.AlertPreference.as_view(),
+    ),
     path("dms/<int:conversation_id>/messages/snapshot", room_views.MessageSnapshot.as_view()),
-    path("communities/<int:community_id>/channels/<int:channel_id>/messages/snapshot", room_views.MessageSnapshot.as_view()),
+    path(
+        "communities/<int:community_id>/channels/<int:channel_id>/messages/snapshot",
+        room_views.MessageSnapshot.as_view(),
+    ),
     path("dms", dm_views.DirectConversations.as_view()),
     path("dms/<int:conversation_id>/messages", dm_views.DirectMessages.as_view()),
     path(

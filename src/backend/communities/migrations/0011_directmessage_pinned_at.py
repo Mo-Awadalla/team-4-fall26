@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0010_directmessage_file_bytes_directmessage_file_name_and_more'),
+        ("communities", "0010_directmessage_file_bytes_directmessage_file_name_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='directmessage',
-            name='pinned_at',
+            model_name="directmessage",
+            name="pinned_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

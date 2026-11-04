@@ -5,20 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0016_roommemberstate_last_read'),
+        ("communities", "0016_roommemberstate_last_read"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='directmessage',
-            name='mentions',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=180), blank=True, default=list, size=None),
+            model_name="directmessage",
+            name="mentions",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(max_length=180), blank=True, default=list, size=None
+            ),
         ),
         migrations.AddField(
-            model_name='message',
-            name='mentions',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=180), blank=True, default=list, size=None),
+            model_name="message",
+            name="mentions",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(max_length=180), blank=True, default=list, size=None
+            ),
         ),
     ]

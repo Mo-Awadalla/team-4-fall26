@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0015_roommemberstate'),
+        ("communities", "0015_roommemberstate"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='roommemberstate',
-            name='last_read',
+            model_name="roommemberstate",
+            name="last_read",
             field=models.PositiveBigIntegerField(default=0),
         ),
     ]

@@ -220,7 +220,10 @@ class CommunityDetail(CommunityView):
         return Response(
             {
                 **summary(community, viewer(request, community)),
-                "channels": ChannelSerializer(visible_channels(community, role_for(community, viewer(request, community))), many=True).data,
+                "channels": ChannelSerializer(
+                    visible_channels(community, role_for(community, viewer(request, community))),
+                    many=True,
+                ).data,
             }
         )
 
@@ -353,7 +356,12 @@ class Transfer(CommunityView):
 class Channels(CommunityView):
     def get(self, request: Request, community_id: int) -> Response:
         community = community_for(community_id)
-        return Response(ChannelSerializer(visible_channels(community, role_for(community, viewer(request, community))), many=True).data)
+        return Response(
+            ChannelSerializer(
+                visible_channels(community, role_for(community, viewer(request, community))),
+                many=True,
+            ).data
+        )
 
     def post(self, request: Request, community_id: int) -> Response:
         parsed = ChannelWriteSerializer(data=request.data)
@@ -383,7 +391,9 @@ class ChannelDetail(CommunityView):
             position = serializers.IntegerField(min_value=0, max_value=19, required=False)
             private = serializers.BooleanField(required=False)
             read_only = serializers.BooleanField(required=False)
-            slowmode_seconds = serializers.IntegerField(min_value=0, max_value=21600, required=False)
+            slowmode_seconds = serializers.IntegerField(
+                min_value=0, max_value=21600, required=False
+            )
             topic = serializers.CharField(max_length=256, allow_blank=True, required=False)
             archived = serializers.BooleanField(required=False)
 

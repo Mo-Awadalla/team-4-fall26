@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0017_directmessage_mentions_message_mentions'),
+        ("communities", "0017_directmessage_mentions_message_mentions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='roommemberstate',
-            name='alerts',
-            field=models.CharField(choices=[('all', 'All'), ('mentions', 'Mentions'), ('muted', 'Muted')], default='all', max_length=8),
+            model_name="roommemberstate",
+            name="alerts",
+            field=models.CharField(
+                choices=[("all", "All"), ("mentions", "Mentions"), ("muted", "Muted")],
+                default="all",
+                max_length=8,
+            ),
         ),
     ]

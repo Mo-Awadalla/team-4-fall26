@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0006_directconversation_directmessage'),
+        ("communities", "0006_directconversation_directmessage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='channel',
-            name='topic',
+            model_name="channel",
+            name="topic",
             field=models.CharField(blank=True, max_length=256),
         ),
     ]

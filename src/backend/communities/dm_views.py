@@ -16,20 +16,27 @@ from .mentions import targets
 from .message_views import (
     MessageInput,
     MessagePage,
-    ReactionInput,
     NewMessageInput,
-    download,
-    upload_fields,
-    poll_fields,
-    poll_data,
-    thread_root,
+    ReactionInput,
     authenticated,
     author_name,
     channel_for,
+    download,
     member_role,
+    poll_data,
+    poll_fields,
     search_messages,
+    thread_root,
+    upload_fields,
 )
-from .models import DirectConversation, DirectMessage, DirectReaction, GuestMembership, Membership, Message
+from .models import (
+    DirectConversation,
+    DirectMessage,
+    DirectReaction,
+    GuestMembership,
+    Membership,
+    Message,
+)
 from .permissions import role_for
 from .views import CommunityView, community_for, guest_id, user_id_for, viewer
 
@@ -55,7 +62,9 @@ def direct_message_data(message: DirectMessage, key: str) -> dict:
     reactions = {}
     if not message.deleted_at:
         for reaction in message.reactions.all():
-            item = reactions.setdefault(reaction.emoji, {"emoji": reaction.emoji, "count": 0, "me": False})
+            item = reactions.setdefault(
+                reaction.emoji, {"emoji": reaction.emoji, "count": 0, "me": False}
+            )
             item["count"] += 1
             item["me"] |= reaction.actor == key
     return {
@@ -192,7 +201,9 @@ class DirectMessages(CommunityView):
         parsed = MessagePage(data=request.query_params)
         parsed.is_valid(raise_exception=True)
         data = parsed.validated_data
-        query = DirectMessage.objects.filter(conversation=conversation, thread_root_id=data.get("thread")).prefetch_related("reactions")
+        query = DirectMessage.objects.filter(
+            conversation=conversation, thread_root_id=data.get("thread")
+        ).prefetch_related("reactions")
         if "after" in data:
             query = query.filter(pk__gt=data["after"]).order_by("id")
         else:
@@ -228,7 +239,9 @@ class DirectMessages(CommunityView):
             conversation=conversation,
             sender_key=key,
             mentions=targets(parsed.validated_data["content"]),
-            thread_root_id=thread_root(DirectMessage.objects.filter(conversation=conversation), parsed.validated_data),
+            thread_root_id=thread_root(
+                DirectMessage.objects.filter(conversation=conversation), parsed.validated_data
+            ),
             **poll_fields(parsed.validated_data),
             **upload_fields(parsed.validated_data),
             author_name=author_name(request),
@@ -246,7 +259,6 @@ class DirectMessageDetail(CommunityView):
         if "attachment" in request.query_params:
             return download(message)
         return Response(direct_message_data(message, key))
-
 
     def patch(self, request: Request, conversation_id: int, message_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
@@ -284,19 +296,28 @@ class DirectMessageDetail(CommunityView):
 class DirectSearch(CommunityView):
     def get(self, request: Request, conversation_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
-        found = search_messages(DirectMessage.objects.filter(conversation=conversation).prefetch_related("reactions"), request.query_params)
+        found = search_messages(
+            DirectMessage.objects.filter(conversation=conversation).prefetch_related("reactions"),
+            request.query_params,
+        )
         return Response({"items": [direct_message_data(item, key) for item in found]})
 
 
 class DirectPin(CommunityView):
     def put(self, request: Request, conversation_id: int, message_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
+
         class Input(serializers.Serializer):
             pinned = serializers.BooleanField()
+
         parsed = Input(data=request.data)
         parsed.is_valid(raise_exception=True)
-        messages = DirectMessage.objects.filter(conversation=conversation, pk=message_id, deleted_at__isnull=True)
-        if not messages.update(pinned_at=timezone.now() if parsed.validated_data["pinned"] else None):
+        messages = DirectMessage.objects.filter(
+            conversation=conversation, pk=message_id, deleted_at__isnull=True
+        )
+        if not messages.update(
+            pinned_at=timezone.now() if parsed.validated_data["pinned"] else None
+        ):
             raise NotFound("Message unavailable.")
         return Response(direct_message_data(messages.get(), key))
 
@@ -304,16 +325,26 @@ class DirectPin(CommunityView):
 class DirectPins(CommunityView):
     def get(self, request: Request, conversation_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
-        messages = DirectMessage.objects.filter(conversation=conversation, pinned_at__isnull=False, deleted_at__isnull=True).order_by("-pinned_at").prefetch_related("reactions")[:50]
+        messages = (
+            DirectMessage.objects.filter(
+                conversation=conversation, pinned_at__isnull=False, deleted_at__isnull=True
+            )
+            .order_by("-pinned_at")
+            .prefetch_related("reactions")[:50]
+        )
         return Response({"items": [direct_message_data(item, key) for item in messages]})
 
 
 class DirectReactions(CommunityView):
     def put(self, request: Request, conversation_id: int, message_id: int) -> Response:
         conversation, key = conversation_for(request, conversation_id)
-        message = get_object_or_404(DirectMessage, conversation=conversation, pk=message_id, deleted_at__isnull=True)
+        message = get_object_or_404(
+            DirectMessage, conversation=conversation, pk=message_id, deleted_at__isnull=True
+        )
+
         class Input(ReactionInput):
             active = serializers.BooleanField()
+
         parsed = Input(data=request.data)
         parsed.is_valid(raise_exception=True)
         values = {"message": message, "actor": key, "emoji": parsed.validated_data["emoji"]}

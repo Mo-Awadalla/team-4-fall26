@@ -4,30 +4,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0009_channel_slowmode_seconds'),
+        ("communities", "0009_channel_slowmode_seconds"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='directmessage',
-            name='file_bytes',
+            model_name="directmessage",
+            name="file_bytes",
             field=models.BinaryField(null=True),
         ),
         migrations.AddField(
-            model_name='directmessage',
-            name='file_name',
+            model_name="directmessage",
+            name="file_name",
             field=models.CharField(blank=True, max_length=255),
         ),
         migrations.AddField(
-            model_name='message',
-            name='file_bytes',
+            model_name="message",
+            name="file_bytes",
             field=models.BinaryField(null=True),
         ),
         migrations.AddField(
-            model_name='message',
-            name='file_name',
+            model_name="message",
+            name="file_name",
             field=models.CharField(blank=True, max_length=255),
         ),
     ]

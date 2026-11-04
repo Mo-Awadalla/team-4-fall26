@@ -20,7 +20,11 @@ def targets(content, *, channel=None, role=None):
             if role not in {"owner", "moderator"}:
                 raise PermissionDenied("Only moderators and owners can mention a whole group.")
             if name == "here":
-                targets.update(RoomMemberState.objects.filter(channel=channel, last_active__gte=timezone.now()-timedelta(seconds=65)).values_list("actor", flat=True))
+                targets.update(
+                    RoomMemberState.objects.filter(
+                        channel=channel, last_active__gte=timezone.now() - timedelta(seconds=65)
+                    ).values_list("actor", flat=True)
+                )
             else:
                 targets.add("role:" + name)
         else:

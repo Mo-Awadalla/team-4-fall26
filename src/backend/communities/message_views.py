@@ -29,7 +29,9 @@ class ReactionInput(serializers.Serializer):
 
 
 class NewMessageInput(MessageInput):
-    options = serializers.ListField(child=serializers.CharField(max_length=80), min_length=2, max_length=10, required=False)
+    options = serializers.ListField(
+        child=serializers.CharField(max_length=80), min_length=2, max_length=10, required=False
+    )
     thread = serializers.IntegerField(min_value=1, required=False)
     content = serializers.CharField(max_length=2000, required=False, allow_blank=True, default="")
     file = serializers.FileField(required=False, max_length=255)
@@ -38,7 +40,9 @@ class NewMessageInput(MessageInput):
         upload = attrs.get("file")
         if upload and upload.size > 2 * 1024 * 1024:
             raise serializers.ValidationError("Attachments must be 2 MiB or smaller.")
-        if "options" in attrs and (not attrs["content"] or len(set(attrs["options"])) != len(attrs["options"])):
+        if "options" in attrs and (
+            not attrs["content"] or len(set(attrs["options"])) != len(attrs["options"])
+        ):
             raise serializers.ValidationError("Enter a poll question and distinct choices.")
         if not upload and not attrs["content"]:
             raise serializers.ValidationError("Enter a message or attach a file.")
@@ -47,7 +51,12 @@ class NewMessageInput(MessageInput):
 
 def thread_root(messages, data):
     root_id = data.get("thread")
-    if root_id and not messages.filter(pk=root_id, thread_root__isnull=True, deleted_at__isnull=True).exists():
+    if (
+        root_id
+        and not messages.filter(
+            pk=root_id, thread_root__isnull=True, deleted_at__isnull=True
+        ).exists()
+    ):
         raise NotFound("Thread starter unavailable.")
     return root_id
 
@@ -76,7 +85,9 @@ def poll_data(message, key):
 def download(message):
     if message.deleted_at or not message.file_name:
         raise NotFound("Attachment unavailable.")
-    return Response({"name": message.file_name, "data": base64.b64encode(message.file_bytes).decode("ascii")})
+    return Response(
+        {"name": message.file_name, "data": base64.b64encode(message.file_bytes).decode("ascii")}
+    )
 
 
 class MessagePage(serializers.Serializer):
@@ -150,7 +161,9 @@ def message_data(request: Request, message: Message, role: str) -> dict:
         "thread_root": message.thread_root_id,
         "author_name": message.author_name,
         "content": message.content,
-        "poll": poll_data(message, f"u:{request.user.pk}" if authenticated(request) else f"g:{identity}"),
+        "poll": poll_data(
+            message, f"u:{request.user.pk}" if authenticated(request) else f"g:{identity}"
+        ),
         "file_name": "" if message.deleted_at else message.file_name,
         "reply_to": message.reply_to_id,
         "created_at": message.created_at,
@@ -177,7 +190,9 @@ class Messages(CommunityView):
         parsed = MessagePage(data=request.query_params)
         parsed.is_valid(raise_exception=True)
         data = parsed.validated_data
-        query = Message.objects.filter(channel=channel, thread_root_id=data.get("thread")).prefetch_related("reactions")
+        query = Message.objects.filter(
+            channel=channel, thread_root_id=data.get("thread")
+        ).prefetch_related("reactions")
         if "after" in data:
             query = query.filter(pk__gt=data["after"]).order_by("id")
         else:
@@ -218,11 +233,15 @@ class Messages(CommunityView):
         if channel.slowmode_seconds and role == "member":
             # Serialize concurrent sends by this member before checking their last post.
             if authenticated(request):
-                Membership.objects.select_for_update().get(community=channel.community, user=request.user)
+                Membership.objects.select_for_update().get(
+                    community=channel.community, user=request.user
+                )
                 previous = channel.messages.filter(author=request.user)
             else:
                 identity = guest_id(request)
-                GuestMembership.objects.select_for_update().get(community=channel.community, guest_id=identity)
+                GuestMembership.objects.select_for_update().get(
+                    community=channel.community, guest_id=identity
+                )
                 previous = channel.messages.filter(guest_id=identity)
             latest = previous.order_by("-id").values_list("created_at", flat=True).first()
             if latest:
@@ -245,14 +264,15 @@ class Messages(CommunityView):
 
 
 class MessageDetail(CommunityView):
-    def get(self, request: Request, community_id: int, channel_id: int, message_id: int) -> Response:
+    def get(
+        self, request: Request, community_id: int, channel_id: int, message_id: int
+    ) -> Response:
         channel = channel_for(community_id, channel_id)
         role = member_role(request, channel)
         message = message_for(channel, message_id)
         if "attachment" in request.query_params:
             return download(message)
         return Response(message_data(request, message, role))
-
 
     def patch(
         self, request: Request, community_id: int, channel_id: int, message_id: int

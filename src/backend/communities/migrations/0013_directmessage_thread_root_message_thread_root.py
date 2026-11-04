@@ -5,20 +5,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0012_directreaction'),
+        ("communities", "0012_directreaction"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='directmessage',
-            name='thread_root',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='thread_messages', to='communities.directmessage'),
+            model_name="directmessage",
+            name="thread_root",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="thread_messages",
+                to="communities.directmessage",
+            ),
         ),
         migrations.AddField(
-            model_name='message',
-            name='thread_root',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='thread_messages', to='communities.message'),
+            model_name="message",
+            name="thread_root",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="thread_messages",
+                to="communities.message",
+            ),
         ),
     ]

@@ -30,6 +30,7 @@
 			controls
 			src={source}><track kind="captions" /></video
 		>{/if}
+	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- authenticated blob download -->
 	<a href={source} download={name}>Download {name}</a>
 {:else}<button disabled={loading} onclick={load}>Open {name}</button>{/if}
 {#if error}<span role="alert">{error}</span>{/if}

@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0007_channel_topic'),
+        ("communities", "0007_channel_topic"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='channel',
-            name='private',
+            model_name="channel",
+            name="private",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='channel',
-            name='read_only',
+            model_name="channel",
+            name="read_only",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { communityRequest } from './communities';
 	type Notice = {
@@ -36,7 +37,8 @@
 	{#if error}<small>{error}</small>{/if}
 	{#each items as item ((item.conversation_id ? 'dm' : 'ch') + item.id)}<a
 			data-sveltekit-reload
-			href={'?' +
+			href={resolve('/communities') +
+				'?' +
 				(item.conversation_id
 					? 'dm=' + item.conversation_id
 					: 'id=' + item.channel__community_id + '&channel=' + item.channel_id) +

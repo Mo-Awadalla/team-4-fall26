@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { communityRequest } from './communities';
 	let {
 		url,
@@ -15,7 +16,7 @@
 		sender = $state(''),
 		date = $state('');
 	async function search() {
-		const params = new URLSearchParams();
+		const params = new SvelteURLSearchParams();
 		if (keyword.trim()) params.set('q', keyword.trim());
 		if (sender.trim()) params.set('sender', sender.trim());
 		if (date) params.set('date', date);

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('communities', '0008_channel_private_channel_read_only'),
+        ("communities", "0008_channel_private_channel_read_only"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='channel',
-            name='slowmode_seconds',
+            model_name="channel",
+            name="slowmode_seconds",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

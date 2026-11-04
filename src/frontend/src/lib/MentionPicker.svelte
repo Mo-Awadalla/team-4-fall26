@@ -16,8 +16,9 @@
 		}}
 	>
 		<option value="">@</option>
-		{#each names as name}<option value={'@[' + name + ']'}>{name}</option>{/each}
-		{#if groups}{#each ['owner', 'moderator', 'member', 'here', 'everyone'] as role}<option
+		{#each [...new Set(names)] as name (name)}<option value={'@[' + name + ']'}>{name}</option
+			>{/each}
+		{#if groups}{#each ['owner', 'moderator', 'member', 'here', 'everyone'] as role (role)}<option
 					value={'@' + role}>@{role}</option
 				>{/each}{/if}
 	</select></label
