@@ -2,11 +2,13 @@
 
 import base64
 import hashlib
+from datetime import UTC
 from math import ceil
 from typing import cast
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db import IntegrityError, transaction
+from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import serializers
@@ -414,5 +416,7 @@ def search_messages(messages, params):
     if "sender" in filters:
         found = found.filter(author_name__iexact=filters["sender"])
     if "date" in filters:
-        found = found.filter(created_at__date=filters["date"])
+        found = found.alias(utc_day=TruncDate("created_at", tzinfo=UTC)).filter(
+            utc_day=filters["date"]
+        )
     return found.order_by("-id")[:50]
