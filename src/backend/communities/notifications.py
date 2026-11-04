@@ -66,7 +66,14 @@ class Notifications(CommunityView):
         ).exclude(own_messages)
         channel_rows = list(
             unread(channels, key, "channel_id", mentioned).values(
-                "id", "content", "author_name", "created_at", "channel_id", "channel__community_id"
+                "id",
+                "content",
+                "author_name",
+                "created_at",
+                "channel_id",
+                "channel__community_id",
+                "channel__name",
+                "channel__community__name",
             )[:30]
         )
         private = DirectMessage.objects.filter(

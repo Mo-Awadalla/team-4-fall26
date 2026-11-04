@@ -43,3 +43,12 @@ a {
 	outline: 3px solid rgb(255 56 92 / 25%);
 	outline-offset: 3px;
 }
+
+@theme inline {
+	--color-card: var(--panel, white);
+	--color-card-foreground: var(--ink, #232428);
+	--color-foreground: var(--ink, #232428);
+	--color-secondary: var(--well, #f4f4f5);
+	--color-secondary-foreground: var(--ink, #232428);
+	--color-muted-foreground: var(--muted, #5c6068);
+}
