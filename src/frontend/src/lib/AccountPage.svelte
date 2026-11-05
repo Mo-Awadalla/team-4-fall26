@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as Card from '$lib/components/ui/card';
 	import { resolve } from '$app/paths';
 	import { onMount, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -74,7 +75,7 @@
 		{:else if session.status === 'error'}
 			<p class="status error" role="alert">{session.error}</p>
 		{:else if session.status === 'signed-out'}
-			<section class="panel" aria-labelledby="account-title">
+			<Card.Root role="region" class="panel" aria-labelledby="account-title">
 				<p class="eyebrow">Accounts</p>
 				<h1 id="account-title">Join StudySpot.</h1>
 				<p class="lede">
@@ -88,9 +89,9 @@
 					</button>
 				</div>
 				<p class="hint">Forgot your password? Choose “Log in”, then “Forgot password?”.</p>
-			</section>
+			</Card.Root>
 		{:else if account && !account.email_verified}
-			<section class="panel" aria-labelledby="account-title">
+			<Card.Root role="region" class="panel" aria-labelledby="account-title">
 				<p class="eyebrow">One more step</p>
 				<h1 id="account-title">Verify your email.</h1>
 				<p class="lede">
@@ -105,9 +106,9 @@
 					</button>
 					<button class="secondary" type="button" onclick={() => session.logOut()}>Log out</button>
 				</div>
-			</section>
+			</Card.Root>
 		{:else if account && account.account_type === null}
-			<section class="panel" aria-labelledby="account-title">
+			<Card.Root role="region" class="panel" aria-labelledby="account-title">
 				<p class="eyebrow">One more step</p>
 				<h1 id="account-title">Who is this account for?</h1>
 
@@ -120,9 +121,9 @@
 					error={session.pendingError}
 					check={(name) => session.checkUsername(name)}
 				/>
-			</section>
+			</Card.Root>
 		{:else if account}
-			<section class="panel" aria-labelledby="account-title">
+			<Card.Root role="region" class="panel" aria-labelledby="account-title">
 				<p class="eyebrow">
 					{account.account_type === 'business' ? 'Business' : 'Student'} account
 				</p>
@@ -148,7 +149,7 @@
 					<a class="secondary" href={resolve('/')}>Find a study spot</a>
 					<button class="secondary" type="button" onclick={() => session.logOut()}>Log out</button>
 				</div>
-			</section>
+			</Card.Root>
 		{/if}
 	</main>
 </div>
@@ -164,7 +165,7 @@
 		margin: 0 auto;
 	}
 
-	.panel {
+	.page :global(.panel) {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -328,7 +329,7 @@
 			padding: 0 12px 15px;
 		}
 
-		.panel {
+		.page :global(.panel) {
 			padding: 40px 16px 48px;
 			border-radius: 24px;
 		}

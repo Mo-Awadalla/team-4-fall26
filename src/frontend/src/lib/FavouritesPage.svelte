@@ -6,6 +6,8 @@
 	import { session } from './session.svelte';
 	import { favourites } from './favourites.svelte';
 
+	let view = $state<'list' | 'map'>('list');
+
 	$effect(() => {
 		const scope = session.scope;
 		if (scope && session.account?.account_type === 'student')
@@ -56,6 +58,8 @@
 				total={favourites.items.length}
 				hasMore={false}
 				showFavouriteError={false}
+				{view}
+				onView={(next) => (view = next)}
 			/>
 		{/if}
 	</main>

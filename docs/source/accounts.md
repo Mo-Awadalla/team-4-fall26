@@ -37,7 +37,7 @@ The choice is made once.
 
 Only completed student accounts can save, list, or remove favourites. The API checks the stored `account_type` on every operation. A valid login alone is not enough. Business and unfinished accounts receive `409 conflict`. Community guest access does not grant access to favourites.
 
-Search results and study-spot detail pages offer **Save** and **Unsave** controls. Completed students also have a **Favourites** page at `/favourites`, with removal controls. Business accounts have no favourites controls.
+Search results and study-spot detail pages offer **Save** and **Unsave** controls. On result cards, these controls sit beside the spot title, separate from the **Maps** and **Share** actions below. Completed students also have a **Favourites** page at `/favourites`, with removal controls and list/map views of their saved spots. Business accounts have no favourites controls.
 
 When a visitor selects **Save**, an inline prompt offers login or signup. After authentication and any required account completion, the browser returns to the originating `/spots/{id}` page. The continuation survives email-verification refreshes and manual completion. It accepts only same-origin paths, belongs to the current login journey, and is cleared on logout or an unrelated journey. It never contains a saved-action instruction. The student must select **Save** again.
 
