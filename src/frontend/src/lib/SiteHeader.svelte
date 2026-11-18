@@ -64,7 +64,7 @@
 		</a>
 	{:else if session.status === 'signed-out'}
 		<button class="nav-link" type="button" onclick={() => session.logIn(here)}>Log in</button>
-		<a class="sign-in" href={resolve('/signup')}>Sign up</a>
+		<a class="sign-in" href={resolve(`/signup?returnTo=${encodeURIComponent(here)}`)}>Sign up</a>
 	{/if}
 {/snippet}
 
