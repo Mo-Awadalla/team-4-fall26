@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -44,7 +44,12 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 
 
 def public_student_profile(profile: StudentProfile) -> dict[str, Any]:
-    fields = set(profile.visible_fields)
+    raw_visible_fields = cast(object, profile.visible_fields)
+    fields = (
+        {value for value in raw_visible_fields if isinstance(value, str)}
+        if isinstance(raw_visible_fields, list)
+        else set()
+    )
     result: dict[str, Any] = {
         "username": profile.account.username,
         "display_name": profile.account.username,
