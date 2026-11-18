@@ -194,4 +194,12 @@ These parts of the accounts epic are still to come:
 - Choosing which profile fields other students can see.
 - Editing a business profile (contact email, phone number).
 
+Completed student accounts have a `StudentProfile` used by the People directory. Students can edit
+their school, courses, study topics, and preferred study spot in **My profile** on `/account`.
+They choose which of those fields are public. Their username is searchable by other signed-in
+students by default; a student can opt out of discovery. Directory filters include course, study
+topic, selected study spot, and nearby profile study spots using a one-time browser location. The
+People tab links to public student profiles and starts direct conversations through the existing
+community DM service. Public profile responses never include email or Auth0 identifiers.
+
 Each will add fields to `Account` or a model beside it. Logging in will not change.

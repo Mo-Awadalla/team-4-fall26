@@ -83,23 +83,19 @@ class Account(models.Model):
         return str(self.username or self.email or self.user.username)
 
 
-class Favourite(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="favourites")
-    spot = models.ForeignKey("spots.StudySpot", on_delete=models.CASCADE, related_name="favourites")
-    created_at = models.DateTimeField(auto_now_add=True)
+class StudentProfile(models.Model):
+    """Student discovery details, with an allowlist of publicly shared fields."""
 
-    class Meta:
-        ordering = ["-created_at", "-id"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["account", "spot"], name="favourite_account_spot_unique"
-            ),
-        ]
-        indexes = [
-            models.Index(
-                fields=["account", "-created_at", "-id"], name="favourite_account_order_idx"
-            ),
-        ]
+    account = models.OneToOneField(
+        Account, on_delete=models.CASCADE, related_name="student_profile"
+    )
+    school = models.CharField(max_length=160, blank=True)
+    courses = models.JSONField(default=list, blank=True)
+    topics = models.JSONField(default=list, blank=True)
+    study_spot_id = models.TextField(blank=True)
+    visible_fields = models.JSONField(default=list, blank=True)
+    discoverable = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.account_id}: {self.spot_id}"
+        return f"Student profile for {self.account.username}"

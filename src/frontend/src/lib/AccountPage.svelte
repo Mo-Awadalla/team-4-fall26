@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import SiteHeader from './SiteHeader.svelte';
 	import SignUpForm from './SignUpForm.svelte';
+	import StudentProfileEditor from './StudentProfileEditor.svelte';
 	import type { CompleteSignUp } from './contract';
 	import { session as shared, type Session } from './session.svelte';
 
@@ -144,6 +145,9 @@
 					<dt>Member since</dt>
 					<dd>{joined}</dd>
 				</dl>
+				{#if account.account_type === 'student'}
+					<StudentProfileEditor />
+				{/if}
 
 				<div class="actions">
 					<a class="secondary" href={resolve('/')}>Find a study spot</a>
