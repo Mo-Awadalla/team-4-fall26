@@ -48,6 +48,9 @@
 			-->
 		<a class="nav-link" href="{resolve('/')}?view=map">Map</a>
 	{/if}
+	{#if session.status === 'signed-in' && session.account?.account_type === 'student'}
+		<a class="nav-link" href={resolve('/people')}>People</a>
+	{/if}
 	<!--
 			Nothing until the session is known, so a prerendered "Log in" never
 			flashes at someone who is already logged in. With accounts switched
