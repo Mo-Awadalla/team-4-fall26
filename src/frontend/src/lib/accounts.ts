@@ -19,7 +19,8 @@ async function request<T>(path: string, init: RequestInit, fetcher: Fetcher): Pr
 		throw new ApiError('network_error', 'Could not reach the StudySpot API.', 0);
 	}
 
-	if (init.method === 'DELETE' && response.status === 204) return undefined as T;
+	// Nothing to parse: a 204 carries no body, whichever method asked for it.
+	if (response.status === 204) return undefined as T;
 
 	let body: unknown;
 	try {
@@ -108,8 +109,11 @@ export function completeSignUp(
 	);
 }
 
-export function listOwnedListings(credentials: Credentials): Promise<{ items: StudySpot[] }> {
-	return authenticatedRequest('/api/listings', credentials);
+export function listOwnedListings(
+	credentials: Credentials,
+	fetcher: Fetcher = globalThis.fetch
+): Promise<{ items: StudySpot[] }> {
+	return authenticatedRequest('/api/listings', credentials, {}, fetcher);
 }
 
 /** Whether a username is free, and if not, why, from `GET /usernames/{name}`. */

@@ -352,6 +352,24 @@ describe('review summaries and pagination', () => {
 			.element(page.getByRole('button', { name: 'Write a review' }))
 			.not.toBeInTheDocument();
 	});
+
+	it('reads as unrated against an API that answers without a summary', async () => {
+		// The API and the frontend are published as separate steps, so a build
+		// can reach a browser before the API that sends `summary`. The reviews
+		// themselves are still readable; only the average is unknown.
+		const complete = reviewPage([review({ body: 'Quiet upstairs.' })]);
+		const withoutSummary: unknown = {
+			items: complete.items,
+			pagination: complete.pagination
+		};
+		const { fetcher } = recorder(() => json(withoutSummary));
+
+		render(ReviewList, { spotId: SPOT_ID, fetcher });
+
+		await expect.element(page.getByText('No ratings yet')).toBeInTheDocument();
+		await expect.element(page.getByText('Quiet upstairs.')).toBeInTheDocument();
+		await expect.element(page.getByText('1 review')).toBeInTheDocument();
+	});
 });
 
 describe('a student managing their review', () => {

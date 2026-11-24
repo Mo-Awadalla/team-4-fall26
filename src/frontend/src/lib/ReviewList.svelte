@@ -66,6 +66,11 @@
 	const publicPage = $derived(
 		publicState.kind === 'ready' && publicState.spot === spotId ? publicState.page : null
 	);
+	// Optional-chained rather than read straight through: the API and the
+	// frontend are published as separate steps, so an API that predates the
+	// summary should leave this reading "No ratings yet" instead of throwing and
+	// taking the whole section down with it.
+	const average = $derived(publicPage?.summary?.average_rating ?? null);
 	const privateVisible = $derived(
 		context !== null &&
 			context.spot === spotId &&
@@ -366,10 +371,10 @@
 
 	{#if publicPage}
 		<p class="reviews-summary">
-			{#if publicPage.summary.average_rating === null}
+			{#if average === null}
 				<span>No ratings yet</span>
 			{:else}
-				<strong>{publicPage.summary.average_rating.toFixed(1)} out of 5</strong>
+				<strong>{average.toFixed(1)} out of 5</strong>
 			{/if}
 			<span
 				>{publicPage.pagination.total}
